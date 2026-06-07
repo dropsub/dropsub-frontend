@@ -54,7 +54,33 @@
     .topnav-right { display: flex; align-items: center; gap: 10px; }
     .notif-btn { width: 30px; height: 30px; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .85rem; cursor: pointer; position: relative; }
     .notif-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; background: var(--blue-bright); border-radius: 50%; border: 1px solid var(--bg-panel); }
-    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--blue-bright); background: linear-gradient(135deg, #2979ff, #7c4dff); display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--blue-bright); background: linear-gradient(135deg, #2979ff, #7c4dff); display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700; cursor: pointer; position: relative; }
+    .user-menu-wrap { position: relative; }
+    .user-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 12px; min-width: 200px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5);
+      z-index: 100; overflow: hidden;
+      animation: dropdownIn .15s cubic-bezier(.22,1,.36,1);
+    }
+    .user-dropdown.open { display: block; }
+    @keyframes dropdownIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .user-dropdown-header {
+      padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
+    }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; color: var(--text-white); }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .user-dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; font-size: .82rem; color: var(--text-light);
+      cursor: pointer; transition: background .12s;
+    }
+    .user-dropdown-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .user-dropdown-item .dd-icon { font-size: .9rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .user-dropdown-item.signout { color: var(--error); }
+    .user-dropdown-item.signout:hover { background: rgba(255,79,106,.08); }
 
     /* ── QUICK UPLOAD CTA — hero feature ─────── */
     .upload-cta-bar {
@@ -560,7 +586,19 @@
   </div>
   <div class="topnav-right">
     <div class="notif-btn" onclick="showToast('3 new subscriber notifications')">🔔<div class="notif-dot"></div></div>
-    <div class="user-avatar" onclick="showToast('Profile settings coming soon')">RF</div>
+    <div class="user-menu-wrap">
+      <div class="user-avatar" onclick="toggleUserMenu(event)">RF</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name">Richard Frias</div>
+          <div class="user-dropdown-email">richardlfrias@gmail.com</div>
+        </div>
+        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
+        <div class="user-dropdown-item" onclick="showToast('Account settings coming soon'); closeUserMenu()"><span class="dd-icon">⚙️</span>Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'"><span class="dd-icon">🚪</span>Sign out</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1223,6 +1261,18 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
   }
+
+  // ── User menu ────────────────────────────────────
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function closeUserMenu() {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu-wrap')) closeUserMenu();
+  });
 
   // ── Init ─────────────────────────────────────────
   renderFolders();
