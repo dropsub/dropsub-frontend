@@ -733,8 +733,8 @@
           <div class="success-sub" id="successSub">
             Your account has been created. Check your email to verify your address, then explore your first artist archives.
           </div>
-          <a class="btn-goto-dashboard" href="dropsub-mockup_copy.html">
-            Go to dashboard
+          <a class="btn-goto-dashboard" href="dropsub-login.html">
+            Sign in to your account
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -913,33 +913,69 @@
     const btn = document.getElementById('submitBtn');
     btn.classList.add('loading');
 
-    // Simulate API call — replace with real Supabase/backend call
-    setTimeout(() => {
-      btn.classList.remove('loading');
+    const role = selectedType === 'artist'
+      ? (document.getElementById('artistRole').value || 'artist')
+      : 'fan';
 
-      // Go to success step
-      document.getElementById('stepTwo').style.display = 'none';
-      document.getElementById('stepThree').style.display = 'block';
+    fetch('https://api.dropsub.com/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        password,
+        full_name: firstName + ' ' + lastName,
+        role,
+        username,
+      }),
+    })
+      .then(function(res) {
+        return res.json().then(function(data) {
+          return { ok: res.ok, data };
+        });
+      })
+      .then(function({ ok, data }) {
+        btn.classList.remove('loading');
 
-      // Update step indicators
-      document.getElementById('step2-item').classList.remove('active');
-      document.getElementById('step2-item').classList.add('done');
-      document.getElementById('step2-circle').textContent = '✓';
-      document.getElementById('step3-item').classList.add('done', 'active');
-      document.getElementById('step3-circle').textContent = '✓';
+        if (ok) {
+          // Go to success step
+          document.getElementById('stepTwo').style.display = 'none';
+          document.getElementById('stepThree').style.display = 'block';
 
-      // Personalize success message
-      if (selectedType === 'artist') {
-        document.getElementById('successTitle').textContent = `Welcome, ${firstName}! 🎸`;
-        document.getElementById('successSub').textContent =
-          `Your artist account is created. Verify your email, then start uploading your first content folder. Your archive is about to start earning.`;
-      } else {
-        document.getElementById('successTitle').textContent = `Welcome, ${firstName}! 🎵`;
-        document.getElementById('successSub').textContent =
-          `Your fan account is ready. Verify your email, then start exploring artist archives and subscribing to exclusive content.`;
-      }
-      currentStep = 3;
-    }, 1600);
+          // Update step indicators
+          document.getElementById('step2-item').classList.remove('active');
+          document.getElementById('step2-item').classList.add('done');
+          document.getElementById('step2-circle').textContent = '✓';
+          document.getElementById('step3-item').classList.add('done', 'active');
+          document.getElementById('step3-circle').textContent = '✓';
+
+          // Personalize success message
+          if (selectedType === 'artist') {
+            document.getElementById('successTitle').textContent = 'Welcome, ' + firstName + '! 🎸';
+            document.getElementById('successSub').textContent =
+              'Your artist account has been created. Check your email to verify your address, then start uploading your first content folder.';
+          } else {
+            document.getElementById('successTitle').textContent = 'Welcome, ' + firstName + '! 🎵';
+            document.getElementById('successSub').textContent =
+              'Your account has been created. Check your email to verify your address, then sign in to start exploring artist archives.';
+          }
+          currentStep = 3;
+
+          // Redirect to login after 3 seconds
+          setTimeout(function() {
+            window.location.href = 'dropsub-login.html';
+          }, 3000);
+        } else {
+          const msg = (data && data.message) || 'Something went wrong. Please try again.';
+          document.getElementById('errorBanner').classList.add('show');
+          document.getElementById('errorMsg').textContent = msg;
+        }
+      })
+      .catch(function() {
+        btn.classList.remove('loading');
+        document.getElementById('errorBanner').classList.add('show');
+        document.getElementById('errorMsg').textContent =
+          'Unable to connect. Please check your connection and try again.';
+      });
   }
 
   // ── Social ───────────────────────────────────────
