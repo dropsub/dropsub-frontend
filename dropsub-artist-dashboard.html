@@ -569,6 +569,12 @@
   </style>
 </head>
 <body>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
 
 <!-- ── TOP NAV ─────────────────────────────────── -->
 <div class="topnav">
@@ -587,11 +593,11 @@
   <div class="topnav-right">
     <div class="notif-btn" onclick="showToast('3 new subscriber notifications')">🔔<div class="notif-dot"></div></div>
     <div class="user-menu-wrap">
-      <div class="user-avatar" onclick="toggleUserMenu(event)">RF</div>
+      <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">RF</div>
       <div class="user-dropdown" id="userDropdown">
         <div class="user-dropdown-header">
-          <div class="user-dropdown-name">Richard Frias</div>
-          <div class="user-dropdown-email">richardlfrias@gmail.com</div>
+          <div class="user-dropdown-name" id="dropdownName">Richard Frias</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
         <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
         <div class="user-dropdown-item" onclick="showToast('Account settings coming soon'); closeUserMenu()"><span class="dd-icon">⚙️</span>Settings</div>
@@ -630,10 +636,10 @@
     <!-- Artist mini profile -->
     <div class="artist-mini">
       <div class="artist-mini-top">
-        <div class="artist-mini-avatar">RF</div>
+        <div class="artist-mini-avatar" id="sidebarAvatar">RF</div>
         <div>
-          <div class="artist-mini-name">Richard Frias</div>
-          <div class="artist-mini-role">Artist Manager · MIYAVI</div>
+          <div class="artist-mini-name" id="sidebarName">Richard Frias</div>
+          <div class="artist-mini-role" id="sidebarRole">Artist Manager</div>
         </div>
       </div>
       <div class="artist-mini-stats">
@@ -1274,10 +1280,55 @@
     if (!e.target.closest('.user-menu-wrap')) closeUserMenu();
   });
 
+  // ── Auth / user profile ──────────────────────────
+  function fetchUserProfile() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('access_token');
+          sessionStorage.removeItem('access_token');
+          window.location.replace('dropsub-login.html');
+          return null;
+        }
+        return res.json();
+      })
+      .then(function(user) {
+        if (!user) return;
+
+        // Role check — fans belong on the fan view
+        if (user.role === 'fan') {
+          window.location.replace('dropsub-mockup_copy.html');
+          return;
+        }
+
+        var name  = user.full_name || user.name || user.username || '';
+        var email = user.email || '';
+        var role  = user.role || '';
+        var initials = name.split(' ').filter(Boolean)
+          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+
+        if (initials) {
+          document.getElementById('navAvatar').textContent     = initials;
+          document.getElementById('sidebarAvatar').textContent = initials;
+        }
+        if (name)  {
+          document.getElementById('dropdownName').textContent = name;
+          document.getElementById('sidebarName').textContent  = name;
+        }
+        if (email) document.getElementById('dropdownEmail').textContent = email;
+        if (role)  document.getElementById('sidebarRole').textContent   = role.charAt(0).toUpperCase() + role.slice(1);
+      })
+      .catch(function() { /* network error — keep defaults */ });
+  }
+
   // ── Init ─────────────────────────────────────────
   renderFolders();
   renderChart();
   renderActivity();
+  fetchUserProfile();
 </script>
 </body>
 </html>
