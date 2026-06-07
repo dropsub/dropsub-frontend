@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — The Artist Content Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deepest);
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND ──────────────────────────────── */
+    .bg-fixed {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(110px); opacity: .14;
+    }
+    .orb-1 {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, #2979ff, #7c4dff);
+      top: -200px; left: -200px;
+      animation: drift1 18s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #f5a623, transparent);
+      bottom: 10%; right: -150px; opacity: .09;
+      animation: drift2 22s ease-in-out infinite;
+    }
+    .orb-3 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #2979ff, transparent);
+      top: 60%; left: 30%; opacity: .07;
+      animation: drift1 15s ease-in-out infinite reverse;
+    }
+    @keyframes drift1 {
+      0%,100% { transform: translate(0,0); }
+      50%      { transform: translate(40px,-30px); }
+    }
+    @keyframes drift2 {
+      0%,100% { transform: translate(0,0); }
+      50%      { transform: translate(-30px,40px); }
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(41,121,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(41,121,255,.035) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+
+    /* ── WRAPPER ─────────────────────────────────── */
+    .wrap { position: relative; z-index: 1; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+      background: rgba(8,15,28,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: all .2s;
+    }
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1.05rem; letter-spacing: .02em;
+      text-decoration: none; color: var(--text-white);
+    }
+    .logo-icon {
+      width: 34px; height: 34px; background: #fff; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; gap: 2px; }
+    .nav-link {
+      padding: 6px 14px; border-radius: 6px;
+      font-size: .84rem; font-weight: 500; color: var(--text-mid);
+      text-decoration: none; cursor: pointer; transition: all .15s;
+    }
+    .nav-link:hover { background: var(--bg-card); color: var(--text-white); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost {
+      padding: 7px 18px; border-radius: 20px;
+      background: none; border: 1px solid var(--border-bright);
+      color: var(--text-light); font-family: inherit;
+      font-size: .84rem; font-weight: 500; cursor: pointer; transition: all .15s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-primary {
+      padding: 8px 20px; border-radius: 20px;
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; font-family: inherit;
+      font-size: .84rem; font-weight: 700; cursor: pointer;
+      transition: all .15s; text-decoration: none; display: inline-block;
+      box-shadow: 0 4px 16px rgba(41,121,255,.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(41,121,255,.45);
+    }
+
+    /* ── SECTIONS ────────────────────────────────── */
+    section { padding: 100px 48px; max-width: 1200px; margin: 0 auto; }
+    section.full { max-width: 100%; padding: 100px 0; }
+
+    /* ── HERO ────────────────────────────────────── */
+    .hero {
+      padding: 120px 48px 80px;
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(41,121,255,.12); border: 1px solid rgba(41,121,255,.25);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: .73rem; font-weight: 700; color: var(--blue-glow);
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--blue-bright);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .5; transform: scale(.8); }
+    }
+
+    .hero-headline {
+      font-size: 3.6rem; font-weight: 900; line-height: 1.08;
+      letter-spacing: -.04em; margin-bottom: 24px;
+      color: var(--text-white);
+    }
+    .hero-headline .grad {
+      background: linear-gradient(135deg, var(--blue-bright) 0%, var(--accent-gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-body {
+      font-size: 1.05rem; line-height: 1.7;
+      color: var(--text-mid); margin-bottom: 36px;
+      max-width: 480px;
+    }
+
+    .hero-cta {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .btn-hero {
+      padding: 14px 28px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; font-family: inherit;
+      font-size: .95rem; font-weight: 700; cursor: pointer;
+      transition: all .15s; text-decoration: none;
+      box-shadow: 0 6px 28px rgba(41,121,255,.4);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 36px rgba(41,121,255,.5);
+    }
+    .btn-hero-ghost {
+      padding: 14px 28px; border-radius: 10px;
+      background: none; border: 1px solid var(--border-bright);
+      color: var(--text-light); font-family: inherit;
+      font-size: .95rem; font-weight: 600; cursor: pointer;
+      transition: all .15s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-ghost:hover {
+      border-color: var(--blue-bright); color: var(--text-white);
+      background: rgba(41,121,255,.06);
+    }
+
+    .hero-trust {
+      margin-top: 32px; display: flex; align-items: center; gap: 16px;
+    }
+    .trust-avatars { display: flex; }
+    .trust-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid var(--bg-deepest);
+      background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; font-weight: 700; color: var(--text-light);
+      margin-left: -8px;
+    }
+    .trust-avatar:first-child { margin-left: 0; }
+    .trust-avatar.g { background: linear-gradient(135deg, #3a0070, #7c4dff); }
+    .trust-avatar.o { background: linear-gradient(135deg, #7c3600, var(--accent-amber)); }
+    .trust-text { font-size: .78rem; color: var(--text-mid); line-height: 1.4; }
+    .trust-text strong { color: var(--text-white); }
+
+    /* Hero right — dashboard preview */
+    .hero-preview {
+      position: relative;
+    }
+    .preview-glow {
+      position: absolute; inset: -40px;
+      background: radial-gradient(ellipse at center, rgba(41,121,255,.12), transparent 70%);
+      pointer-events: none;
+    }
+    .preview-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-bright);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(41,121,255,.08);
+      animation: heroFloat 6s ease-in-out infinite;
+    }
+    @keyframes heroFloat {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    .preview-topbar {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .preview-dot.r { background: #ff5f57; }
+    .preview-dot.y { background: #febc2e; }
+    .preview-dot.g { background: #28c840; }
+    .preview-title {
+      margin-left: 8px; font-size: .75rem; font-weight: 600;
+      color: var(--text-mid); letter-spacing: .04em;
+    }
+    .preview-body { padding: 20px; }
+    .preview-artist-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .preview-avatar-lg {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 800; border: 2px solid var(--blue-bright);
+      box-shadow: 0 0 12px rgba(41,121,255,.4);
+      flex-shrink: 0;
+    }
+    .preview-artist-info { flex: 1; }
+    .preview-artist-name { font-size: .88rem; font-weight: 800; margin-bottom: 2px; }
+    .preview-artist-sub { font-size: .7rem; color: var(--text-mid); }
+    .preview-stat { text-align: right; }
+    .preview-stat-val {
+      font-size: .9rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .preview-stat-label { font-size: .65rem; color: var(--text-dim); }
+    .preview-folders { display: flex; flex-direction: column; gap: 8px; }
+    .preview-folder {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .preview-folder-left { display: flex; align-items: center; gap: 10px; }
+    .preview-folder-icon { font-size: 1rem; }
+    .preview-folder-name { font-size: .78rem; font-weight: 600; color: var(--text-light); }
+    .preview-folder-meta { font-size: .65rem; color: var(--text-dim); }
+    .pf-badge {
+      font-size: .65rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; white-space: nowrap;
+    }
+    .pf-badge.sub  { background: rgba(41,121,255,.15); color: var(--blue-glow); }
+    .pf-badge.prem { background: rgba(245,166,35,.15); color: var(--accent-gold); }
+    .pf-badge.free { background: rgba(63,160,106,.15); color: #3fa06a; }
+
+    /* ── LOGOS / SOCIAL PROOF BAR ─────────────────── */
+    .proof-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 48px;
+      background: rgba(12,21,39,.6);
+    }
+    .proof-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; gap: 48px; flex-wrap: wrap;
+    }
+    .proof-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-dim);
+      white-space: nowrap;
+    }
+    .proof-names {
+      display: flex; align-items: center; gap: 40px; flex-wrap: wrap; flex: 1;
+    }
+    .proof-name {
+      font-size: .95rem; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--text-dim);
+      transition: color .2s; cursor: default;
+      white-space: nowrap;
+    }
+    .proof-name:hover { color: var(--text-mid); }
+
+    /* ── HOW IT WORKS ─────────────────────────────── */
+    .section-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(41,121,255,.1); border: 1px solid rgba(41,121,255,.2);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: .7rem; font-weight: 700; color: var(--blue-glow);
+      letter-spacing: .1em; text-transform: uppercase; margin-bottom: 20px;
+    }
+    .section-headline {
+      font-size: 2.6rem; font-weight: 900; line-height: 1.1;
+      letter-spacing: -.03em; margin-bottom: 16px;
+      color: var(--text-white);
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--text-mid); line-height: 1.7;
+      max-width: 560px; margin-bottom: 60px;
+    }
+
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .step-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px 28px;
+      position: relative; overflow: hidden;
+      transition: border-color .2s, transform .2s;
+    }
+    .step-card:hover {
+      border-color: var(--border-bright); transform: translateY(-4px);
+    }
+    .step-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--blue-bright), transparent);
+      opacity: 0; transition: opacity .2s;
+    }
+    .step-card:hover::before { opacity: 1; }
+    .step-number {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--blue-bright);
+      margin-bottom: 16px;
+    }
+    .step-icon {
+      font-size: 2rem; margin-bottom: 16px;
+    }
+    .step-title {
+      font-size: 1.05rem; font-weight: 800; margin-bottom: 10px;
+      color: var(--text-white);
+    }
+    .step-desc {
+      font-size: .85rem; color: var(--text-mid); line-height: 1.6;
+    }
+
+    /* ── MONETIZATION TIERS ───────────────────────── */
+    .tiers-wrap {
+      background: linear-gradient(180deg, rgba(12,21,39,.8), var(--bg-deepest));
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .tiers-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+      margin-top: 20px;
+    }
+    .tier-card {
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px 28px;
+      transition: all .2s; position: relative; overflow: hidden;
+    }
+    .tier-card.featured {
+      border-color: var(--blue-bright);
+      box-shadow: 0 0 40px rgba(41,121,255,.15), inset 0 0 40px rgba(41,121,255,.03);
+    }
+    .tier-featured-badge {
+      position: absolute; top: 16px; right: 16px;
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border-radius: 20px; padding: 3px 10px;
+      font-size: .65rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .tier-card:hover { transform: translateY(-4px); border-color: var(--border-bright); }
+    .tier-card.featured:hover { border-color: var(--blue-glow); }
+    .tier-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 20px;
+    }
+    .tier-icon.free    { background: rgba(63,160,106,.15); }
+    .tier-icon.sub     { background: rgba(41,121,255,.15); }
+    .tier-icon.premium { background: rgba(245,166,35,.15); }
+    .tier-name {
+      font-size: 1.2rem; font-weight: 800; margin-bottom: 8px;
+    }
+    .tier-price {
+      font-size: 2rem; font-weight: 900; letter-spacing: -.03em;
+      margin-bottom: 8px; color: var(--text-white);
+    }
+    .tier-price span { font-size: .9rem; font-weight: 500; color: var(--text-mid); }
+    .tier-desc { font-size: .85rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 24px; }
+    .tier-features { display: flex; flex-direction: column; gap: 10px; }
+    .tier-feature {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .82rem; color: var(--text-light);
+    }
+    .tf-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: .7rem;
+    }
+    .tf-check.blue   { background: rgba(41,121,255,.2); color: var(--blue-bright); }
+    .tf-check.green  { background: rgba(63,160,106,.2); color: #3fa06a; }
+    .tf-check.gold   { background: rgba(245,166,35,.2); color: var(--accent-gold); }
+
+    /* ── STATS BAND ───────────────────────────────── */
+    .stats-band {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 1px; background: var(--border);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .stat-item {
+      background: var(--bg-dark); padding: 48px 32px;
+      text-align: center; transition: background .2s;
+    }
+    .stat-item:hover { background: var(--bg-card); }
+    .stat-num {
+      font-size: 2.8rem; font-weight: 900; letter-spacing: -.04em;
+      margin-bottom: 8px; line-height: 1;
+    }
+    .stat-num.blue {
+      background: linear-gradient(135deg, var(--blue-bright), var(--blue-glow));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-num.gold {
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: .82rem; color: var(--text-mid); line-height: 1.4; }
+
+    /* ── FOR ARTISTS / FOR FANS ───────────────────── */
+    .split-section {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    .split-card {
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 20px; padding: 48px 40px; overflow: hidden;
+      position: relative; transition: border-color .2s;
+    }
+    .split-card:hover { border-color: var(--border-bright); }
+    .split-card.artists { border-top: 3px solid var(--blue-bright); }
+    .split-card.fans    { border-top: 3px solid var(--accent-gold); }
+    .split-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 20px; padding: 4px 12px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .split-tag.blue { background: rgba(41,121,255,.12); color: var(--blue-glow); }
+    .split-tag.gold { background: rgba(245,166,35,.12); color: var(--accent-gold); }
+    .split-title {
+      font-size: 1.8rem; font-weight: 900; line-height: 1.15;
+      letter-spacing: -.02em; margin-bottom: 16px;
+    }
+    .split-desc { font-size: .9rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 28px; }
+    .split-bullets { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .split-bullet {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .85rem; color: var(--text-light); line-height: 1.5;
+    }
+    .bullet-icon { flex-shrink: 0; margin-top: 1px; font-size: .9rem; }
+    .btn-split-blue {
+      padding: 12px 24px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; font-family: inherit;
+      font-size: .88rem; font-weight: 700; cursor: pointer;
+      transition: all .15s; text-decoration: none; display: inline-block;
+      box-shadow: 0 4px 20px rgba(41,121,255,.35);
+    }
+    .btn-split-blue:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(41,121,255,.45); }
+    .btn-split-gold {
+      padding: 12px 24px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
+      border: none; color: #080f1c; font-family: inherit;
+      font-size: .88rem; font-weight: 700; cursor: pointer;
+      transition: all .15s; text-decoration: none; display: inline-block;
+      box-shadow: 0 4px 20px rgba(245,166,35,.3);
+    }
+    .btn-split-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(245,166,35,.4); }
+
+    /* ── TESTIMONIAL ─────────────────────────────── */
+    .testimonial-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+    }
+    .testi-card {
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; transition: all .2s;
+    }
+    .testi-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
+    .testi-stars { color: var(--accent-gold); font-size: .85rem; margin-bottom: 14px; }
+    .testi-text { font-size: .87rem; color: var(--text-light); line-height: 1.65; margin-bottom: 20px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 10px; }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 700; flex-shrink: 0;
+    }
+    .testi-avatar.g { background: linear-gradient(135deg, #3a0070, #7c4dff); }
+    .testi-avatar.o { background: linear-gradient(135deg, #7c3600, var(--accent-amber)); }
+    .testi-name { font-size: .82rem; font-weight: 700; color: var(--text-white); }
+    .testi-role { font-size: .72rem; color: var(--text-dim); }
+
+    /* ── CTA BAND ─────────────────────────────────── */
+    .cta-band {
+      background: linear-gradient(135deg, rgba(41,121,255,.12), rgba(90,77,255,.08));
+      border-top: 1px solid rgba(41,121,255,.2);
+      border-bottom: 1px solid rgba(41,121,255,.2);
+      text-align: center; padding: 100px 48px;
+    }
+    .cta-inner { max-width: 640px; margin: 0 auto; }
+    .cta-headline {
+      font-size: 2.8rem; font-weight: 900; line-height: 1.1;
+      letter-spacing: -.03em; margin-bottom: 20px;
+    }
+    .cta-sub {
+      font-size: 1rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 36px;
+    }
+    .cta-btns { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      padding: 60px 48px 40px;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+    }
+    .footer-brand { }
+    .footer-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: .95rem; margin-bottom: 14px;
+    }
+    .footer-logo-icon {
+      width: 30px; height: 30px; background: #fff; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .footer-logo-icon svg { width: 18px; height: 18px; }
+    .footer-desc { font-size: .83rem; color: var(--text-dim); line-height: 1.65; max-width: 280px; margin-bottom: 20px; }
+    .footer-col-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px;
+    }
+    .footer-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-link {
+      font-size: .83rem; color: var(--text-mid); text-decoration: none; transition: color .15s;
+    }
+    .footer-link:hover { color: var(--text-white); }
+    .footer-bottom {
+      max-width: 1200px; margin: 40px auto 0;
+      padding-top: 24px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: .78rem; color: var(--text-dim);
+    }
+
+    /* ── TOAST ───────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--bg-hover); border: 1px solid var(--border-bright);
+      border-radius: 24px; padding: 10px 20px;
+      font-size: .82rem; color: var(--text-white); font-weight: 500;
+      opacity: 0; transition: all .25s; z-index: 200; white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── ANIMATIONS ──────────────────────────────── */
+    .fade-up {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 80px 24px 60px; }
+      .hero-preview { display: none; }
+      .hero-headline { font-size: 2.4rem; }
+      section { padding: 60px 24px; }
+      .steps-grid, .tiers-grid, .split-section, .testimonial-grid { grid-template-columns: 1fr; }
+      .stats-band { grid-template-columns: 1fr 1fr; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .proof-inner { flex-direction: column; gap: 20px; }
+      .proof-names { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-fixed">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="wrap">
+
+  <!-- ── NAV ──────────────────────────────────────── -->
+  <nav class="nav">
+    <div class="nav-left">
+      <a class="logo" href="#">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+            <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        DropSub
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="#how">How it works</a>
+        <a class="nav-link" href="#tiers">Tiers</a>
+        <a class="nav-link" href="#artists">For Artists</a>
+        <a class="nav-link" href="#fans">For Fans</a>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+      <a class="btn-primary" href="#" onclick="showToast('Sign up coming soon!'); return false;">Get started free</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────── -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <div class="eyebrow-dot"></div>
+        Now in early access
+      </div>
+      <h1 class="hero-headline">
+        Your artist's archives,<br>
+        <span class="grad">finally monetized.</span>
+      </h1>
+      <p class="hero-body">
+        DropSub is the platform where artists and their teams turn terabytes of unused content into recurring revenue — and fans get unprecedented access to what happens behind the scenes.
+      </p>
+      <div class="hero-cta">
+        <a class="btn-hero" href="#" onclick="showToast('Sign up coming soon!'); return false;">
+          Start for free
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a class="btn-hero-ghost" href="#how">
+          See how it works
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8"/></svg>
+        </a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-avatars">
+          <div class="trust-avatar">BC</div>
+          <div class="trust-avatar g">MV</div>
+          <div class="trust-avatar o">KL</div>
+          <div class="trust-avatar">SC</div>
+          <div class="trust-avatar">DC</div>
+        </div>
+        <div class="trust-text">
+          <strong>MIYAVI, BangChan & more</strong><br>
+          are sharing their archives on DropSub
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard preview card -->
+    <div class="hero-preview">
+      <div class="preview-glow"></div>
+      <div class="preview-card">
+        <div class="preview-topbar">
+          <div class="preview-dot r"></div>
+          <div class="preview-dot y"></div>
+          <div class="preview-dot g"></div>
+          <span class="preview-title">DropSub — Artist Content Platform</span>
+        </div>
+        <div class="preview-body">
+          <div class="preview-artist-row">
+            <div class="preview-avatar-lg">MV</div>
+            <div class="preview-artist-info">
+              <div class="preview-artist-name">MIYAVI</div>
+              <div class="preview-artist-sub">Rock · J-Glam · 5,000+ files · 180 GB</div>
+            </div>
+            <div class="preview-stat">
+              <div class="preview-stat-val">$80K+</div>
+              <div class="preview-stat-label">earned</div>
+            </div>
+          </div>
+          <div class="preview-folders">
+            <div class="preview-folder">
+              <div class="preview-folder-left">
+                <div class="preview-folder-icon">📁</div>
+                <div>
+                  <div class="preview-folder-name">Kiyomizu Temple 2021</div>
+                  <div class="preview-folder-meta">422 files · 14 GB</div>
+                </div>
+              </div>
+              <span class="pf-badge sub">SUBSCRIPTION</span>
+            </div>
+            <div class="preview-folder">
+              <div class="preview-folder-left">
+                <div class="preview-folder-icon">⭐</div>
+                <div>
+                  <div class="preview-folder-name">20th Anniversary Futurism</div>
+                  <div class="preview-folder-meta">1,200 files · 42 GB</div>
+                </div>
+              </div>
+              <span class="pf-badge prem">$19.99</span>
+            </div>
+            <div class="preview-folder">
+              <div class="preview-folder-left">
+                <div class="preview-folder-icon">📂</div>
+                <div>
+                  <div class="preview-folder-name">Birthday Event 2022</div>
+                  <div class="preview-folder-meta">145 files · 3.2 GB</div>
+                </div>
+              </div>
+              <span class="pf-badge free">FREE</span>
+            </div>
+            <div class="preview-folder">
+              <div class="preview-folder-left">
+                <div class="preview-folder-icon">📁</div>
+                <div>
+                  <div class="preview-folder-name">Coachella 2022</div>
+                  <div class="preview-folder-meta">510 files · 18 GB</div>
+                </div>
+              </div>
+              <span class="pf-badge sub">SUBSCRIPTION</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SOCIAL PROOF BAR ──────────────────────────── -->
+  <div class="proof-bar">
+    <div class="proof-inner">
+      <div class="proof-label">Artists on platform</div>
+      <div class="proof-names">
+        <div class="proof-name">MIYAVI</div>
+        <div class="proof-name">BangChan</div>
+        <div class="proof-name">Doechii</div>
+        <div class="proof-name">Kendrick Lamar</div>
+        <div class="proof-name">Sabrina Carpenter</div>
+        <div class="proof-name">Dead Boyz</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW IT WORKS ──────────────────────────────── -->
+  <section id="how" class="fade-up">
+    <div class="section-eyebrow">How it works</div>
+    <h2 class="section-headline">Three steps to monetize<br>your entire archive</h2>
+    <p class="section-sub">DropSub sits between file storage and premium content subscriptions — giving artists a living, monetized public archive.</p>
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <div class="step-number">Step 01</div>
+        <div class="step-icon">📂</div>
+        <div class="step-title">Upload your archive</div>
+        <div class="step-desc">Drag and drop your content — photos, videos, audio, documents. Organize into folders by date, event, or type. Your team can contribute directly.</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-number">Step 02</div>
+        <div class="step-icon">🎛️</div>
+        <div class="step-title">Set access tiers</div>
+        <div class="step-desc">Choose Free to drive discovery, Subscription for recurring revenue, or Premium for one-time exclusive drops. Mix and match across folders.</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-number">Step 03</div>
+        <div class="step-icon">💰</div>
+        <div class="step-title">Fans pay, you earn</div>
+        <div class="step-desc">Share your DropSub link. Fans subscribe or purchase. Revenue lands directly in your account. Content you already created, earning forever.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS BAND ────────────────────────────────── -->
+  <div class="stats-band fade-up">
+    <div class="stat-item">
+      <div class="stat-num gold">$80K+</div>
+      <div class="stat-label">Earned by MIYAVI's<br>archive alone</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num blue">5,000+</div>
+      <div class="stat-label">Content files<br>in MIYAVI's archive</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num blue">3</div>
+      <div class="stat-label">Monetization tiers<br>Free · Sub · Premium</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num gold">∞</div>
+      <div class="stat-label">Content lives forever<br>on the blockchain</div>
+    </div>
+  </div>
+
+  <!-- ── TIERS ─────────────────────────────────────── -->
+  <div class="tiers-wrap" id="tiers">
+    <section class="fade-up">
+      <div class="section-eyebrow">Monetization tiers</div>
+      <h2 class="section-headline">Three ways to offer<br>your content</h2>
+      <p class="section-sub">Mix and match tiers across your folders. Use Free to grow your audience, Subscription for steady income, Premium for your most exclusive drops.</p>
+      <div class="tiers-grid">
+        <div class="tier-card fade-up">
+          <div class="tier-icon free">📣</div>
+          <div class="tier-name">Free</div>
+          <div class="tier-price">$0 <span>/ always</span></div>
+          <div class="tier-desc">Promotional content that drives interest in your paid tiers. Build your audience and showcase what subscribers get.</div>
+          <div class="tier-features">
+            <div class="tier-feature"><div class="tf-check green">✓</div>Public visibility</div>
+            <div class="tier-feature"><div class="tf-check green">✓</div>Drive subscriptions</div>
+            <div class="tier-feature"><div class="tf-check green">✓</div>No paywall</div>
+            <div class="tier-feature"><div class="tf-check green">✓</div>Fan discovery tool</div>
+          </div>
+        </div>
+        <div class="tier-card featured fade-up">
+          <div class="tier-featured-badge">Most popular</div>
+          <div class="tier-icon sub">📋</div>
+          <div class="tier-name">Subscription</div>
+          <div class="tier-price">$<span>you set</span> <span>/ month</span></div>
+          <div class="tier-desc">Recurring monthly access to content folders. Fans subscribe once and get everything you upload to that folder forever.</div>
+          <div class="tier-features">
+            <div class="tier-feature"><div class="tf-check blue">✓</div>Recurring monthly revenue</div>
+            <div class="tier-feature"><div class="tf-check blue">✓</div>Artist sets the price</div>
+            <div class="tier-feature"><div class="tf-check blue">✓</div>Auto-unlocks new uploads</div>
+            <div class="tier-feature"><div class="tf-check blue">✓</div>Subscriber analytics</div>
+          </div>
+        </div>
+        <div class="tier-card fade-up">
+          <div class="tier-icon premium">⭐</div>
+          <div class="tier-name">Premium Drop</div>
+          <div class="tier-price">$<span>you set</span> <span>/ one-time</span></div>
+          <div class="tier-desc">Exclusive one-time purchases for your most valuable content. Anniversary collections, tour archives, rare behind-the-scenes.</div>
+          <div class="tier-features">
+            <div class="tier-feature"><div class="tf-check gold">✓</div>One-time payment</div>
+            <div class="tier-feature"><div class="tf-check gold">✓</div>Lifetime fan access</div>
+            <div class="tier-feature"><div class="tf-check gold">✓</div>Highest revenue per fan</div>
+            <div class="tier-feature"><div class="tf-check gold">✓</div>Exclusive positioning</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── FOR ARTISTS / FOR FANS ────────────────────── -->
+  <section class="fade-up">
+    <div class="split-section">
+      <div class="split-card artists fade-up" id="artists">
+        <div class="split-tag blue">🎸 For Artists & Managers</div>
+        <h3 class="split-title">Turn your archive into a revenue stream</h3>
+        <p class="split-desc">You already have the content. Thousands of photos, videos, and behind-the-scenes moments sitting unused in Dropbox. DropSub unlocks that value.</p>
+        <div class="split-bullets">
+          <div class="split-bullet"><div class="bullet-icon">📁</div><div>Upload and organize content by event, date, or type — your team can contribute directly.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">💳</div><div>Set your own prices. You control every tier, every folder, every release.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">📊</div><div>Real-time analytics — see who's subscribing, what's performing, and where revenue is growing.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">🔐</div><div>Enterprise-grade security. Your content is protected with permission-based access at every level.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">⛓️</div><div>All content secured on the blockchain. Your archive lives forever.</div></div>
+        </div>
+        <a class="btn-split-blue" href="#" onclick="showToast('Artist sign up coming soon!'); return false;">Start as an artist →</a>
+      </div>
+      <div class="split-card fans fade-up" id="fans">
+        <div class="split-tag gold">🎵 For Fans</div>
+        <h3 class="split-title">Get closer to the artists you love</h3>
+        <p class="split-desc">Go beyond the public feed. Access the real story — rehearsal footage, tour diaries, studio sessions, and rare archives that exist nowhere else.</p>
+        <div class="split-bullets">
+          <div class="split-bullet"><div class="bullet-icon">🗂️</div><div>Browse your favorite artist's full archive — organized, searchable, always growing.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">🔓</div><div>Choose your level — free discovery, monthly subscription, or one-time exclusive drops.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">📱</div><div>Access on any device. Download what you love. Keep it forever with Premium purchases.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">🔔</div><div>Get notified the moment your artist drops new content to a folder you're subscribed to.</div></div>
+          <div class="split-bullet"><div class="bullet-icon">🌍</div><div>Support your artist directly. Every subscription goes straight to the people who made it.</div></div>
+        </div>
+        <a class="btn-split-gold" href="#" onclick="showToast('Fan sign up coming soon!'); return false;">Start as a fan →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TESTIMONIALS ──────────────────────────────── -->
+  <section class="fade-up">
+    <div class="section-eyebrow">Early access feedback</div>
+    <h2 class="section-headline">What people are saying</h2>
+    <p class="section-sub">From artists and fans in our early access program.</p>
+    <div class="testimonial-grid">
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"I had 180 GB of MIYAVI content sitting in Dropbox doing nothing. DropSub turned it into a real revenue stream. This is what the industry was missing."</div>
+        <div class="testi-author">
+          <div class="testi-avatar o">RF</div>
+          <div>
+            <div class="testi-name">Richard Frias</div>
+            <div class="testi-role">Founder · Former MIYAVI Manager</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Finally a platform built for how artists actually work. My whole team uploads directly. Fans get the real behind-the-scenes, not just what makes it to social."</div>
+        <div class="testi-author">
+          <div class="testi-avatar g">AK</div>
+          <div>
+            <div class="testi-name">Artist Manager</div>
+            <div class="testi-role">Early Access · Los Angeles</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"I subscribed to three artists on day one. Seeing actual tour archives and studio footage from artists I love — it's a completely different relationship with the music."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">JL</div>
+          <div>
+            <div class="testi-name">Fan subscriber</div>
+            <div class="testi-role">Early Access · New York</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ──────────────────────────────────── -->
+  <div class="cta-band fade-up">
+    <div class="cta-inner">
+      <div class="section-eyebrow" style="margin:0 auto 20px; display:inline-flex;">Ready to start?</div>
+      <h2 class="cta-headline">Your archive is already<br><span style="background:linear-gradient(135deg,var(--blue-bright),var(--accent-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">worth something.</span></h2>
+      <p class="cta-sub">Join DropSub today. Upload your first folder for free. Start earning from content you already own.</p>
+      <div class="cta-btns">
+        <a class="btn-hero" href="#" onclick="showToast('Sign up coming soon!'); return false;">
+          Get started free
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a class="btn-hero-ghost" href="dropsub-login.html">Sign in to dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+              <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          DropSub
+        </div>
+        <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives. Built for artists, managers, and the fans who love them.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <div class="footer-links">
+          <a class="footer-link" href="#how">How it works</a>
+          <a class="footer-link" href="#tiers">Pricing tiers</a>
+          <a class="footer-link" href="#artists">For artists</a>
+          <a class="footer-link" href="#fans">For fans</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a class="footer-link" href="#">About</a>
+          <a class="footer-link" href="#">Blog</a>
+          <a class="footer-link" href="#">Press</a>
+          <a class="footer-link" href="#">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <div class="footer-links">
+          <a class="footer-link" href="#">Terms of Service</a>
+          <a class="footer-link" href="#">Privacy Policy</a>
+          <a class="footer-link" href="#">Copyright / DMCA</a>
+          <a class="footer-link" href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+      <span>Seeking seed round · $500K · dropsub.com</span>
+    </div>
+  </footer>
+
+</div><!-- /wrap -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Toast ────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ── Scroll fade-up animations ────────────────────
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // Stagger children
+        e.target.querySelectorAll('.fade-up').forEach((child, i) => {
+          setTimeout(() => child.classList.add('visible'), i * 100);
+        });
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // ── Sticky nav shadow on scroll ──────────────────
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.nav');
+    nav.style.boxShadow = window.scrollY > 10
+      ? '0 4px 24px rgba(0,0,0,.4)'
+      : 'none';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Artist Content Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:  #080f1c;
+      --bg-dark:     #0c1527;
+      --bg-panel:    #0f1d35;
+      --bg-sidebar:  #0d1a30;
+      --bg-card:     #132040;
+      --bg-hover:    #1a2d50;
+      --bg-row:      #0e1a2e;
+      --bg-row-alt:  #0b1525;
+      --blue-bright: #2979ff;
+      --blue-mid:    #1a56d6;
+      --blue-glow:   #3d8bff;
+      --blue-dim:    #1c3a6e;
+      --accent-gold: #f5a623;
+      --accent-amber:#e8921a;
+      --folder-blue: #2979ff;
+      --folder-gold: #f5a623;
+      --text-white:  #ffffff;
+      --text-light:  #c8d8f0;
+      --text-mid:    #7a9cc8;
+      --text-dim:    #3d5a8a;
+      --border:      #1a2d50;
+      --border-bright: #253d6e;
+      --radius:      8px;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deepest);
+      color: var(--text-white);
+      display: flex; flex-direction: column;
+    }
+
+    /* ── TOP NAV ─────────────────────────────────────── */
+    .topnav {
+      background: var(--bg-darkest);
+      border-bottom: 1px solid var(--border);
+      height: 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; flex-shrink: 0; z-index: 50;
+      background: var(--bg-panel);
+    }
+    .topnav-left { display: flex; align-items: center; gap: 20px; }
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: .95rem; letter-spacing: .02em;
+    }
+    .logo-icon {
+      width: 30px; height: 30px;
+      background: #fff; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link {
+      padding: 5px 12px; border-radius: 6px; font-size: .82rem;
+      font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s;
+    }
+    .nav-link:hover, .nav-link.active { background: var(--bg-hover); color: var(--text-white); }
+    .topnav-right { display: flex; align-items: center; gap: 12px; }
+    .search-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      border-radius: 20px; padding: 5px 14px; width: 220px;
+    }
+    .search-bar input {
+      background: none; border: none; outline: none; color: var(--text-light);
+      font-size: .82rem; font-family: inherit; width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--text-dim); }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--blue-bright); overflow: hidden;
+      background: linear-gradient(135deg, #2979ff, #7c4dff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700; cursor: pointer;
+    }
+    .notif-btn {
+      width: 30px; height: 30px; background: var(--bg-card);
+      border: 1px solid var(--border-bright); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; cursor: pointer; position: relative;
+    }
+    .notif-dot {
+      position: absolute; top: 3px; right: 3px;
+      width: 7px; height: 7px; background: var(--blue-bright);
+      border-radius: 50%; border: 1px solid var(--bg-panel);
+    }
+    .btn-upgrade {
+      background: linear-gradient(135deg, var(--blue-bright), #7c4dff);
+      color: #fff; border: none; border-radius: 16px;
+      padding: 5px 14px; font-size: .78rem; font-weight: 700;
+      cursor: pointer; letter-spacing: .03em;
+    }
+
+    /* ── APP SHELL ───────────────────────────────────── */
+    .app-shell {
+      flex: 1; display: flex; overflow: hidden;
+    }
+
+    /* ── LEFT SIDEBAR ────────────────────────────────── */
+    .sidebar-left {
+      width: 90px; background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; padding: 16px 0;
+      overflow-y: auto; flex-shrink: 0; gap: 6px;
+    }
+    .sidebar-left::-webkit-scrollbar { width: 0; }
+    .artist-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; cursor: pointer; padding: 8px 6px;
+      border-radius: 10px; width: 80px; transition: all .15s;
+    }
+    .artist-item:hover { background: var(--bg-hover); }
+    .artist-item.active { background: var(--bg-card); }
+    .artist-item.active .artist-ring { border-color: var(--blue-bright); box-shadow: 0 0 12px rgba(41,121,255,.5); }
+    .artist-ring {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 2.5px solid var(--border-bright);
+      overflow: hidden; transition: all .2s;
+      background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 700; color: var(--text-mid);
+    }
+    .artist-ring img { width: 100%; height: 100%; object-fit: cover; }
+    .artist-name {
+      font-size: .58rem; font-weight: 600; text-align: center;
+      color: var(--text-mid); letter-spacing: .05em; text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .artist-item.active .artist-name { color: var(--text-white); }
+    .sidebar-divider {
+      width: 40px; height: 1px; background: var(--border); margin: 4px 0;
+    }
+    .add-artist-btn {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 2px dashed var(--border-bright);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; color: var(--text-dim); cursor: pointer; transition: all .2s;
+    }
+    .add-artist-btn:hover { border-color: var(--blue-bright); color: var(--blue-bright); }
+
+    /* ── MAIN CONTENT ────────────────────────────────── */
+    .main-content {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: var(--bg-dark);
+    }
+
+    /* Artist header / featured media */
+    .featured-banner {
+      position: relative; flex-shrink: 0;
+      height: 220px; overflow: hidden;
+      background: var(--bg-deepest);
+    }
+    .featured-media {
+      display: flex; height: 100%; gap: 3px;
+    }
+    .media-col {
+      flex: 1; overflow: hidden; position: relative; cursor: pointer;
+    }
+    .media-col img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(.85); transition: filter .2s;
+    }
+    .media-col:hover img { filter: brightness(1); }
+    .media-col.active-frame { flex: 1.4; }
+    .media-col.tinted img { filter: brightness(.6) saturate(1.5); }
+    .media-col::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(8,15,28,.7));
+      pointer-events: none;
+    }
+    .play-btn {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 44px; height: 44px; background: rgba(255,255,255,.15);
+      backdrop-filter: blur(4px); border: 2px solid rgba(255,255,255,.6);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; cursor: pointer; transition: all .2s; z-index: 2;
+    }
+    .play-btn:hover { background: rgba(41,121,255,.5); border-color: var(--blue-bright); }
+    .featured-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 14px 20px;
+      background: linear-gradient(to top, rgba(8,15,28,.85), transparent);
+      display: flex; align-items: flex-end; justify-content: space-between; z-index: 3;
+    }
+    .artist-title { font-size: 1.3rem; font-weight: 800; letter-spacing: .04em; }
+    .artist-subtitle { font-size: .75rem; color: var(--text-mid); }
+    .featured-tags { display: flex; gap: 6px; }
+    .featured-tag {
+      background: rgba(41,121,255,.2); border: 1px solid rgba(41,121,255,.4);
+      border-radius: 4px; padding: 3px 9px; font-size: .7rem; font-weight: 600;
+      color: var(--blue-glow); letter-spacing: .04em;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; align-items: center; gap: 6px; padding: 10px 20px;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+      background: var(--bg-panel);
+    }
+    .toolbar-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 16px; border-radius: 7px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      color: var(--text-light); font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; letter-spacing: .04em;
+    }
+    .toolbar-btn:hover { background: var(--bg-hover); border-color: var(--blue-bright); color: #fff; }
+    .toolbar-btn .icon { font-size: 1rem; }
+    .toolbar-spacer { flex: 1; }
+    .toolbar-view-toggle { display: flex; gap: 2px; }
+    .view-btn {
+      width: 30px; height: 30px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .85rem; color: var(--text-dim); transition: all .15s;
+    }
+    .view-btn.active, .view-btn:hover { background: var(--blue-mid); color: #fff; border-color: var(--blue-mid); }
+
+    /* File table */
+    .file-area {
+      flex: 1; overflow-y: auto; padding: 0;
+    }
+    .file-area::-webkit-scrollbar { width: 4px; }
+    .file-area::-webkit-scrollbar-track { background: var(--bg-dark); }
+    .file-area::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+    .file-table { width: 100%; border-collapse: collapse; }
+    .file-table thead tr {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+    }
+    .file-table th {
+      padding: 9px 16px; text-align: left;
+      font-size: .7rem; font-weight: 700; color: var(--text-dim);
+      letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+    }
+    .file-table th:last-child { text-align: right; }
+    .file-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .12s;
+    }
+    .file-table tbody tr:nth-child(odd) { background: var(--bg-row); }
+    .file-table tbody tr:nth-child(even) { background: var(--bg-row-alt); }
+    .file-table tbody tr:hover { background: var(--bg-hover); }
+    .file-table tbody tr.selected { background: rgba(41,121,255,.12); border-color: rgba(41,121,255,.3); }
+    .file-table td { padding: 10px 16px; font-size: .82rem; vertical-align: middle; }
+    .file-name-cell {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .folder-icon {
+      font-size: 1.3rem; flex-shrink: 0; line-height: 1;
+    }
+    .folder-icon.blue { filter: hue-rotate(0deg); }
+    .folder-icon.gold { filter: hue-rotate(35deg) saturate(2) brightness(1.1); }
+    .file-name {
+      font-weight: 500; color: var(--text-white);
+      font-size: .83rem; letter-spacing: .02em;
+    }
+    .file-date { color: var(--text-dim); font-size: .77rem; margin-top: 2px; }
+    .access-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 5px; font-size: .72rem;
+      font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+    }
+    .access-badge.subscription {
+      background: rgba(41,121,255,.12); color: var(--blue-bright);
+      border: 1px solid rgba(41,121,255,.25);
+    }
+    .access-badge.free {
+      background: rgba(34,197,94,.1); color: #4ade80;
+      border: 1px solid rgba(34,197,94,.25);
+    }
+    .access-badge.premium {
+      background: rgba(245,166,35,.1); color: var(--accent-gold);
+      border: 1px solid rgba(245,166,35,.25);
+    }
+    .access-badge.locked {
+      background: rgba(239,68,68,.08); color: #f87171;
+      border: 1px solid rgba(239,68,68,.2);
+    }
+    /* ── Premium locked row ── */
+    .file-table tbody tr.row-premium-locked { opacity:.52; }
+    .file-table tbody tr.row-premium-locked td { background: repeating-linear-gradient(-45deg,rgba(245,166,35,.015),rgba(245,166,35,.015) 4px,transparent 4px,transparent 12px) !important; }
+    .file-table tbody tr.row-premium-locked:hover { opacity:.72; cursor:pointer; }
+    .file-table tbody tr.row-premium-locked:hover td { background: rgba(245,166,35,.05) !important; }
+    /* ── Premium purchased row ── */
+    .file-table tbody tr.row-premium-purchased td { background: rgba(245,166,35,.03) !important; }
+    .file-table tbody tr.row-premium-purchased:hover td { background: rgba(245,166,35,.07) !important; }
+    /* Teaser text */
+    .folder-teaser { font-size:.68rem; color:var(--text-dim); margin-top:3px; max-width:320px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-style:italic; }
+    /* Inline purchase CTA */
+    .purchase-cta { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-amber)); border:none; border-radius:16px; padding:5px 12px; font-size:.7rem; font-weight:700; color:#080f1c; cursor:pointer; transition:all .15s; font-family:inherit; white-space:nowrap; }
+    .purchase-cta:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(245,166,35,.35); }
+    /* Purchased badge */
+    .purchased-badge { display:inline-flex; align-items:center; gap:4px; background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.3); border-radius:16px; padding:3px 10px; font-size:.68rem; font-weight:700; color:var(--accent-gold); white-space:nowrap; }
+    /* Lock icon */
+    .lock-chip { display:inline-flex; align-items:center; gap:4px; background:rgba(26,45,80,.6); border:1px solid var(--border-bright); border-radius:16px; padding:3px 8px; font-size:.65rem; color:var(--text-dim); margin-left:4px; }
+    .date-cell { color: var(--text-mid); font-size: .78rem; }
+    .row-actions { display: flex; gap: 6px; justify-content: flex-end; opacity: 0; transition: opacity .15s; }
+    .file-table tbody tr:hover .row-actions { opacity: 1; }
+    .row-action-btn {
+      width: 26px; height: 26px; background: var(--bg-hover);
+      border: 1px solid var(--border-bright); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; cursor: pointer; transition: all .15s;
+    }
+    .row-action-btn:hover { background: var(--blue-mid); border-color: var(--blue-mid); }
+
+    /* ── RIGHT SIDEBAR ───────────────────────────────── */
+    .sidebar-right {
+      width: 220px; background: var(--bg-sidebar);
+      border-left: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar-right::-webkit-scrollbar { width: 0; }
+    .rs-section {
+      border-bottom: 1px solid var(--border); padding: 14px;
+    }
+    .rs-label {
+      font-size: .65rem; font-weight: 700; color: var(--text-dim);
+      letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .rs-label .dot { width: 5px; height: 5px; background: var(--blue-bright); border-radius: 50%; }
+    /* Also Viewing */
+    .also-viewing-avatars { display: flex; gap: -4px; }
+    .av-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid var(--bg-sidebar); margin-right: -8px;
+      overflow: hidden; background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700;
+    }
+    .av-avatar.a1 { background: linear-gradient(135deg, #2979ff, #7c4dff); }
+    .av-avatar.a2 { background: linear-gradient(135deg, #00bcd4, #2979ff); }
+    .av-avatar.a3 { background: linear-gradient(135deg, #7c4dff, #e040fb); }
+    .av-count {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--bg-card); border: 2px solid var(--border-bright);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .62rem; font-weight: 700; color: var(--text-mid);
+    }
+    .viewing-count { font-size: .72rem; color: var(--text-mid); margin-top: 6px; }
+
+    /* Date thumbnails */
+    .date-header {
+      font-size: .72rem; font-weight: 600; color: var(--text-light); margin-bottom: 8px;
+    }
+    .thumb-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+    }
+    .thumb {
+      aspect-ratio: 1; border-radius: 4px; overflow: hidden;
+      background: var(--bg-card); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; transition: all .15s;
+      border: 1px solid transparent;
+    }
+    .thumb:hover { border-color: var(--blue-bright); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Tags */
+    .tags-row { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag-pill {
+      background: rgba(41,121,255,.15); border: 1px solid rgba(41,121,255,.3);
+      border-radius: 4px; padding: 3px 8px; font-size: .65rem;
+      font-weight: 600; color: var(--blue-glow); cursor: pointer; transition: all .15s;
+    }
+    .tag-pill:hover { background: rgba(41,121,255,.3); }
+
+    /* Pinned items */
+    .pinned-list { display: flex; flex-direction: column; gap: 7px; }
+    .pinned-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 8px; border-radius: 6px; cursor: pointer;
+      background: var(--bg-card); border: 1px solid var(--border);
+      transition: all .15s;
+    }
+    .pinned-item:hover { border-color: var(--blue-bright); background: var(--bg-hover); }
+    .pinned-icon { font-size: 1rem; flex-shrink: 0; }
+    .pinned-name { font-size: .74rem; font-weight: 600; color: var(--text-light); }
+    .pinned-meta { font-size: .62rem; color: var(--text-dim); }
+
+    /* Recommended */
+    .rec-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .rec-artist {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer;
+    }
+    .rec-ring {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid var(--border-bright); overflow: hidden;
+      background: var(--bg-card); display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700; transition: all .15s;
+    }
+    .rec-ring:hover { border-color: var(--blue-bright); }
+    .rec-name { font-size: .58rem; color: var(--text-mid); font-weight: 600; text-align: center; }
+
+    /* ── MODAL / UPGRADE OVERLAY ─────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 14px; padding: 32px; max-width: 400px; width: 90%;
+      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+      animation: popIn .25s ease;
+    }
+    @keyframes popIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+    .modal-icon { font-size: 2.5rem; margin-bottom: 14px; }
+    .modal h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+    .modal p { font-size: .88rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 22px; }
+    .modal-tiers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .modal-tier {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-radius: 8px; cursor: pointer; transition: all .15s;
+      border: 1.5px solid var(--border-bright);
+    }
+    .modal-tier:hover { border-color: var(--blue-bright); background: var(--bg-hover); }
+    .modal-tier.featured { background: rgba(41,121,255,.1); border-color: var(--blue-bright); }
+    .tier-name { font-size: .88rem; font-weight: 700; }
+    .tier-desc { font-size: .72rem; color: var(--text-mid); margin-top: 2px; }
+    .tier-price { font-size: 1rem; font-weight: 800; color: var(--blue-glow); }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn {
+      flex: 1; padding: 11px; border-radius: 8px; font-size: .88rem; font-weight: 700;
+      border: none; cursor: pointer; transition: all .15s;
+    }
+    .modal-btn.primary { background: var(--blue-bright); color: #fff; }
+    .modal-btn.primary:hover { background: var(--blue-glow); }
+    .modal-btn.secondary { background: var(--bg-card); color: var(--text-mid); border: 1px solid var(--border-bright); }
+    .modal-btn.secondary:hover { color: #fff; }
+
+    /* ── UPLOAD MODAL ────────────────────────────────── */
+    .upload-modal {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 14px; padding: 32px; max-width: 480px; width: 90%;
+      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+      animation: popIn .25s ease;
+    }
+    .upload-modal h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 20px; }
+    .upload-drop {
+      border: 2px dashed var(--border-bright); border-radius: 10px;
+      padding: 36px; text-align: center; cursor: pointer; margin-bottom: 18px;
+      transition: all .15s;
+    }
+    .upload-drop:hover { border-color: var(--blue-bright); background: rgba(41,121,255,.05); }
+    .upload-drop .drop-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .upload-drop p { font-size: .85rem; color: var(--text-mid); }
+    .upload-drop strong { color: var(--blue-glow); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .form-group label { display: block; font-size: .72rem; font-weight: 600; color: var(--text-dim); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; }
+    .form-group select, .form-group input {
+      width: 100%; padding: 9px 12px; border-radius: 7px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      color: var(--text-white); font-family: inherit; font-size: .85rem; outline: none;
+    }
+    .form-group select:focus, .form-group input:focus { border-color: var(--blue-bright); }
+    option { background: var(--bg-card); }
+
+    /* ── STATUS BAR ──────────────────────────────────── */
+    .status-bar {
+      height: 28px; background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 16px; gap: 16px; flex-shrink: 0;
+    }
+    .status-item { font-size: .68rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; }
+
+    /* ── TOAST ───────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-panel); border: 1px solid var(--blue-bright);
+      border-radius: 8px; padding: 10px 20px; font-size: .85rem; font-weight: 600;
+      color: var(--text-white); z-index: 300; opacity: 0; transition: opacity .3s;
+      box-shadow: 0 8px 32px rgba(41,121,255,.25); pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+
+    /* Scrollbar styling */
+    .file-area::-webkit-scrollbar { width: 4px; }
+    .file-area::-webkit-scrollbar-track { background: transparent; }
+    .file-area::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ══ TOP NAV ══════════════════════════════════════════════ -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 7C3 5.89543 3.89543 5 5 5H10L12 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" fill="#111" stroke="#111" stroke-width="1.5"/>
+          <text x="6.5" y="15.5" font-size="5.5" font-weight="900" fill="white" font-family="Arial">DS</text>
+        </svg>
+      </div>
+      <span>DropSub</span>
+    </div>
+    <nav class="nav-links">
+      <div class="nav-link active">My Artists</div>
+      <div class="nav-link">Discover</div>
+      <div class="nav-link">Subscriptions</div>
+      <div class="nav-link">Drops</div>
+    </nav>
+  </div>
+  <div class="topnav-right">
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search artists, folders, tags…"/>
+    </div>
+    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="user-avatar">RF</div>
+    <button class="btn-upgrade">PRO</button>
+  </div>
+</nav>
+
+<!-- ══ APP SHELL ═════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- LEFT SIDEBAR: Artist list -->
+  <aside class="sidebar-left">
+    <div class="artist-item active" onclick="switchArtist(this,'BANGCHAN','#BANGCHAN #WOLFBOY #SKZ','K-Pop · Stray Kids')">
+      <div class="artist-ring">🎤</div>
+      <div class="artist-name">BANGCHAN</div>
+    </div>
+    <div class="artist-item" onclick="switchArtist(this,'DOECHII','#DOECHII #SWAMP #TDE','Hip-Hop · TDE')">
+      <div class="artist-ring">🎵</div>
+      <div class="artist-name">DOECHII</div>
+    </div>
+    <div class="artist-item" onclick="switchArtist(this,'SABRINA CARPENTER','#SABRINA #ESPRESSO #POP','Pop · Island Records')">
+      <div class="artist-ring">🌟</div>
+      <div class="artist-name">SABRINA CARPENTER</div>
+    </div>
+    <div class="artist-item" onclick="switchArtist(this,'KENDRICK LAMAR','#KENDRICK #PGDE #HIP-HOP','Hip-Hop · PG&amp;E')">
+      <div class="artist-ring">🏆</div>
+      <div class="artist-name">KENDRICK LAMAR</div>
+    </div>
+    <div class="artist-item" onclick="switchArtist(this,'DEAD BOYZ','#DEADBOYZ #UNDERGROUND','Alternative · Indie')">
+      <div class="artist-ring">🎸</div>
+      <div class="artist-name">DEAD BOYZ</div>
+    </div>
+    <div class="artist-item" onclick="switchArtist(this,'MIYAVI','#MIYAVI #JROCK #GUITAR','Rock · J-Glam')">
+      <div class="artist-ring">⚡</div>
+      <div class="artist-name">MIYAVI</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="add-artist-btn" onclick="showToast('Artist discovery coming soon!')">+</div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- Featured Banner -->
+    <div class="featured-banner">
+      <div class="featured-media" id="featuredMedia">
+        <div class="media-col" style="background: linear-gradient(135deg, #1a2d50, #0d1a30); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
+          <div style="font-size:3rem;">🎤</div>
+          <div style="font-size:.7rem; color:var(--text-mid);">STUDIO SESSION</div>
+        </div>
+        <div class="media-col active-frame" style="background: linear-gradient(135deg, #1c3060, #0a1428); display:flex; align-items:center; justify-content:center; position:relative;">
+          <div style="font-size:4rem; opacity:.5;">🎵</div>
+          <div class="play-btn" onclick="showToast('Playing featured content…')">▶</div>
+        </div>
+        <div class="media-col tinted" style="background: linear-gradient(135deg, #2a1020, #100818); display:flex; align-items:center; justify-content:center;">
+          <div style="font-size:3rem; opacity:.6;">🎭</div>
+        </div>
+      </div>
+      <div class="featured-overlay">
+        <div>
+          <div class="artist-title" id="artistTitle">BANGCHAN</div>
+          <div class="artist-subtitle" id="artistSubtitle">K-Pop · Stray Kids · 847 files · 12.4 GB</div>
+        </div>
+        <div class="featured-tags" id="featuredTags">
+          <div class="featured-tag">SUBSCRIBED</div>
+          <div class="featured-tag">142 NEW</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-btn" onclick="openUploadModal()">
+        <span class="icon">⬆️</span> UPLOAD
+      </div>
+      <div class="toolbar-btn" onclick="showToast('Folder created!')">
+        <span class="icon">✏️</span> CREATE
+      </div>
+      <div class="toolbar-btn" onclick="showToast('Organize view opened!')">
+        <span class="icon">📂</span> ORGANIZE
+      </div>
+      <div class="toolbar-spacer"></div>
+      <div style="font-size:.75rem; color:var(--text-dim); margin-right:8px;" id="folderCount">6 folders · 847 files</div>
+      <div class="toolbar-view-toggle">
+        <div class="view-btn active" title="List view">☰</div>
+        <div class="view-btn" onclick="showToast('Grid view coming soon!')">⊞</div>
+      </div>
+    </div>
+
+    <!-- File Table -->
+    <div class="file-area">
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th style="width:40px;"><input type="checkbox" style="accent-color:var(--blue-bright);" onclick="toggleAll(this)"/></th>
+            <th>NAME</th>
+            <th>ACCESS</th>
+            <th>DATE</th>
+            <th>SIZE</th>
+            <th>FILES</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="fileTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+
+    <!-- Also Viewing -->
+    <div class="rs-section">
+      <div class="rs-label"><span class="dot"></span>ALSO VIEWING</div>
+      <div class="also-viewing-avatars">
+        <div class="av-avatar a1">JK</div>
+        <div class="av-avatar a2">ML</div>
+        <div class="av-avatar a3">SR</div>
+        <div class="av-count">+8</div>
+      </div>
+      <div class="viewing-count">11 fans viewing now</div>
+    </div>
+
+    <!-- Date thumbnails -->
+    <div class="rs-section">
+      <div class="date-header">DATE: JUNE 29, 2023</div>
+      <div class="thumb-grid">
+        <div class="thumb" onclick="showToast('Opening photo…')">📸</div>
+        <div class="thumb" onclick="showToast('Opening photo…')">🎬</div>
+        <div class="thumb" onclick="showToast('Opening photo…')">📷</div>
+        <div class="thumb" onclick="showToast('Opening photo…')">🎥</div>
+        <div class="thumb" onclick="showToast('Opening photo…')">📸</div>
+        <div class="thumb" onclick="showToast('Opening photo…')">🎞</div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="rs-section">
+      <div class="rs-label">TAGS</div>
+      <div class="tags-row" id="sidebarTags">
+        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#BANGCHAN</div>
+        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#WOLFBOY</div>
+        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#SKZ</div>
+        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#KPOP</div>
+        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#TOUR2023</div>
+      </div>
+    </div>
+
+    <!-- Pinned Items -->
+    <div class="rs-section">
+      <div class="rs-label">📌 PINNED ITEMS</div>
+      <div class="pinned-list">
+        <div class="pinned-item" onclick="showToast('Opening pinned item…')">
+          <div class="pinned-icon">📁</div>
+          <div>
+            <div class="pinned-name">Wolf Era BTS</div>
+            <div class="pinned-meta">Subscription · 34 files</div>
+          </div>
+        </div>
+        <div class="pinned-item" onclick="showToast('Opening pinned item…')">
+          <div class="pinned-icon">🎵</div>
+          <div>
+            <div class="pinned-name">Unreleased Demos</div>
+            <div class="pinned-meta">Premium · $7.99</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Drops -->
+    <div class="rs-section">
+      <div class="rs-label">RECOMMENDED DROPS</div>
+      <div class="rec-grid">
+        <div class="rec-artist" onclick="showToast('Opening artist profile…')">
+          <div class="rec-ring">🎤</div>
+          <div class="rec-name">ATEEZ</div>
+        </div>
+        <div class="rec-artist" onclick="showToast('Opening artist profile…')">
+          <div class="rec-ring">🌟</div>
+          <div class="rec-name">DOJA CAT</div>
+        </div>
+        <div class="rec-artist" onclick="showToast('Opening artist profile…')">
+          <div class="rec-ring">🎸</div>
+          <div class="rec-name">TAYLOR S.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storage info -->
+    <div class="rs-section">
+      <div class="rs-label">YOUR STORAGE</div>
+      <div style="font-size:.72rem; color:var(--text-mid); margin-bottom:6px;">12.4 GB of 50 GB used</div>
+      <div style="background:var(--bg-card); border-radius:4px; height:5px; overflow:hidden;">
+        <div style="background:linear-gradient(90deg,var(--blue-bright),#7c4dff); width:25%; height:100%; border-radius:4px;"></div>
+      </div>
+      <div style="font-size:.65rem; color:var(--text-dim); margin-top:6px; line-height:1.5;">Content archived to blockchain<br>🔗 Permanent storage enabled</div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- ══ STATUS BAR ════════════════════════════════════════════ -->
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> Connected</div>
+  <div class="status-item">🔗 Blockchain sync: Active</div>
+  <div class="status-item">☁️ Cloud backup: On</div>
+  <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
+</div>
+
+<!-- ══ SUBSCRIPTION MODAL ════════════════════════════════════ -->
+<div class="modal-overlay" id="subModal">
+  <div class="modal">
+    <div class="modal-icon" id="subModalIcon">🔒</div>
+    <h3 id="subModalTitle">Unlock This Folder</h3>
+    <p id="subModalDesc">Subscribe to get full access to this content folder and all future drops from this artist.</p>
+    <div class="modal-tiers">
+      <div class="modal-tier">
+        <div>
+          <div class="tier-name">Free Preview</div>
+          <div class="tier-desc">Limited sample content only</div>
+        </div>
+        <div class="tier-price">FREE</div>
+      </div>
+      <div class="modal-tier featured">
+        <div>
+          <div class="tier-name">Subscription Access</div>
+          <div class="tier-desc">Full folder + monthly new drops</div>
+        </div>
+        <div class="tier-price">$4.99/mo</div>
+      </div>
+      <div class="modal-tier">
+        <div>
+          <div class="tier-name" id="premiumTierName">Premium One-Time</div>
+          <div class="tier-desc">Exclusive access, no recurring charge</div>
+        </div>
+        <div class="tier-price" id="premiumTierPrice">$7.99</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="closeModal();showToast('Subscribed! Access granted 🎉')">Subscribe Now</button>
+      <button class="modal-btn secondary" onclick="closeModal()">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UPLOAD MODAL ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="upload-modal">
+    <h3>⬆️ Upload Content</h3>
+    <div class="upload-drop" onclick="showToast('File picker would open here…')">
+      <span class="drop-icon">📂</span>
+      <p>Drag & drop files here, or <strong>browse to upload</strong></p>
+      <p style="font-size:.75rem; margin-top:6px; color:var(--text-dim);">Photos, videos, audio, documents supported</p>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Folder Name</label>
+        <input type="text" placeholder="e.g. Tokyo Tour Photos"/>
+      </div>
+      <div class="form-group">
+        <label>Access Tier</label>
+        <select>
+          <option>Free</option>
+          <option selected>Subscription</option>
+          <option>Premium</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date / Event</label>
+        <input type="text" placeholder="e.g. 2025-06 · Coachella"/>
+      </div>
+      <div class="form-group">
+        <label>Tags</label>
+        <input type="text" placeholder="#tour #backstage"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="closeUploadModal();showToast('Upload queued! Files will be archived to blockchain.')">Upload &amp; Archive</button>
+      <button class="modal-btn secondary" onclick="closeUploadModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ═════════════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ══ JAVASCRIPT ════════════════════════════════════════════ -->
+<script>
+  // ── Artist data ─────────────────────────────────────────────
+  const artists = {
+    'BANGCHAN': {
+      subtitle: 'K-Pop · Stray Kids · 847 files · 12.4 GB',
+      tags: ['#BANGCHAN','#WOLFBOY','#SKZ','#KPOP','#TOUR2023'],
+      folders: [
+        { name: 'Chicago Tour Photos', type: 'subscription', date: '2023-06-29', size: '3.2 GB', files: 142, color:'blue' },
+        { name: 'Bang Chan on Adventures', type: 'free', date: '2023-07-12', size: '890 MB', files: 67, color:'gold' },
+        { name: 'Backstage Seoul Concert', type: 'subscription', date: '2023-09-03', size: '2.1 GB', files: 214, color:'blue' },
+        { name: 'Vacation Selfies', type: 'subscription', date: '2023-08-20', size: '1.4 GB', files: 88, color:'blue' },
+        { name: 'Atlant Tour Photos', type: 'subscription', date: '2023-10-15', size: '2.8 GB', files: 193, color:'blue' },
+        { name: 'Early Access New Music', type: 'premium', date: '2024-01-05', size: '540 MB', files: 12, price:'$7.99', color:'blue', purchased: false, teaser: 'Get early access to unreleased tracks and studio demos from the upcoming Stray Kids album. 12 audio files in lossless quality.' },
+      ],
+      folderCount: '6 folders · 847 files',
+    },
+    'DOECHII': {
+      subtitle: 'Hip-Hop · TDE · 312 files · 8.7 GB',
+      tags: ['#DOECHII','#SWAMP','#TDE','#HIPHOP'],
+      folders: [
+        { name: 'Swamp Princess Sessions', type: 'subscription', date: '2024-01-10', size: '2.4 GB', files: 98, color:'blue' },
+        { name: 'Grammy Week BTS', type: 'premium', date: '2024-02-04', size: '1.8 GB', files: 44, price:'$9.99', color:'blue', purchased: false, teaser: 'Exclusive behind-the-scenes from Grammy week — rehearsals, red carpet prep, backstage moments. 44 photos and videos.' },
+        { name: 'Fan Promo Clips', type: 'free', date: '2023-12-01', size: '220 MB', files: 18, color:'gold' },
+        { name: 'Studio Vlogs', type: 'subscription', date: '2024-03-15', size: '4.3 GB', files: 152, color:'blue' },
+      ],
+      folderCount: '4 folders · 312 files',
+    },
+    'SABRINA CARPENTER': {
+      subtitle: 'Pop · Island Records · 621 files · 15.1 GB',
+      tags: ['#SABRINA','#ESPRESSO','#POP','#SHORTNCUTE'],
+      folders: [
+        { name: 'Espresso Era Tour', type: 'subscription', date: '2024-06-10', size: '4.8 GB', files: 211, color:'blue' },
+        { name: 'Short n Sweet BTS', type: 'premium', date: '2024-08-23', size: '3.2 GB', files: 90, price:'$12.99', color:'blue', purchased: true, teaser: 'Full behind-the-scenes archive from the Short n Sweet album recording sessions. 90 photos and video clips, studio and personal.' },
+        { name: 'Meet & Greet Archive', type: 'subscription', date: '2024-07-08', size: '2.1 GB', files: 178, color:'blue' },
+        { name: 'Free Fan Clips', type: 'free', date: '2024-05-15', size: '640 MB', files: 32, color:'gold' },
+        { name: 'Radio Appearances', type: 'subscription', date: '2024-09-02', size: '4.4 GB', files: 110, color:'blue' },
+      ],
+      folderCount: '5 folders · 621 files',
+    },
+    'KENDRICK LAMAR': {
+      subtitle: 'Hip-Hop · PG&E · 489 files · 22.3 GB',
+      tags: ['#KENDRICK','#PGDE','#THEDOT','#COMPTON'],
+      folders: [
+        { name: 'GNX Album Footage', type: 'subscription', date: '2024-11-22', size: '8.4 GB', files: 143, color:'blue' },
+        { name: 'Halftime Show Archive', type: 'premium', date: '2025-02-09', size: '6.7 GB', files: 88, price:'$14.99', color:'blue', purchased: false, teaser: 'Complete Super Bowl halftime show archive — rehearsals, production setup, performance footage, and post-show candids. 88 files.' },
+        { name: 'Free Promo Clips', type: 'free', date: '2024-10-01', size: '780 MB', files: 24, color:'gold' },
+        { name: 'Studio Candids', type: 'subscription', date: '2025-01-14', size: '6.4 GB', files: 234, color:'blue' },
+      ],
+      folderCount: '4 folders · 489 files',
+    },
+    'DEAD BOYZ': {
+      subtitle: 'Alternative · Indie · 178 files · 4.2 GB',
+      tags: ['#DEADBOYZ','#UNDERGROUND','#INDIE'],
+      folders: [
+        { name: 'LA Show Highlights', type: 'free', date: '2024-04-20', size: '1.2 GB', files: 56, color:'gold' },
+        { name: 'Rehearsal Footage', type: 'subscription', date: '2024-05-10', size: '2.8 GB', files: 112, color:'blue' },
+        { name: 'Band Candids', type: 'subscription', date: '2024-06-01', size: '220 MB', files: 10, color:'blue' },
+      ],
+      folderCount: '3 folders · 178 files',
+    },
+    'MIYAVI': {
+      subtitle: 'Rock · J-Glam · 5,000+ files · 180 GB',
+      tags: ['#MIYAVI','#JROCK','#GUITAR','#JGLAM','#ARCHIVE'],
+      folders: [
+        { name: 'Kiyomizu Temple 2021', type: 'subscription', date: '2021-09-15', size: '14 GB', files: 422, color:'blue' },
+        { name: 'NA Tour 2021', type: 'subscription', date: '2021-10-01', size: '22 GB', files: 640, color:'blue' },
+        { name: 'Coachella 2022', type: 'subscription', date: '2022-04-17', size: '18 GB', files: 510, color:'blue' },
+        { name: 'Birthday Event 2022', type: 'free', date: '2022-09-14', size: '3.2 GB', files: 145, color:'gold' },
+        { name: '20th Anniversary Futurism', type: 'premium', date: '2022-10-21', size: '42 GB', files: 1200, price:'$19.99', color:'blue', purchased: true, teaser: '1,200 photos and videos spanning MIYAVI\'s entire 20-year career — rare backstage archives, personal photos, and unreleased tour footage.' },
+        { name: 'Serbia 2022 Backstage', type: 'subscription', date: '2022-03-08', size: '9.4 GB', files: 310, color:'blue' },
+      ],
+      folderCount: '6 folders · 5,000+ files',
+    },
+  };
+
+  let currentArtist = 'BANGCHAN';
+
+  function switchArtist(el, name, tags, subtitle) {
+    document.querySelectorAll('.artist-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    currentArtist = name;
+    const data = artists[name];
+    document.getElementById('artistTitle').textContent = name;
+    document.getElementById('artistSubtitle').textContent = data.subtitle;
+    document.getElementById('folderCount').textContent = data.folderCount;
+    // Update tags
+    const tagContainer = document.getElementById('sidebarTags');
+    tagContainer.innerHTML = data.tags.map(t =>
+      `<div class="tag-pill" onclick="showToast('Filtering by tag…')">${t}</div>`
+    ).join('');
+    // Render table
+    renderTable(data.folders);
+    showToast(`Switched to ${name}`);
+  }
+
+  function renderTable(folders) {
+    var tbody = document.getElementById('fileTableBody');
+    tbody.innerHTML = '';
+    folders.forEach(function(f) {
+      var isFree       = f.type === 'free';
+      var isSub        = f.type === 'subscription';
+      var isPremLocked = f.type === 'premium' && !f.purchased;
+      var isPremOwned  = f.type === 'premium' &&  f.purchased;
+
+      var tr = document.createElement('tr');
+      if (isPremLocked) tr.className = 'row-premium-locked';
+      if (isPremOwned)  tr.className = 'row-premium-purchased';
+
+      // Checkbox
+      var tdCb = document.createElement('td');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      if (isPremLocked) { cb.disabled = true; cb.style.opacity = '0.3'; }
+      else cb.style.accentColor = isPremOwned ? 'var(--accent-gold)' : 'var(--blue-bright)';
+      tdCb.appendChild(cb);
+      tr.appendChild(tdCb);
+
+      // Name cell
+      var tdName = document.createElement('td');
+      var cell = document.createElement('div');
+      cell.className = 'file-name-cell';
+      var icon = document.createElement('span');
+      var folderEmoji = f.color === 'gold' ? '📂' : '📁';
+      if (isFree)           { icon.className = 'folder-icon gold'; icon.textContent = folderEmoji; }
+      else if (isSub)       { icon.className = 'folder-icon blue'; icon.textContent = folderEmoji; }
+      else if (isPremOwned) { icon.className = 'folder-icon gold'; icon.style.color = 'var(--accent-gold)'; icon.textContent = '⭐'; }
+      else                  { icon.className = 'folder-icon'; icon.style.opacity = '0.42'; icon.style.filter = 'grayscale(0.7)'; icon.textContent = '⭐'; }
+      var info = document.createElement('div');
+      var nameDiv = document.createElement('div');
+      nameDiv.className = 'file-name';
+      if (isPremLocked) {
+        nameDiv.style.cssText = 'color:var(--text-dim);display:flex;align-items:center;gap:6px;';
+        nameDiv.appendChild(document.createTextNode(f.name + ' '));
+        var chip = document.createElement('span');
+        chip.className = 'lock-chip';
+        chip.textContent = '🔒 ' + f.price;
+        nameDiv.appendChild(chip);
+      } else if (isPremOwned) {
+        nameDiv.style.color = 'var(--accent-gold)';
+        nameDiv.textContent = f.name;
+      } else {
+        nameDiv.textContent = f.name;
+      }
+      info.appendChild(nameDiv);
+      var meta = document.createElement('div');
+      meta.className = 'file-date';
+      if (isPremLocked) meta.style.color = 'var(--text-dim)';
+      meta.textContent = f.files + ' files · ' + f.size;
+      info.appendChild(meta);
+      if (isPremLocked && f.teaser) {
+        var tDiv = document.createElement('div');
+        tDiv.className = 'folder-teaser';
+        tDiv.textContent = f.teaser;
+        info.appendChild(tDiv);
+      }
+      cell.appendChild(icon);
+      cell.appendChild(info);
+      tdName.appendChild(cell);
+      tr.appendChild(tdName);
+
+      // Badge
+      var tdBadge = document.createElement('td');
+      if (isFree) {
+        var el = document.createElement('span');
+        el.className = 'access-badge free';
+        el.textContent = '✓ FREE';
+        tdBadge.appendChild(el);
+      } else if (isSub) {
+        var el = document.createElement('span');
+        el.className = 'access-badge subscription';
+        el.textContent = '📋 SUBSCRIPTION';
+        tdBadge.appendChild(el);
+      } else if (isPremOwned) {
+        var el = document.createElement('span');
+        el.className = 'purchased-badge';
+        el.textContent = '⭐ PURCHASED';
+        tdBadge.appendChild(el);
+      } else {
+        var el = document.createElement('button');
+        el.className = 'purchase-cta';
+        el.textContent = '⭐ Buy ' + f.price;
+        (function(name, price, desc) {
+          el.onclick = function(e) { e.stopPropagation(); handlePremiumData(name, price, desc); };
+        })(f.name, f.price, f.teaser || '');
+        tdBadge.appendChild(el);
+      }
+      tr.appendChild(tdBadge);
+
+      // Date / Size / Files
+      [formatDate(f.date), f.size, String(f.files)].forEach(function(val) {
+        var td = document.createElement('td');
+        td.className = 'date-cell';
+        if (isPremLocked) td.style.color = 'var(--text-dim)';
+        td.textContent = val;
+        tr.appendChild(td);
+      });
+
+      // Actions
+      var tdAct = document.createElement('td');
+      if (isFree || isSub) {
+        var w = document.createElement('div'); w.className = 'row-actions';
+        var b = document.createElement('div'); b.className = 'row-action-btn'; b.title = 'Share';
+        b.textContent = '🔗';
+        b.onclick = function(e) { e.stopPropagation(); showToast('Link copied!'); };
+        w.appendChild(b); tdAct.appendChild(w);
+      } else if (isPremOwned) {
+        var w = document.createElement('div'); w.className = 'row-actions';
+        var b = document.createElement('div'); b.className = 'row-action-btn'; b.title = 'Download';
+        b.textContent = '⬇️';
+        b.onclick = function(e) { e.stopPropagation(); showToast('Download starting…'); };
+        w.appendChild(b); tdAct.appendChild(w);
+      }
+      tr.appendChild(tdAct);
+
+      // Row click
+      tr.style.cursor = 'pointer';
+      if (isFree) {
+        tr.onclick = function() { showToast('Opening folder…'); };
+      } else if (isSub) {
+        (function(n) { tr.onclick = function() { handleRowClick('subscription', n, ''); }; })(f.name);
+      } else if (isPremOwned) {
+        tr.onclick = function() { showToast('Opening purchased drop…'); };
+      } else {
+        (function(n, p, d) { tr.onclick = function() { handlePremiumData(n, p, d); }; })(f.name, f.price, f.teaser || '');
+      }
+
+      tbody.appendChild(tr);
+    });
+  }
+
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function handlePremiumData(name, price, teaser) {
+    document.getElementById('subModalIcon').textContent = '⭐';
+    document.getElementById('subModalTitle').textContent = name;
+    document.getElementById('subModalDesc').textContent = teaser || 'Purchase this exclusive Premium Drop for one-time access.';
+    document.getElementById('premiumTierName').textContent = 'One-Time Purchase';
+    document.getElementById('premiumTierPrice').textContent = price;
+    var tiers = document.querySelectorAll('.modal-tier');
+    tiers.forEach(function(t, i) {
+      if (i === 0) t.style.display = 'none';
+      if (i === 1) t.style.display = 'none';
+      if (i === 2) t.classList.add('featured');
+    });
+    var btn = document.querySelector('.modal-btn.primary');
+    if (btn) btn.textContent = 'Purchase for ' + price;
+    document.getElementById('subModal').classList.add('open');
+  }
+
+  function handleRowClick(type, name, price) {
+    if (type === 'subscription') {
+      document.getElementById('subModalTitle').textContent = 'Unlock: ' + name;
+      document.getElementById('subModalDesc').textContent = 'Subscribe to get full access to this content folder and all future drops from ' + currentArtist + '.';
+      document.getElementById('subModalIcon').textContent = '📁';
+      document.getElementById('premiumTierPrice').textContent = price || '$7.99';
+      document.getElementById('subModal').classList.add('open');
+    }
+  }
+
+
+  function closeModal() { document.getElementById('subModal').classList.remove('open'); }
+  function openUploadModal() { document.getElementById('uploadModal').classList.add('open'); }
+  function closeUploadModal() { document.getElementById('uploadModal').classList.remove('open'); }
+
+  document.getElementById('subModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('uploadModal').addEventListener('click', function(e) {
+    if (e.target === this) closeUploadModal();
+  });
+
+  function toggleAll(cb) {
+    document.querySelectorAll('#fileTableBody input[type="checkbox"]').forEach(c => c.checked = cb.checked);
+  }
+
+  // ── Toast ───────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ── Init ────────────────────────────────────────────────────
+  renderTable(artists['BANGCHAN'].folders);
+</script>
+</body>
+</html>
