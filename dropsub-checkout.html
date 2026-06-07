@@ -418,6 +418,12 @@
   </style>
 </head>
 <body>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
 
 <div class="bg-fixed">
   <div class="orb orb-1"></div>
@@ -510,10 +516,10 @@
         <div class="section-body">
           <!-- Logged in state -->
           <div class="logged-in-pill" id="loggedInState">
-            <div class="li-avatar">JF</div>
+            <div class="li-avatar" id="liAvatar">JF</div>
             <div class="li-info">
-              <div class="li-name">Jane Fan</div>
-              <div class="li-email">jane@email.com</div>
+              <div class="li-name" id="liName">—</div>
+              <div class="li-email" id="liEmail">—</div>
             </div>
             <div>
               <div class="li-badge">✓ Signed in</div>
@@ -910,11 +916,40 @@
     document.getElementById('cardErr').classList.remove('show');
   });
 
+  // ── Auth / user profile ──────────────────────────
+  function fetchUserProfile() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('access_token');
+          sessionStorage.removeItem('access_token');
+          window.location.replace('dropsub-login.html');
+          return null;
+        }
+        return res.json();
+      })
+      .then(function(user) {
+        if (!user) return;
+        var name = user.full_name || user.name || user.username || '';
+        var email = user.email || '';
+        var initials = name.split(' ').filter(Boolean)
+          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+        if (initials) document.getElementById('liAvatar').textContent = initials;
+        if (name)     document.getElementById('liName').textContent   = name;
+        if (email)    document.getElementById('liEmail').textContent  = email;
+      })
+      .catch(function() { /* network error — keep defaults */ });
+  }
+
   // ── Init ─────────────────────────────────────────
   // Set next billing in footer note
   const nb = new Date(); nb.setMonth(nb.getMonth() + 1);
   document.getElementById('recurringNote').textContent =
     'Then $7.99/month. Cancel anytime from your account settings.';
+  fetchUserProfile();
 </script>
 </body>
 </html>
