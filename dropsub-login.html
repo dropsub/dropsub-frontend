@@ -751,24 +751,38 @@
     // Loading state
     btn.classList.add('loading');
 
-    // Simulate auth — replace with real API call
-    setTimeout(() => {
-      btn.classList.remove('loading');
-
-      // Demo: any email ending in @dropsub.com succeeds
-      if (email.endsWith('@dropsub.com') || password === 'demo123') {
-        showToast('✓ Signed in — redirecting to dashboard…');
-        setTimeout(() => {
-          // Replace with actual dashboard URL
+    fetch('https://api.dropsub.com/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+      .then(function(res) {
+        return res.json().then(function(data) {
+          return { ok: res.ok, status: res.status, data };
+        });
+      })
+      .then(function({ ok, data }) {
+        btn.classList.remove('loading');
+        if (ok) {
+          const storage = document.getElementById('rememberMe').checked
+            ? localStorage
+            : sessionStorage;
+          storage.setItem('access_token', data.access_token);
+          storage.setItem('user', JSON.stringify(data.user));
           window.location.href = 'dropsub-mockup_copy.html';
-        }, 1200);
-      } else {
-        banner.classList.add('show');
+        } else {
+          const msg = (data && data.message) || 'Invalid email or password. Please try again.';
+          document.getElementById('errorMsg').textContent = msg;
+          banner.classList.add('show');
+          document.getElementById('passwordInput').classList.add('error');
+        }
+      })
+      .catch(function() {
+        btn.classList.remove('loading');
         document.getElementById('errorMsg').textContent =
-          'Invalid email or password. Try demo123 as password.';
-        document.getElementById('passwordInput').classList.add('error');
-      }
-    }, 1400);
+          'Unable to connect. Please check your connection and try again.';
+        banner.classList.add('show');
+      });
   }
 
   // ── Social login handler ─────────────────────────
