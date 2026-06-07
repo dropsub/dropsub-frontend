@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Content Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deepest);
+      color: var(--text-white);
+      display: flex; flex-direction: column;
+    }
+
+    /* ── TOP NAV ─────────────────────────────────────── */
+    .topnav {
+      background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; flex-shrink: 0; z-index: 50;
+    }
+    .topnav-left { display: flex; align-items: center; gap: 20px; }
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: .95rem; letter-spacing: .02em;
+      text-decoration: none; color: var(--text-white);
+    }
+    .logo-icon {
+      width: 30px; height: 30px; background: #fff; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link {
+      padding: 5px 12px; border-radius: 6px; font-size: .82rem;
+      font-weight: 500; color: var(--text-mid); cursor: pointer;
+      transition: all .15s; text-decoration: none;
+    }
+    .nav-link:hover { background: var(--bg-hover); color: var(--text-white); }
+    .topnav-right { display: flex; align-items: center; gap: 12px; }
+    .search-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      border-radius: 20px; padding: 5px 14px; width: 220px;
+    }
+    .search-bar input {
+      background: none; border: none; outline: none; color: var(--text-light);
+      font-size: .82rem; font-family: inherit; width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--text-dim); }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--blue-bright);
+      background: linear-gradient(135deg, #2979ff, #7c4dff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700; cursor: pointer;
+    }
+    .notif-btn {
+      width: 30px; height: 30px; background: var(--bg-card);
+      border: 1px solid var(--border-bright); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; cursor: pointer; position: relative;
+    }
+    .notif-dot {
+      position: absolute; top: 3px; right: 3px;
+      width: 7px; height: 7px; background: var(--blue-bright);
+      border-radius: 50%; border: 1px solid var(--bg-panel);
+    }
+
+    /* ── APP SHELL ───────────────────────────────────── */
+    .app-shell { flex: 1; display: flex; overflow: hidden; }
+    .main-content {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: var(--bg-dark);
+    }
+
+    /* ── FOLDER HEADER ───────────────────────────────── */
+    .folder-header {
+      background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      padding: 18px 24px; flex-shrink: 0; display: none;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .73rem; color: var(--text-dim); margin-bottom: 12px;
+    }
+    .breadcrumb a { color: var(--text-mid); text-decoration: none; transition: color .12s; }
+    .breadcrumb a:hover { color: var(--text-white); }
+    .breadcrumb-sep { color: var(--text-dim); }
+    .folder-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+    .folder-meta-left { flex: 1; min-width: 0; }
+    .folder-artist {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--blue-glow); margin-bottom: 5px;
+    }
+    .folder-name {
+      font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em;
+      line-height: 1.2; margin-bottom: 6px;
+    }
+    .folder-desc {
+      font-size: .83rem; color: var(--text-mid); line-height: 1.55;
+      max-width: 600px;
+    }
+    .folder-stats {
+      display: flex; align-items: center; gap: 16px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .folder-stat {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .74rem; color: var(--text-dim);
+    }
+    .folder-stat strong { color: var(--text-light); font-weight: 600; }
+    .tier-badge {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: .65rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    }
+    .tier-badge.sub      { background: rgba(41,121,255,.12); border: 1px solid rgba(41,121,255,.25); color: var(--blue-glow); }
+    .tier-badge.premium  { background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.25); color: var(--accent-gold); }
+    .tier-badge.free     { background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.2); color: #4ade80; }
+
+    /* ── TOOLBAR ─────────────────────────────────────── */
+    .toolbar {
+      background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      padding: 8px 24px; display: none; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .filter-tabs { display: flex; gap: 2px; }
+    .filter-tab {
+      padding: 5px 12px; border-radius: 6px; font-size: .78rem; font-weight: 600;
+      color: var(--text-mid); cursor: pointer; transition: all .12s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .filter-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .filter-tab.active { background: rgba(41,121,255,.15); color: var(--blue-glow); }
+    .filter-tab .tab-count {
+      background: var(--bg-card); border-radius: 10px;
+      padding: 1px 6px; font-size: .65rem; color: var(--text-dim);
+    }
+    .filter-tab.active .tab-count { background: rgba(41,121,255,.2); color: var(--blue-glow); }
+    .toolbar-spacer { flex: 1; }
+    .sort-select {
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      border-radius: 6px; padding: 5px 10px; color: var(--text-light);
+      font-family: inherit; font-size: .78rem; outline: none; cursor: pointer;
+    }
+    .sort-select option { background: var(--bg-card); }
+    .view-toggle { display: flex; gap: 2px; }
+    .view-btn {
+      width: 28px; height: 28px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .8rem; color: var(--text-dim); transition: all .12s;
+    }
+    .view-btn.active, .view-btn:hover { background: var(--blue-mid); color: #fff; border-color: var(--blue-mid); }
+
+    /* ── SCROLL AREA ─────────────────────────────────── */
+    .scroll-area {
+      flex: 1; overflow-y: auto; padding: 20px 24px;
+    }
+    .scroll-area::-webkit-scrollbar { width: 4px; }
+    .scroll-area::-webkit-scrollbar-track { background: var(--bg-dark); }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+    /* ── STATE VIEWS ─────────────────────────────────── */
+    .state-view {
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; gap: 16px; padding: 80px 0; text-align: center;
+    }
+    .state-view.show { display: flex; }
+
+    /* Loading */
+    .spinner {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 3px solid var(--border-bright);
+      border-top-color: var(--blue-bright);
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error / empty */
+    .state-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
+    }
+    .state-icon.error   { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); }
+    .state-icon.empty   { background: rgba(41,121,255,.08); border: 1px solid rgba(41,121,255,.2); }
+    .state-icon.lock    { background: rgba(245,166,35,.08); border: 1px solid rgba(245,166,35,.2); }
+    .state-title { font-size: 1.1rem; font-weight: 800; }
+    .state-title.error  { color: #f87171; }
+    .state-desc  { font-size: .85rem; color: var(--text-mid); max-width: 340px; line-height: 1.65; }
+
+    /* Upgrade CTA (403) */
+    .upgrade-box {
+      background: var(--bg-panel); border: 1px solid rgba(245,166,35,.2);
+      border-radius: 14px; padding: 24px 28px; max-width: 380px; width: 90%;
+      display: flex; flex-direction: column; gap: 14px; text-align: left;
+    }
+    .upgrade-folder-name { font-size: 1rem; font-weight: 800; }
+    .upgrade-artist      { font-size: .78rem; color: var(--text-mid); }
+    .upgrade-price {
+      font-size: 1.6rem; font-weight: 900; letter-spacing: -.03em;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .upgrade-price span { font-size: .85rem; font-weight: 500; color: var(--text-mid); -webkit-text-fill-color: var(--text-mid); }
+    .btn-upgrade-cta {
+      padding: 12px 0; border-radius: 10px; text-align: center;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
+      border: none; color: #080f1c; font-family: inherit;
+      font-size: .88rem; font-weight: 800; cursor: pointer;
+      transition: all .15s; text-decoration: none; display: block;
+      box-shadow: 0 4px 18px rgba(245,166,35,.3); letter-spacing: .02em;
+    }
+    .btn-upgrade-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,166,35,.45); }
+    .btn-back-link {
+      padding: 9px 20px; border-radius: 8px; background: none;
+      border: 1px solid var(--border-bright); color: var(--text-mid);
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; text-decoration: none;
+      display: inline-block;
+    }
+    .btn-back-link:hover { border-color: var(--blue-bright); color: var(--text-white); }
+
+    /* ── FILE GRID ───────────────────────────────────── */
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+    }
+    .file-grid.list-mode {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    /* Grid card */
+    .file-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; cursor: pointer;
+      position: relative; transition: border-color .15s, transform .15s;
+      aspect-ratio: 1;
+    }
+    .file-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+    .file-card:hover .file-card-overlay { opacity: 1; }
+
+    .file-card-thumb {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .file-card-bg {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .file-card-bg.video-bg  { background: linear-gradient(135deg, #0a1428, #1a2d50); }
+    .file-card-bg.audio-bg  { background: linear-gradient(135deg, #0f1a30, #1a1035); }
+    .file-card-bg.other-bg  { background: linear-gradient(135deg, #0c1527, #132040); }
+    .file-type-icon { font-size: 2.4rem; opacity: .7; }
+    .file-card-label {
+      font-size: .65rem; font-weight: 600; color: var(--text-dim);
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+
+    /* Waveform bars (decorative) */
+    .waveform {
+      display: flex; align-items: flex-end; gap: 2px; height: 28px;
+      margin-top: 4px; opacity: .45;
+    }
+    .waveform-bar {
+      width: 3px; background: var(--blue-bright); border-radius: 1px;
+      animation: wave var(--d, .8s) ease-in-out infinite alternate;
+    }
+    @keyframes wave { from { transform: scaleY(.3); } to { transform: scaleY(1); } }
+
+    /* Play overlay on videos */
+    .play-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .play-circle {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,.15); backdrop-filter: blur(4px);
+      border: 2px solid rgba(255,255,255,.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: all .15s;
+    }
+    .file-card:hover .play-circle { background: rgba(41,121,255,.5); border-color: var(--blue-bright); }
+
+    /* Hover overlay with file name */
+    .file-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,15,28,.88) 40%, transparent);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 10px; opacity: 0; transition: opacity .15s;
+    }
+    .file-card-name {
+      font-size: .72rem; font-weight: 600; color: var(--text-white);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .file-card-meta { font-size: .62rem; color: var(--text-mid); margin-top: 2px; }
+
+    /* List mode card */
+    .file-grid.list-mode .file-card {
+      aspect-ratio: unset; height: 52px; border-radius: 7px;
+      display: flex; align-items: center; gap: 12px; padding: 0 12px;
+    }
+    .file-grid.list-mode .file-card-thumb,
+    .file-grid.list-mode .file-card-bg {
+      width: 36px; height: 36px; border-radius: 5px; flex-shrink: 0;
+    }
+    .file-grid.list-mode .file-card-bg { justify-content: center; }
+    .file-grid.list-mode .file-type-icon { font-size: 1.2rem; }
+    .file-grid.list-mode .waveform { display: none; }
+    .file-grid.list-mode .file-card-label { display: none; }
+    .file-grid.list-mode .file-card-overlay { display: none; }
+    .file-grid.list-mode .play-overlay { width: 36px; height: 36px; }
+    .file-grid.list-mode .play-circle { width: 24px; height: 24px; font-size: .6rem; }
+    .list-file-info {
+      display: none; flex: 1; min-width: 0;
+    }
+    .file-grid.list-mode .list-file-info { display: block; }
+    .list-file-name {
+      font-size: .82rem; font-weight: 600; color: var(--text-white);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .list-file-meta { font-size: .7rem; color: var(--text-dim); margin-top: 2px; }
+    .list-file-type {
+      font-size: .65rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--text-dim);
+      flex-shrink: 0; padding-right: 4px;
+    }
+
+    /* ── LIGHTBOX ────────────────────────────────────── */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.92); backdrop-filter: blur(8px);
+      display: none; flex-direction: column;
+    }
+    .lightbox.open { display: flex; }
+
+    .lightbox-topbar {
+      height: 52px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(8,15,28,.6);
+    }
+    .lightbox-filename {
+      font-size: .88rem; font-weight: 600; color: var(--text-white);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 400px;
+    }
+    .lightbox-counter { font-size: .78rem; color: var(--text-dim); white-space: nowrap; }
+    .lb-topbar-right { display: flex; align-items: center; gap: 12px; }
+    .lb-icon-btn {
+      width: 32px; height: 32px; border-radius: 6px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .85rem; transition: all .12s; color: var(--text-light);
+      text-decoration: none;
+    }
+    .lb-icon-btn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); }
+
+    .lightbox-stage {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; padding: 16px 72px;
+    }
+
+    /* Nav arrows */
+    .lb-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.1rem; transition: all .12s; z-index: 2;
+      color: var(--text-white);
+    }
+    .lb-arrow:hover { background: rgba(41,121,255,.3); border-color: var(--blue-bright); }
+    .lb-arrow.prev { left: 14px; }
+    .lb-arrow.next { right: 14px; }
+    .lb-arrow.hidden { opacity: 0; pointer-events: none; }
+
+    /* Media containers */
+    .lb-image-wrap {
+      max-width: 100%; max-height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lb-image-wrap img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain; border-radius: 6px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .lb-video-wrap { width: 100%; max-width: 900px; }
+    .lb-video-wrap video {
+      width: 100%; border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      background: #000;
+    }
+    .lb-audio-wrap {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 14px; padding: 32px 40px; width: 100%; max-width: 480px;
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .lb-audio-icon { font-size: 3rem; }
+    .lb-audio-title { font-size: 1rem; font-weight: 700; text-align: center; }
+    .lb-audio-waveform {
+      display: flex; align-items: flex-end; gap: 3px; height: 48px; width: 100%;
+    }
+    .lb-audio-waveform .waveform-bar {
+      flex: 1; background: linear-gradient(to top, var(--blue-bright), var(--blue-glow));
+    }
+    .lb-audio-wrap audio { width: 100%; }
+    .lb-other-wrap {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 14px; padding: 40px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5); max-width: 380px;
+    }
+    .lb-other-icon { font-size: 3.5rem; }
+    .lb-other-name { font-size: .95rem; font-weight: 700; }
+    .lb-other-size { font-size: .8rem; color: var(--text-mid); }
+    .lb-download-btn {
+      padding: 10px 24px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; font-family: inherit;
+      font-size: .84rem; font-weight: 700; cursor: pointer;
+      transition: all .15s; text-decoration: none; display: inline-block;
+    }
+    .lb-download-btn:hover { transform: translateY(-1px); }
+
+    /* Lightbox footer */
+    .lightbox-footer {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 24px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      background: rgba(8,15,28,.6);
+    }
+    .lb-footer-item { font-size: .73rem; color: var(--text-dim); }
+    .lb-footer-item strong { color: var(--text-mid); font-weight: 500; }
+
+    /* ── STATUS BAR ──────────────────────────────────── */
+    .status-bar {
+      height: 28px; background: var(--bg-panel); border-top: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 16px; gap: 16px; flex-shrink: 0;
+    }
+    .status-item { font-size: .68rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; }
+
+    /* ── TOAST ───────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-panel); border: 1px solid var(--blue-bright);
+      border-radius: 8px; padding: 10px 20px; font-size: .85rem; font-weight: 600;
+      color: var(--text-white); z-index: 400; opacity: 0; transition: opacity .3s;
+      box-shadow: 0 8px 32px rgba(41,121,255,.25); pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
+
+<!-- ══ TOP NAV ══════════════════════════════════════════════ -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-mockup_copy.html">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 7C3 5.89543 3.89543 5 5 5H10L12 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" fill="#111" stroke="#111" stroke-width="1.5"/>
+          <text x="6.5" y="15.5" font-size="5.5" font-weight="900" fill="white" font-family="Arial">DS</text>
+        </svg>
+      </div>
+      <span>DropSub</span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="dropsub-mockup_copy.html">My Artists</a>
+      <a class="nav-link" href="#">Discover</a>
+      <a class="nav-link" href="dropsub-subscriptions.html">Subscriptions</a>
+      <a class="nav-link" href="#">Drops</a>
+    </nav>
+  </div>
+  <div class="topnav-right">
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search artists, folders, tags…"/>
+    </div>
+    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="user-avatar" id="userAvatar">—</div>
+  </div>
+</nav>
+
+<!-- ══ APP SHELL ═════════════════════════════════════════════ -->
+<div class="app-shell">
+  <main class="main-content">
+
+    <!-- Folder header (shown after successful load) -->
+    <div class="folder-header" id="folderHeader">
+      <div class="breadcrumb">
+        <a href="dropsub-mockup_copy.html">My Artists</a>
+        <span class="breadcrumb-sep">›</span>
+        <span id="breadcrumbArtist">—</span>
+        <span class="breadcrumb-sep">›</span>
+        <span id="breadcrumbFolder">—</span>
+      </div>
+      <div class="folder-meta">
+        <div class="folder-meta-left">
+          <div class="folder-artist" id="folderArtist">—</div>
+          <div class="folder-name" id="folderName">—</div>
+          <div class="folder-desc" id="folderDesc"></div>
+          <div class="folder-stats">
+            <div class="folder-stat"><strong id="statFiles">—</strong> files</div>
+            <div class="folder-stat"><strong id="statSize">—</strong></div>
+            <div class="folder-stat" id="statDateWrap">Updated <strong id="statDate">—</strong></div>
+            <span class="tier-badge" id="tierBadge"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar (shown after successful load) -->
+    <div class="toolbar" id="toolbar">
+      <div class="filter-tabs" id="filterTabs">
+        <div class="filter-tab active" data-filter="all" onclick="setFilter('all')">
+          All <span class="tab-count" id="countAll">0</span>
+        </div>
+        <div class="filter-tab" data-filter="image" onclick="setFilter('image')">
+          Images <span class="tab-count" id="countImage">0</span>
+        </div>
+        <div class="filter-tab" data-filter="video" onclick="setFilter('video')">
+          Videos <span class="tab-count" id="countVideo">0</span>
+        </div>
+        <div class="filter-tab" data-filter="audio" onclick="setFilter('audio')">
+          Audio <span class="tab-count" id="countAudio">0</span>
+        </div>
+        <div class="filter-tab" data-filter="other" onclick="setFilter('other')" id="filterOtherTab">
+          Other <span class="tab-count" id="countOther">0</span>
+        </div>
+      </div>
+      <div class="toolbar-spacer"></div>
+      <select class="sort-select" onchange="setSort(this.value)">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="name">Name A–Z</option>
+        <option value="size">Largest first</option>
+      </select>
+      <div class="view-toggle">
+        <div class="view-btn active" id="gridViewBtn" title="Grid view" onclick="setView('grid')">⊞</div>
+        <div class="view-btn" id="listViewBtn" title="List view" onclick="setView('list')">☰</div>
+      </div>
+    </div>
+
+    <!-- Scroll area -->
+    <div class="scroll-area">
+
+      <!-- Loading -->
+      <div class="state-view show" id="stateLoading">
+        <div class="spinner"></div>
+        <span style="font-size:.85rem; color:var(--text-mid);">Loading folder…</span>
+      </div>
+
+      <!-- 403 Upgrade -->
+      <div class="state-view" id="stateUpgrade">
+        <div class="state-icon lock">🔒</div>
+        <div class="state-title">Access required</div>
+        <div class="state-desc">Subscribe or purchase this folder to view its contents.</div>
+        <div class="upgrade-box" id="upgradeBox">
+          <div class="upgrade-folder-name" id="upgradeFolderName">—</div>
+          <div class="upgrade-artist" id="upgradeArtist">—</div>
+          <div class="upgrade-price" id="upgradePrice">—</div>
+          <a class="btn-upgrade-cta" href="dropsub-mockup_copy.html" id="upgradeCta">Subscribe to unlock</a>
+          <a class="btn-back-link" href="dropsub-mockup_copy.html">← Back to My Artists</a>
+        </div>
+      </div>
+
+      <!-- 404 / Error -->
+      <div class="state-view" id="stateError">
+        <div class="state-icon error">⚠️</div>
+        <div class="state-title error" id="errorTitle">Something went wrong</div>
+        <div class="state-desc" id="errorDesc">Could not load this folder. Please try again.</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+          <button class="btn-back-link" onclick="loadFolder()">Try again</button>
+          <a class="btn-back-link" href="dropsub-mockup_copy.html">← My Artists</a>
+        </div>
+      </div>
+
+      <!-- Empty folder -->
+      <div class="state-view" id="stateEmpty">
+        <div class="state-icon empty">📂</div>
+        <div class="state-title">No files yet</div>
+        <div class="state-desc">This folder exists but doesn't have any files yet. Check back soon.</div>
+        <a class="btn-back-link" href="dropsub-mockup_copy.html">← Back to My Artists</a>
+      </div>
+
+      <!-- Empty filter result -->
+      <div class="state-view" id="stateFilterEmpty">
+        <div class="state-icon empty">🔍</div>
+        <div class="state-title">No files match this filter</div>
+        <div class="state-desc" id="filterEmptyDesc">Try a different filter tab.</div>
+        <button class="btn-back-link" onclick="setFilter('all')">Clear filter</button>
+      </div>
+
+      <!-- File grid -->
+      <div class="file-grid" id="fileGrid"></div>
+
+    </div><!-- /scroll-area -->
+  </main>
+</div>
+
+<!-- ══ STATUS BAR ════════════════════════════════════════════ -->
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> Connected</div>
+  <div class="status-item">🔗 Blockchain sync: Active</div>
+  <div class="status-item">☁️ Cloud backup: On</div>
+  <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
+</div>
+
+<!-- ══ LIGHTBOX ══════════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-topbar">
+    <div class="lightbox-filename" id="lbFilename">—</div>
+    <div class="lb-topbar-right">
+      <span class="lightbox-counter" id="lbCounter"></span>
+      <a class="lb-icon-btn" id="lbDownloadBtn" title="Download" download>⬇</a>
+      <div class="lb-icon-btn" title="Close (Esc)" onclick="closeLightbox()">✕</div>
+    </div>
+  </div>
+  <div class="lightbox-stage" id="lbStage">
+    <div class="lb-arrow prev" id="lbPrev" onclick="lbNav(-1)">‹</div>
+    <div class="lb-arrow next" id="lbNext" onclick="lbNav(1)">›</div>
+    <div id="lbContent"></div>
+  </div>
+  <div class="lightbox-footer" id="lbFooter"></div>
+</div>
+
+<!-- ══ TOAST ═════════════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ══ JAVASCRIPT ════════════════════════════════════════════ -->
+<script>
+  var allFiles      = [];
+  var filteredFiles = [];
+  var currentFilter = 'all';
+  var currentSort   = 'newest';
+  var currentView   = 'grid';
+  var lbIndex       = 0;
+
+  // ── Toast ────────────────────────────────────────────────────
+  var toastTimer;
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2400);
+  }
+
+  // ── State helpers ────────────────────────────────────────────
+  var stateIds = ['stateLoading','stateUpgrade','stateError','stateEmpty','stateFilterEmpty'];
+  function showState(id) {
+    stateIds.forEach(function(s) {
+      document.getElementById(s).classList.toggle('show', s === id);
+    });
+    document.getElementById('fileGrid').style.display = 'none';
+    document.getElementById('folderHeader').style.display = 'none';
+    document.getElementById('toolbar').style.display     = 'none';
+  }
+  function showGrid() {
+    stateIds.forEach(function(s) { document.getElementById(s).classList.remove('show'); });
+    document.getElementById('fileGrid').style.display     = 'grid';
+    document.getElementById('folderHeader').style.display = 'block';
+    document.getElementById('toolbar').style.display      = 'flex';
+  }
+
+  // ── File type detection ──────────────────────────────────────
+  var IMAGE_EXTS = ['jpg','jpeg','png','gif','webp','heic','svg','bmp','avif','tiff'];
+  var VIDEO_EXTS = ['mp4','mov','avi','mkv','webm','m4v','wmv','flv'];
+  var AUDIO_EXTS = ['mp3','wav','flac','aac','m4a','ogg','opus','wma'];
+
+  function getFileType(file) {
+    var t = (file.type || file.mime_type || '').toLowerCase();
+    if (t.startsWith('image')) return 'image';
+    if (t.startsWith('video')) return 'video';
+    if (t.startsWith('audio')) return 'audio';
+    var ext = (file.name || file.filename || '').split('.').pop().toLowerCase();
+    if (IMAGE_EXTS.indexOf(ext) !== -1) return 'image';
+    if (VIDEO_EXTS.indexOf(ext) !== -1) return 'video';
+    if (AUDIO_EXTS.indexOf(ext) !== -1) return 'audio';
+    return 'other';
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes) return '—';
+    if (bytes < 1024)        return bytes + ' B';
+    if (bytes < 1048576)     return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1073741824)  return (bytes / 1048576).toFixed(1) + ' MB';
+    return (bytes / 1073741824).toFixed(1) + ' GB';
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    var d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fileName(file) {
+    return file.name || file.filename || file.title || 'Untitled';
+  }
+
+  function fileUrl(file) {
+    return file.url || file.file_url || file.download_url || '';
+  }
+
+  function thumbUrl(file) {
+    return file.thumbnail_url || file.thumb_url || fileUrl(file);
+  }
+
+  // ── Waveform decoration ──────────────────────────────────────
+  var WAVE_HEIGHTS = [12,20,28,16,34,22,10,30,18,26,14,32,24,8,20,28,16,22,30,12];
+  function makeWaveform(cls) {
+    var html = '<div class="waveform">';
+    for (var i = 0; i < 20; i++) {
+      var delay = (i * 0.04).toFixed(2);
+      html += '<div class="waveform-bar" style="height:' + WAVE_HEIGHTS[i] + 'px;--d:' + (0.5 + i * 0.05).toFixed(2) + 's;animation-delay:-' + delay + 's;"></div>';
+    }
+    return html + '</div>';
+  }
+
+  // ── Render file grid ─────────────────────────────────────────
+  function renderGrid(files) {
+    var grid = document.getElementById('fileGrid');
+    grid.innerHTML = '';
+    var isList = currentView === 'list';
+
+    files.forEach(function(file, idx) {
+      var type = getFileType(file);
+      var name = fileName(file);
+      var size = formatBytes(file.size || file.file_size);
+      var date = formatDate(file.created_at || file.uploaded_at);
+
+      var card = document.createElement('div');
+      card.className = 'file-card';
+      card.onclick = function() { openLightbox(idx); };
+
+      var mediaHtml = '';
+
+      if (type === 'image') {
+        var src = thumbUrl(file);
+        if (src) {
+          mediaHtml = '<img class="file-card-thumb" src="' + src + '" alt="' + name + '" loading="lazy" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'"/>' +
+            '<div class="file-card-bg" style="display:none;"><span class="file-type-icon">🖼</span></div>';
+        } else {
+          mediaHtml = '<div class="file-card-bg"><span class="file-type-icon">🖼</span></div>';
+        }
+        mediaHtml += '<div class="file-card-overlay"><div class="file-card-name">' + name + '</div><div class="file-card-meta">' + size + '</div></div>';
+
+      } else if (type === 'video') {
+        mediaHtml =
+          '<div class="file-card-bg video-bg">' +
+            '<span class="file-type-icon">🎬</span>' +
+            '<span class="file-card-label">Video</span>' +
+          '</div>' +
+          '<div class="play-overlay"><div class="play-circle">▶</div></div>' +
+          '<div class="file-card-overlay"><div class="file-card-name">' + name + '</div><div class="file-card-meta">' + size + '</div></div>';
+
+      } else if (type === 'audio') {
+        mediaHtml =
+          '<div class="file-card-bg audio-bg">' +
+            '<span class="file-type-icon">🎵</span>' +
+            makeWaveform() +
+            '<span class="file-card-label">Audio</span>' +
+          '</div>' +
+          '<div class="file-card-overlay"><div class="file-card-name">' + name + '</div><div class="file-card-meta">' + size + '</div></div>';
+
+      } else {
+        var extIcon = name.endsWith('.pdf') ? '📄' : name.match(/\.(doc|docx)$/i) ? '📝' : name.match(/\.(zip|rar)$/i) ? '🗜' : '📁';
+        mediaHtml =
+          '<div class="file-card-bg other-bg">' +
+            '<span class="file-type-icon">' + extIcon + '</span>' +
+            '<span class="file-card-label">' + (name.split('.').pop().toUpperCase().slice(0,4)) + '</span>' +
+          '</div>' +
+          '<div class="file-card-overlay"><div class="file-card-name">' + name + '</div><div class="file-card-meta">' + size + '</div></div>';
+      }
+
+      // List mode extra info
+      var listInfo = '<div class="list-file-info">' +
+        '<div class="list-file-name">' + name + '</div>' +
+        '<div class="list-file-meta">' + size + (date !== '—' ? ' · ' + date : '') + '</div>' +
+        '</div>' +
+        '<div class="list-file-type">' + type.toUpperCase() + '</div>';
+
+      card.innerHTML = mediaHtml + listInfo;
+      grid.appendChild(card);
+    });
+  }
+
+  // ── Filter & sort ────────────────────────────────────────────
+  function setFilter(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-tab').forEach(function(tab) {
+      tab.classList.toggle('active', tab.dataset.filter === filter);
+    });
+    applyFilterSort();
+  }
+
+  function setSort(val) {
+    currentSort = val;
+    applyFilterSort();
+  }
+
+  function setView(view) {
+    currentView = view;
+    var grid = document.getElementById('fileGrid');
+    grid.classList.toggle('list-mode', view === 'list');
+    document.getElementById('gridViewBtn').classList.toggle('active', view === 'grid');
+    document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
+  }
+
+  function applyFilterSort() {
+    var files = allFiles.slice();
+
+    // Filter
+    if (currentFilter !== 'all') {
+      files = files.filter(function(f) { return getFileType(f) === currentFilter; });
+    }
+
+    // Sort
+    files.sort(function(a, b) {
+      if (currentSort === 'newest') {
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      } else if (currentSort === 'oldest') {
+        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+      } else if (currentSort === 'name') {
+        return fileName(a).localeCompare(fileName(b));
+      } else if (currentSort === 'size') {
+        return (b.size || b.file_size || 0) - (a.size || a.file_size || 0);
+      }
+      return 0;
+    });
+
+    filteredFiles = files;
+
+    if (files.length === 0 && allFiles.length > 0) {
+      document.getElementById('fileGrid').style.display = 'none';
+      var desc = document.getElementById('filterEmptyDesc');
+      desc.textContent = 'No ' + currentFilter + ' files in this folder.';
+      document.getElementById('stateFilterEmpty').classList.add('show');
+    } else {
+      document.getElementById('stateFilterEmpty').classList.remove('show');
+      document.getElementById('fileGrid').style.display = currentView === 'list' ? 'grid' : 'grid';
+      renderGrid(files);
+    }
+  }
+
+  // ── Populate folder header ───────────────────────────────────
+  function populateHeader(folder) {
+    var artist  = folder.artist_name  || folder.artist  || '—';
+    var name    = folder.name         || folder.title   || 'Untitled Folder';
+    var desc    = folder.description  || '';
+    var count   = folder.file_count   != null ? folder.file_count : (allFiles.length);
+    var size    = formatBytes(folder.total_size || folder.size);
+    var updated = formatDate(folder.updated_at  || folder.created_at);
+    var tier    = (folder.tier || '').toLowerCase();
+
+    document.getElementById('folderArtist').textContent    = artist;
+    document.getElementById('folderName').textContent      = name;
+    document.getElementById('folderDesc').textContent      = desc;
+    document.getElementById('statFiles').textContent       = count;
+    document.getElementById('statSize').textContent        = size !== '—' ? size : '';
+    document.getElementById('statDate').textContent        = updated;
+    document.getElementById('breadcrumbArtist').textContent = artist;
+    document.getElementById('breadcrumbFolder').textContent = name;
+    document.title = 'DropSub — ' + name;
+
+    var badge = document.getElementById('tierBadge');
+    if (tier === 'subscription') { badge.className = 'tier-badge sub'; badge.textContent = 'Subscription'; }
+    else if (tier === 'premium') { badge.className = 'tier-badge premium'; badge.textContent = 'Premium Drop'; }
+    else if (tier === 'free')    { badge.className = 'tier-badge free'; badge.textContent = 'Free'; }
+    else { badge.style.display = 'none'; }
+
+    if (!desc)    document.getElementById('folderDesc').style.display   = 'none';
+    if (size === '—') document.getElementById('statSize').style.display = 'none';
+  }
+
+  // ── Populate filter counts ───────────────────────────────────
+  function populateCounts(files) {
+    var counts = { image: 0, video: 0, audio: 0, other: 0 };
+    files.forEach(function(f) { counts[getFileType(f)]++; });
+    document.getElementById('countAll').textContent   = files.length;
+    document.getElementById('countImage').textContent = counts.image;
+    document.getElementById('countVideo').textContent = counts.video;
+    document.getElementById('countAudio').textContent = counts.audio;
+    document.getElementById('countOther').textContent = counts.other;
+    if (counts.other === 0) document.getElementById('filterOtherTab').style.display = 'none';
+  }
+
+  // ── Load folder from API ─────────────────────────────────────
+  function loadFolder() {
+    var params   = new URLSearchParams(window.location.search);
+    var folderId = params.get('folder_id');
+
+    if (!folderId) {
+      window.location.replace('dropsub-mockup_copy.html');
+      return;
+    }
+
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    showState('stateLoading');
+
+    fetch('https://api.dropsub.com/api/folders/' + encodeURIComponent(folderId) + '/files', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('access_token');
+          sessionStorage.removeItem('access_token');
+          window.location.replace('dropsub-login.html');
+          return null;
+        }
+        return res.json().then(function(data) { return { status: res.status, ok: res.ok, data: data }; });
+      })
+      .then(function(result) {
+        if (!result) return;
+
+        if (result.status === 403) {
+          var folder = (result.data && result.data.folder) || result.data || {};
+          var price  = folder.price != null ? folder.price : result.data.price;
+          var interval = folder.interval || result.data.interval || 'month';
+          var tier   = (folder.tier || result.data.tier || 'subscription').toLowerCase();
+          var fname  = folder.name  || result.data.folder_name || 'This folder';
+          var artist = folder.artist_name || result.data.artist_name || '';
+
+          document.getElementById('upgradeFolderName').textContent = fname;
+          document.getElementById('upgradeArtist').textContent     = artist ? 'by ' + artist : '';
+
+          var priceEl = document.getElementById('upgradePrice');
+          if (price != null) {
+            priceEl.innerHTML = '$' + parseFloat(price).toFixed(2) +
+              '<span> / ' + (tier === 'premium' ? 'one-time' : interval) + '</span>';
+          } else {
+            priceEl.textContent = 'Subscription required';
+          }
+
+          var ctaEl = document.getElementById('upgradeCta');
+          ctaEl.textContent = tier === 'premium' ? 'Purchase to unlock' : 'Subscribe to unlock';
+
+          showState('stateUpgrade');
+          return;
+        }
+
+        if (result.status === 404) {
+          document.getElementById('errorTitle').textContent = 'Folder not found';
+          document.getElementById('errorDesc').textContent  = 'This folder doesn't exist or may have been removed.';
+          showState('stateError');
+          return;
+        }
+
+        if (!result.ok) {
+          var msg = (result.data && result.data.message) || 'Could not load this folder.';
+          document.getElementById('errorDesc').textContent = msg;
+          showState('stateError');
+          return;
+        }
+
+        var data   = result.data;
+        var folder = data.folder || data;
+        var files  = data.files  || data.items || data.contents || [];
+
+        if (!Array.isArray(files)) files = [];
+
+        allFiles = files;
+        populateHeader(folder);
+        populateCounts(files);
+
+        if (files.length === 0) {
+          document.getElementById('folderHeader').style.display = 'block';
+          showState('stateEmpty');
+          return;
+        }
+
+        showGrid();
+        applyFilterSort();
+      })
+      .catch(function() {
+        document.getElementById('errorTitle').textContent = 'Connection error';
+        document.getElementById('errorDesc').textContent  = 'Could not reach the server. Check your connection and try again.';
+        showState('stateError');
+      });
+  }
+
+  // ── Lightbox ─────────────────────────────────────────────────
+  function openLightbox(gridIndex) {
+    lbIndex = gridIndex;
+    renderLightboxItem();
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+    // Pause any playing media
+    document.querySelectorAll('#lbContent video, #lbContent audio').forEach(function(m) {
+      m.pause();
+    });
+  }
+
+  function lbNav(dir) {
+    lbIndex = Math.max(0, Math.min(filteredFiles.length - 1, lbIndex + dir));
+    renderLightboxItem();
+  }
+
+  function renderLightboxItem() {
+    var file = filteredFiles[lbIndex];
+    if (!file) return;
+
+    var type = getFileType(file);
+    var name = fileName(file);
+    var url  = fileUrl(file);
+    var size = formatBytes(file.size || file.file_size);
+    var date = formatDate(file.created_at || file.uploaded_at);
+
+    document.getElementById('lbFilename').textContent = name;
+    document.getElementById('lbCounter').textContent  =
+      (lbIndex + 1) + ' / ' + filteredFiles.length;
+
+    var dlBtn = document.getElementById('lbDownloadBtn');
+    if (url) { dlBtn.href = url; dlBtn.download = name; dlBtn.style.display = 'flex'; }
+    else     { dlBtn.style.display = 'none'; }
+
+    // Pause previous media
+    document.querySelectorAll('#lbContent video, #lbContent audio').forEach(function(m) { m.pause(); });
+
+    var content = document.getElementById('lbContent');
+    content.innerHTML = '';
+
+    if (type === 'image') {
+      var wrap = document.createElement('div');
+      wrap.className = 'lb-image-wrap';
+      var img = document.createElement('img');
+      img.src = url || thumbUrl(file);
+      img.alt = name;
+      wrap.appendChild(img);
+      content.appendChild(wrap);
+
+    } else if (type === 'video') {
+      var wrap = document.createElement('div');
+      wrap.className = 'lb-video-wrap';
+      var vid = document.createElement('video');
+      vid.src = url;
+      vid.controls = true;
+      vid.autoplay = true;
+      vid.style.maxHeight = '70vh';
+      wrap.appendChild(vid);
+      content.appendChild(wrap);
+
+    } else if (type === 'audio') {
+      var wrap = document.createElement('div');
+      wrap.className = 'lb-audio-wrap';
+      var iconEl = document.createElement('div');
+      iconEl.className = 'lb-audio-icon';
+      iconEl.textContent = '🎵';
+      var titleEl = document.createElement('div');
+      titleEl.className = 'lb-audio-title';
+      titleEl.textContent = name;
+      var waveEl = document.createElement('div');
+      waveEl.className = 'lb-audio-waveform';
+      waveEl.innerHTML = makeWaveform('lb-audio');
+      var aud = document.createElement('audio');
+      aud.src = url;
+      aud.controls = true;
+      aud.autoplay = true;
+      wrap.appendChild(iconEl);
+      wrap.appendChild(titleEl);
+      wrap.appendChild(waveEl);
+      wrap.appendChild(aud);
+      content.appendChild(wrap);
+
+    } else {
+      var ext = name.split('.').pop().toUpperCase();
+      var extIcon = name.endsWith('.pdf') ? '📄' : name.match(/\.(doc|docx)$/i) ? '📝' : name.match(/\.(zip|rar)$/i) ? '🗜' : '📁';
+      var wrap = document.createElement('div');
+      wrap.className = 'lb-other-wrap';
+      wrap.innerHTML =
+        '<div class="lb-other-icon">' + extIcon + '</div>' +
+        '<div class="lb-other-name">' + name + '</div>' +
+        '<div class="lb-other-size">' + (size !== '—' ? size : ext) + '</div>' +
+        (url ? '<a class="lb-download-btn" href="' + url + '" download="' + name + '">⬇ Download file</a>' : '');
+      content.appendChild(wrap);
+    }
+
+    // Arrow visibility
+    document.getElementById('lbPrev').classList.toggle('hidden', lbIndex === 0);
+    document.getElementById('lbNext').classList.toggle('hidden', lbIndex === filteredFiles.length - 1);
+
+    // Footer metadata
+    var footerParts = [];
+    if (size !== '—') footerParts.push('<div class="lb-footer-item"><strong>' + size + '</strong></div>');
+    if (date !== '—') footerParts.push('<div class="lb-footer-item">Added <strong>' + date + '</strong></div>');
+    footerParts.push('<div class="lb-footer-item"><strong>' + type.toUpperCase() + '</strong></div>');
+    document.getElementById('lbFooter').innerHTML = footerParts.join(
+      '<div style="width:1px;height:14px;background:var(--border-bright);"></div>'
+    );
+  }
+
+  // ── Keyboard nav ─────────────────────────────────────────────
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'ArrowLeft')  lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
+  });
+
+  // Close lightbox on background click
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this || e.target === document.getElementById('lbStage')) closeLightbox();
+  });
+
+  // ── User profile ─────────────────────────────────────────────
+  function fetchUserProfile() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(res) {
+        if (res.status === 401) {
+          localStorage.removeItem('access_token');
+          sessionStorage.removeItem('access_token');
+          window.location.replace('dropsub-login.html');
+          return null;
+        }
+        return res.json();
+      })
+      .then(function(user) {
+        if (!user) return;
+        var name     = user.full_name || user.name || user.username || '';
+        var initials = name.split(' ').filter(Boolean)
+          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+        var avatar = document.getElementById('userAvatar');
+        if (avatar && initials) { avatar.textContent = initials; avatar.title = name; }
+      })
+      .catch(function() {});
+  }
+
+  // ── Init ─────────────────────────────────────────────────────
+  fetchUserProfile();
+  loadFolder();
+</script>
+</body>
+</html>
