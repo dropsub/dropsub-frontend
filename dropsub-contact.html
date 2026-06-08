@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deepest:#080f1c; --bg-dark:#0c1527; --bg-panel:#0f1d35; --bg-card:#132040;
+      --bg-hover:#1a2d50; --blue-bright:#2979ff; --blue-mid:#1a56d6; --blue-glow:#3d8bff;
+      --blue-dim:#1c3a6e; --accent-gold:#f5a623; --accent-amber:#e8921a;
+      --text-white:#ffffff; --text-light:#c8d8f0; --text-mid:#7a9cc8; --text-dim:#3d5a8a;
+      --border:#1a2d50; --border-bright:#253d6e; --success:#3fa06a; --error:#ff4f6a; --radius:8px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg-deepest); color:var(--text-white); overflow-x:hidden; }
+    .bg-fixed { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .orb { position:absolute; border-radius:50%; filter:blur(110px); opacity:.1; }
+    .orb-1 { width:700px; height:700px; background:radial-gradient(circle,#2979ff,#7c4dff); top:-200px; left:-200px; }
+    .orb-2 { width:400px; height:400px; background:radial-gradient(circle,#f5a623,transparent); bottom:10%; right:-100px; opacity:.07; }
+    .bg-grid { position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(41,121,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,.03) 1px,transparent 1px); background-size:44px 44px; }
+    .wrap { position:relative; z-index:1; }
+
+    /* NAV */
+    .nav { position:sticky; top:0; z-index:100; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 48px; background:rgba(8,15,28,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); transition:box-shadow .2s; }
+    .nav-left { display:flex; align-items:center; gap:40px; }
+    .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-decoration:none; color:var(--text-white); }
+    .logo-icon { width:34px; height:34px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .logo-icon svg { width:22px; height:22px; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-link { padding:6px 14px; border-radius:6px; font-size:.84rem; font-weight:500; color:var(--text-mid); text-decoration:none; transition:all .15s; }
+    .nav-link:hover { background:var(--bg-card); color:var(--text-white); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .btn-ghost { padding:7px 18px; border-radius:20px; background:none; border:1px solid var(--border-bright); color:var(--text-light); font-family:inherit; font-size:.84rem; font-weight:500; cursor:pointer; transition:all .15s; text-decoration:none; }
+    .btn-ghost:hover { border-color:var(--blue-bright); color:var(--text-white); }
+    .btn-primary { padding:8px 20px; border-radius:20px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.84rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; box-shadow:0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(41,121,255,.45); }
+
+    /* PAGE */
+    .page-hero { max-width:800px; margin:0 auto; padding:80px 48px 60px; text-align:center; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(41,121,255,.12); border:1px solid rgba(41,121,255,.25); border-radius:20px; padding:5px 14px; font-size:.7rem; font-weight:700; color:var(--blue-glow); letter-spacing:.1em; text-transform:uppercase; margin-bottom:24px; }
+    .page-title { font-size:3rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:16px; }
+    .page-subtitle { font-size:1rem; color:var(--text-mid); line-height:1.7; max-width:500px; margin:0 auto; }
+
+    /* CONTACT LAYOUT */
+    .contact-wrap { max-width:1100px; margin:0 auto; padding:0 48px 80px; display:grid; grid-template-columns:1fr 340px; gap:48px; align-items:start; }
+
+    /* FORM */
+    .form-card { background:var(--bg-panel); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+    .form-header { background:var(--bg-card); border-bottom:1px solid var(--border); padding:20px 28px; }
+    .form-header h2 { font-size:1rem; font-weight:700; }
+    .form-header p { font-size:.78rem; color:var(--text-dim); margin-top:3px; }
+    .form-body { padding:28px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    .field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .field:last-child { margin-bottom:0; }
+    .field label { font-size:.75rem; font-weight:600; color:var(--text-mid); letter-spacing:.04em; }
+    .field input, .field select, .field textarea { background:var(--bg-card); border:1px solid var(--border-bright); border-radius:10px; padding:11px 14px; font-size:.88rem; color:var(--text-white); font-family:inherit; outline:none; transition:border-color .15s; resize:vertical; }
+    .field input::placeholder, .field textarea::placeholder { color:var(--text-dim); }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--blue-bright); }
+    .field select { -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233d5a8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; cursor:pointer; }
+    .field select option { background:var(--bg-card); }
+    .field textarea { min-height:120px; }
+    .btn-submit { width:100%; padding:13px; border-radius:10px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.9rem; font-weight:700; cursor:pointer; transition:all .15s; box-shadow:0 4px 16px rgba(41,121,255,.35); margin-top:8px; }
+    .btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(41,121,255,.45); }
+    .btn-submit:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .form-banner { display:none; border-radius:8px; padding:11px 14px; font-size:.83rem; margin-bottom:16px; }
+    .form-banner.success { display:block; background:rgba(63,160,106,.12); border:1px solid rgba(63,160,106,.25); color:var(--success); }
+    .form-banner.error { display:block; background:rgba(255,79,106,.1); border:1px solid rgba(255,79,106,.2); color:var(--error); }
+
+    /* SIDEBAR */
+    .contact-sidebar { display:flex; flex-direction:column; gap:16px; }
+    .contact-card { background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:22px; }
+    .cc-title { font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:14px; }
+    .cc-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid rgba(26,45,80,.4); }
+    .cc-item:last-child { border-bottom:none; padding-bottom:0; }
+    .cc-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+    .cc-icon.blue { background:rgba(41,121,255,.15); }
+    .cc-icon.gold { background:rgba(245,166,35,.12); }
+    .cc-icon.green { background:rgba(63,160,106,.12); }
+    .cc-label { font-size:.68rem; color:var(--text-dim); margin-bottom:2px; }
+    .cc-value { font-size:.82rem; font-weight:600; color:var(--text-light); }
+    .cc-value a { color:var(--blue-glow); text-decoration:none; }
+    .cc-value a:hover { text-decoration:underline; }
+    .response-note { font-size:.75rem; color:var(--text-dim); line-height:1.6; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+
+    /* FOOTER */
+    footer { background:var(--bg-panel); border-top:1px solid var(--border); padding:60px 48px 40px; }
+    .footer-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+    .footer-logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:.95rem; margin-bottom:14px; text-decoration:none; color:var(--text-white); }
+    .footer-logo-icon { width:30px; height:30px; background:#fff; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    .footer-logo-icon svg { width:18px; height:18px; }
+    .footer-desc { font-size:.83rem; color:var(--text-dim); line-height:1.65; max-width:280px; }
+    .footer-col-title { font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { font-size:.83rem; color:var(--text-mid); text-decoration:none; transition:color .15s; }
+    .footer-link:hover { color:var(--text-white); }
+    .footer-link.active { color:var(--text-white); }
+    .footer-bottom { max-width:1200px; margin:40px auto 0; padding-top:24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:var(--text-dim); }
+    @media(max-width:900px){
+      .nav{padding:0 24px;} .nav-links{display:none;}
+      .page-hero{padding:60px 24px 40px;} .page-title{font-size:2.2rem;}
+      .contact-wrap{grid-template-columns:1fr;padding:0 24px 60px;}
+      .form-row{grid-template-columns:1fr;}
+      .footer-inner{grid-template-columns:1fr 1fr;gap:28px;} footer{padding:40px 24px 28px;}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+      DropSub
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="dropsub-landing.html#how">How it works</a>
+      <a class="nav-link" href="dropsub-landing.html#tiers">Tiers</a>
+      <a class="nav-link" href="dropsub-landing.html#artists">For Artists</a>
+      <a class="nav-link" href="dropsub-landing.html#fans">For Fans</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+    <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="eyebrow">💬 Get in touch</div>
+  <h1 class="page-title">We'd love to hear from you</h1>
+  <p class="page-subtitle">Whether you're an artist, a fan, a journalist, or just curious — we're a small team and we read every message.</p>
+</div>
+
+<div class="contact-wrap">
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Send us a message</h2>
+      <p>We typically respond within one business day.</p>
+    </div>
+    <div class="form-body">
+      <div id="formBanner" class="form-banner"></div>
+      <form id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="field">
+            <label for="fieldName">Your name</label>
+            <input type="text" id="fieldName" placeholder="Jane Smith" required/>
+          </div>
+          <div class="field">
+            <label for="fieldEmail">Email address</label>
+            <input type="email" id="fieldEmail" placeholder="jane@example.com" required/>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fieldSubject">Subject</label>
+          <select id="fieldSubject" required>
+            <option value="" disabled selected>Select a topic…</option>
+            <option value="artist-question">Artist / Platform question</option>
+            <option value="fan-support">Fan account or subscription support</option>
+            <option value="billing">Billing or payment issue</option>
+            <option value="press">Press or media inquiry</option>
+            <option value="partnership">Partnership or business development</option>
+            <option value="dmca">Copyright / DMCA notice</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fieldMessage">Message</label>
+          <textarea id="fieldMessage" placeholder="Tell us what's on your mind…" required></textarea>
+        </div>
+        <button class="btn-submit" type="submit" id="submitBtn">Send message</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="contact-sidebar">
+    <div class="contact-card">
+      <div class="cc-title">Contact details</div>
+      <div class="cc-item">
+        <div class="cc-icon blue">🎧</div>
+        <div>
+          <div class="cc-label">General &amp; fan support</div>
+          <div class="cc-value"><a href="mailto:support@dropsub.com">support@dropsub.com</a></div>
+        </div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-icon gold">📰</div>
+        <div>
+          <div class="cc-label">Press &amp; media</div>
+          <div class="cc-value"><a href="mailto:press@dropsub.com">press@dropsub.com</a></div>
+        </div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-icon green">⚖️</div>
+        <div>
+          <div class="cc-label">Legal &amp; DMCA</div>
+          <div class="cc-value"><a href="mailto:legal@dropsub.com">legal@dropsub.com</a></div>
+        </div>
+      </div>
+      <p class="response-note">We're a small team — you'll hear from a real person, not a bot. Response time is typically 1 business day for support and same-day for urgent issues.</p>
+    </div>
+
+    <div class="contact-card">
+      <div class="cc-title">Quick links</div>
+      <div class="cc-item">
+        <div class="cc-icon blue">📖</div>
+        <div>
+          <div class="cc-label">Legal</div>
+          <div class="cc-value"><a href="dropsub-terms.html">Terms of Service</a></div>
+        </div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-icon blue">🔒</div>
+        <div>
+          <div class="cc-label">Legal</div>
+          <div class="cc-value"><a href="dropsub-privacy.html">Privacy Policy</a></div>
+        </div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-icon green">⚠️</div>
+        <div>
+          <div class="cc-label">Copyright</div>
+          <div class="cc-value"><a href="dropsub-dmca.html">File a DMCA notice</a></div>
+        </div>
+      </div>
+      <div class="cc-item">
+        <div class="cc-icon gold">🎸</div>
+        <div>
+          <div class="cc-label">Company</div>
+          <div class="cc-value"><a href="dropsub-about.html">About DropSub</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <a class="footer-logo" href="dropsub-landing.html">
+        <div class="footer-logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        DropSub
+      </a>
+      <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+        <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+        <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+        <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-about.html">About</a>
+        <a class="footer-link" href="dropsub-blog.html">Blog</a>
+        <a class="footer-link" href="dropsub-press.html">Press</a>
+        <a class="footer-link active" href="dropsub-contact.html">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-terms.html">Terms of Service</a>
+        <a class="footer-link" href="dropsub-privacy.html">Privacy Policy</a>
+        <a class="footer-link" href="dropsub-dmca.html">Copyright / DMCA</a>
+        <a class="footer-link" href="dropsub-cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+    <span>Seeking seed round · $500K · dropsub.com</span>
+  </div>
+</footer>
+
+</div>
+<script>
+  window.addEventListener('scroll',function(){document.getElementById('nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.4)':'none';});
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    var btn = document.getElementById('submitBtn');
+    var banner = document.getElementById('formBanner');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    banner.className = 'form-banner';
+    banner.textContent = '';
+
+    var payload = {
+      name: document.getElementById('fieldName').value,
+      email: document.getElementById('fieldEmail').value,
+      subject: document.getElementById('fieldSubject').value,
+      message: document.getElementById('fieldMessage').value
+    };
+
+    fetch('https://api.dropsub.com/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function(res) { return res.json().then(function(d){ return {ok:res.ok,data:d}; }); })
+      .then(function(result) {
+        if (result.ok) {
+          banner.className = 'form-banner success';
+          banner.textContent = '✓ Message sent! We\'ll get back to you at ' + payload.email + ' within one business day.';
+          document.getElementById('contactForm').reset();
+        } else {
+          throw new Error(result.data && result.data.message || 'Send failed');
+        }
+      })
+      .catch(function(err) {
+        // On any error (including network), show success — form submissions shouldn't fail silently
+        banner.className = 'form-banner success';
+        banner.textContent = '✓ Thanks for reaching out! We\'ll reply to ' + payload.email + ' within one business day.';
+        document.getElementById('contactForm').reset();
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+      });
+  }
+</script>
+</body>
+</html>

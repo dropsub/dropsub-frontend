@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Press — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deepest:#080f1c; --bg-dark:#0c1527; --bg-panel:#0f1d35; --bg-card:#132040;
+      --bg-hover:#1a2d50; --blue-bright:#2979ff; --blue-mid:#1a56d6; --blue-glow:#3d8bff;
+      --blue-dim:#1c3a6e; --accent-gold:#f5a623; --accent-amber:#e8921a;
+      --text-white:#ffffff; --text-light:#c8d8f0; --text-mid:#7a9cc8; --text-dim:#3d5a8a;
+      --border:#1a2d50; --border-bright:#253d6e; --radius:8px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg-deepest); color:var(--text-white); overflow-x:hidden; }
+    .bg-fixed { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .orb { position:absolute; border-radius:50%; filter:blur(110px); opacity:.1; }
+    .orb-1 { width:700px; height:700px; background:radial-gradient(circle,#2979ff,#7c4dff); top:-200px; left:-200px; }
+    .orb-2 { width:400px; height:400px; background:radial-gradient(circle,#f5a623,transparent); bottom:10%; right:-100px; opacity:.07; }
+    .bg-grid { position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(41,121,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,.03) 1px,transparent 1px); background-size:44px 44px; }
+    .wrap { position:relative; z-index:1; }
+
+    /* NAV */
+    .nav { position:sticky; top:0; z-index:100; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 48px; background:rgba(8,15,28,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); transition:box-shadow .2s; }
+    .nav-left { display:flex; align-items:center; gap:40px; }
+    .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-decoration:none; color:var(--text-white); }
+    .logo-icon { width:34px; height:34px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .logo-icon svg { width:22px; height:22px; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-link { padding:6px 14px; border-radius:6px; font-size:.84rem; font-weight:500; color:var(--text-mid); text-decoration:none; transition:all .15s; }
+    .nav-link:hover { background:var(--bg-card); color:var(--text-white); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .btn-ghost { padding:7px 18px; border-radius:20px; background:none; border:1px solid var(--border-bright); color:var(--text-light); font-family:inherit; font-size:.84rem; font-weight:500; cursor:pointer; transition:all .15s; text-decoration:none; }
+    .btn-ghost:hover { border-color:var(--blue-bright); color:var(--text-white); }
+    .btn-primary { padding:8px 20px; border-radius:20px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.84rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; box-shadow:0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(41,121,255,.45); }
+
+    /* PAGE */
+    .page-hero { max-width:800px; margin:0 auto; padding:80px 48px 60px; text-align:center; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(41,121,255,.12); border:1px solid rgba(41,121,255,.25); border-radius:20px; padding:5px 14px; font-size:.7rem; font-weight:700; color:var(--blue-glow); letter-spacing:.1em; text-transform:uppercase; margin-bottom:24px; }
+    .page-title { font-size:3rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:16px; }
+    .page-subtitle { font-size:1rem; color:var(--text-mid); line-height:1.7; max-width:520px; margin:0 auto; }
+
+    .content-wrap { max-width:1100px; margin:0 auto; padding:0 48px 80px; }
+
+    /* Company facts */
+    .facts-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:48px; }
+    .fact-item { background:var(--bg-card); padding:32px 24px; text-align:center; }
+    .fact-num { font-size:2.2rem; font-weight:900; letter-spacing:-.04em; line-height:1; margin-bottom:6px; }
+    .fact-num.gold { background:linear-gradient(135deg,var(--accent-gold),var(--accent-amber)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .fact-num.blue { background:linear-gradient(135deg,var(--blue-bright),var(--blue-glow)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .fact-label { font-size:.75rem; color:var(--text-dim); line-height:1.4; }
+
+    /* Company overview */
+    .section-label { font-size:.65rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--blue-bright); margin-bottom:10px; }
+    .section-title { font-size:1.6rem; font-weight:900; letter-spacing:-.025em; margin-bottom:16px; }
+    .section-body { font-size:.9rem; color:var(--text-light); line-height:1.8; max-width:700px; }
+    .section-body + .section-body { margin-top:12px; }
+
+    .content-section { margin-bottom:56px; }
+
+    /* Boilerplate */
+    .boilerplate { background:var(--bg-card); border:1px solid var(--border-bright); border-radius:12px; padding:24px 28px; }
+    .boilerplate-label { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px; }
+    .boilerplate-text { font-size:.85rem; color:var(--text-light); line-height:1.75; }
+
+    /* Logo pack */
+    .logo-pack-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
+    .logo-item { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:32px 20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; transition:border-color .2s; cursor:pointer; }
+    .logo-item:hover { border-color:var(--border-bright); }
+    .logo-item.dark-bg { background:var(--bg-deepest); }
+    .logo-item.light-bg { background:#f0f4ff; }
+    .logo-preview { font-size:1.2rem; font-weight:900; letter-spacing:.02em; }
+    .logo-preview.on-light { color:#080f1c; }
+    .logo-item-label { font-size:.7rem; color:var(--text-dim); }
+    .logo-item-dl { font-size:.68rem; color:var(--blue-glow); display:flex; align-items:center; gap:4px; }
+    .coming-tag { display:inline-block; background:var(--bg-hover); border:1px solid var(--border-bright); border-radius:20px; padding:3px 10px; font-size:.62rem; font-weight:700; color:var(--text-dim); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+
+    /* Press contact */
+    .press-contact-card { background:linear-gradient(135deg,rgba(41,121,255,.1),rgba(90,77,255,.07)); border:1px solid rgba(41,121,255,.2); border-radius:20px; padding:40px 48px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+    .pcc-left h2 { font-size:1.4rem; font-weight:900; margin-bottom:8px; }
+    .pcc-left p { font-size:.88rem; color:var(--text-mid); line-height:1.65; max-width:480px; }
+    .pcc-right { display:flex; flex-direction:column; gap:10px; flex-shrink:0; }
+    .contact-chip { display:flex; align-items:center; gap:10px; background:var(--bg-card); border:1px solid var(--border-bright); border-radius:10px; padding:10px 16px; font-size:.84rem; color:var(--text-light); text-decoration:none; transition:all .15s; }
+    .contact-chip:hover { border-color:var(--blue-bright); color:var(--text-white); }
+    .chip-icon { font-size:.9rem; flex-shrink:0; }
+    .chip-label { font-size:.68rem; color:var(--text-dim); display:block; margin-bottom:1px; }
+    .chip-value { font-weight:600; }
+
+    /* FOOTER */
+    footer { background:var(--bg-panel); border-top:1px solid var(--border); padding:60px 48px 40px; }
+    .footer-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+    .footer-logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:.95rem; margin-bottom:14px; text-decoration:none; color:var(--text-white); }
+    .footer-logo-icon { width:30px; height:30px; background:#fff; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    .footer-logo-icon svg { width:18px; height:18px; }
+    .footer-desc { font-size:.83rem; color:var(--text-dim); line-height:1.65; max-width:280px; margin-bottom:20px; }
+    .footer-col-title { font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { font-size:.83rem; color:var(--text-mid); text-decoration:none; transition:color .15s; }
+    .footer-link:hover { color:var(--text-white); }
+    .footer-link.active { color:var(--text-white); }
+    .footer-bottom { max-width:1200px; margin:40px auto 0; padding-top:24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:var(--text-dim); }
+    @media(max-width:900px){
+      .nav{padding:0 24px;} .nav-links{display:none;}
+      .page-hero{padding:60px 24px 40px;} .page-title{font-size:2.2rem;}
+      .content-wrap{padding:0 24px 60px;}
+      .facts-grid{grid-template-columns:1fr 1fr;}
+      .logo-pack-grid{grid-template-columns:1fr;}
+      .press-contact-card{flex-direction:column;}
+      .footer-inner{grid-template-columns:1fr 1fr;gap:28px;} footer{padding:40px 24px 28px;}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+      DropSub
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="dropsub-landing.html#how">How it works</a>
+      <a class="nav-link" href="dropsub-landing.html#tiers">Tiers</a>
+      <a class="nav-link" href="dropsub-landing.html#artists">For Artists</a>
+      <a class="nav-link" href="dropsub-landing.html#fans">For Fans</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+    <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="eyebrow">📰 Press & Media</div>
+  <h1 class="page-title">DropSub in the news</h1>
+  <p class="page-subtitle">Company facts, brand assets, and press contact information for journalists and media professionals.</p>
+</div>
+
+<div class="content-wrap">
+
+  <!-- Stats -->
+  <div class="facts-grid">
+    <div class="fact-item"><div class="fact-num gold">2025</div><div class="fact-label">Year founded</div></div>
+    <div class="fact-item"><div class="fact-num blue">$80K+</div><div class="fact-label">Earned by first artist on platform</div></div>
+    <div class="fact-item"><div class="fact-num blue">5,000+</div><div class="fact-label">Content files on platform</div></div>
+    <div class="fact-item"><div class="fact-num gold">3</div><div class="fact-label">Monetization tiers</div></div>
+  </div>
+
+  <!-- About -->
+  <div class="content-section">
+    <div class="section-label">About DropSub</div>
+    <h2 class="section-title">Company overview</h2>
+    <p class="section-body">DropSub is an early-stage content monetization platform that enables musicians and their teams to upload, organize, and monetize their creative archives — photos, videos, studio sessions, and tour footage — through tiered fan subscriptions and one-time premium purchases.</p>
+    <p class="section-body" style="margin-top:12px;">Founded in 2025 by Richard Frias, a former manager for international touring artist MIYAVI, DropSub addresses the gap between the content artists create and the content fans can actually access. The company is based in the United States and is currently in early access.</p>
+  </div>
+
+  <!-- Boilerplate -->
+  <div class="content-section">
+    <div class="section-label">Press boilerplate</div>
+    <div class="boilerplate">
+      <div class="boilerplate-label">Suggested copy for press mentions</div>
+      <p class="boilerplate-text">DropSub is a content monetization platform that enables artists and their teams to turn their creative archives into recurring revenue. Artists upload their full catalog — photos, videos, audio, and behind-the-scenes footage — and offer fans tiered access through free, subscription, and premium purchase models. Founded in 2025 by former artist manager Richard Frias, DropSub is currently in early access. Learn more at dropsub.com.</p>
+    </div>
+  </div>
+
+  <!-- Founder -->
+  <div class="content-section">
+    <div class="section-label">Founder bio</div>
+    <h2 class="section-title">Richard Frias — Founder & CEO</h2>
+    <p class="section-body">Richard Frias is the founder and CEO of DropSub. He previously managed international touring artist MIYAVI, overseeing content strategy, fan engagement, and digital operations across North America, Europe, and Asia. During that tenure, he identified the gap between the volume of content artists produce and the monetization infrastructure available to them. DropSub is his solution to that problem — built from the inside of artist management, for the teams that live in it.</p>
+    <p class="section-body" style="margin-top:12px;">For interview requests and founder availability: <a href="mailto:press@dropsub.com" style="color:var(--blue-glow);">press@dropsub.com</a></p>
+  </div>
+
+  <!-- Logos -->
+  <div class="content-section">
+    <div class="section-label">Brand assets</div>
+    <h2 class="section-title">Logo downloads</h2>
+    <p class="section-body" style="margin-bottom:0;">Brand assets will be available for download when DropSub launches publicly. In the meantime, contact <a href="mailto:press@dropsub.com" style="color:var(--blue-glow);">press@dropsub.com</a> for access.</p>
+    <div class="logo-pack-grid">
+      <div class="logo-item dark-bg">
+        <span class="logo-preview" style="color:#fff;">DropSub</span>
+        <span class="logo-item-label">Wordmark — dark background</span>
+        <span class="coming-tag">Coming soon</span>
+      </div>
+      <div class="logo-item" style="background:#0f1d35;">
+        <span class="logo-preview" style="color:#fff; display:flex; align-items:center; gap:8px;">
+          <span style="width:28px;height:28px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;color:#080f1c;">DS</span>
+          DropSub
+        </span>
+        <span class="logo-item-label">Logo + wordmark — dark</span>
+        <span class="coming-tag">Coming soon</span>
+      </div>
+      <div class="logo-item light-bg">
+        <span class="logo-preview on-light">DropSub</span>
+        <span class="logo-item-label" style="color:#3d5a8a;">Wordmark — light background</span>
+        <span class="coming-tag">Coming soon</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Press contact -->
+  <div class="press-contact-card">
+    <div class="pcc-left">
+      <h2>Media inquiries</h2>
+      <p>For interview requests, product announcements, fact-checking, or any other press needs, reach out directly. We typically respond to press inquiries within one business day.</p>
+    </div>
+    <div class="pcc-right">
+      <a class="contact-chip" href="mailto:press@dropsub.com">
+        <span class="chip-icon">📧</span>
+        <div>
+          <span class="chip-label">Press &amp; media</span>
+          <span class="chip-value">press@dropsub.com</span>
+        </div>
+      </a>
+      <a class="contact-chip" href="dropsub-about.html">
+        <span class="chip-icon">🎸</span>
+        <div>
+          <span class="chip-label">Founder background</span>
+          <span class="chip-value">Read the story →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <a class="footer-logo" href="dropsub-landing.html">
+        <div class="footer-logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        DropSub
+      </a>
+      <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+        <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+        <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+        <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-about.html">About</a>
+        <a class="footer-link" href="dropsub-blog.html">Blog</a>
+        <a class="footer-link active" href="dropsub-press.html">Press</a>
+        <a class="footer-link" href="dropsub-contact.html">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-terms.html">Terms of Service</a>
+        <a class="footer-link" href="dropsub-privacy.html">Privacy Policy</a>
+        <a class="footer-link" href="dropsub-dmca.html">Copyright / DMCA</a>
+        <a class="footer-link" href="dropsub-cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+    <span>Seeking seed round · $500K · dropsub.com</span>
+  </div>
+</footer>
+
+</div>
+<script>
+  window.addEventListener('scroll',function(){document.getElementById('nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.4)':'none';});
+</script>
+</body>
+</html>

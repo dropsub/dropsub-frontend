@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DMCA / Copyright Policy — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deepest:#080f1c; --bg-dark:#0c1527; --bg-panel:#0f1d35; --bg-card:#132040;
+      --bg-hover:#1a2d50; --blue-bright:#2979ff; --blue-mid:#1a56d6; --blue-glow:#3d8bff;
+      --blue-dim:#1c3a6e; --accent-gold:#f5a623; --accent-amber:#e8921a;
+      --text-white:#ffffff; --text-light:#c8d8f0; --text-mid:#7a9cc8; --text-dim:#3d5a8a;
+      --border:#1a2d50; --border-bright:#253d6e; --success:#3fa06a; --error:#ff4f6a; --radius:8px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg-deepest); color:var(--text-white); overflow-x:hidden; }
+    .bg-fixed { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .orb { position:absolute; border-radius:50%; filter:blur(110px); opacity:.1; }
+    .orb-1 { width:700px; height:700px; background:radial-gradient(circle,#2979ff,#7c4dff); top:-200px; left:-200px; }
+    .orb-2 { width:400px; height:400px; background:radial-gradient(circle,#f5a623,transparent); bottom:10%; right:-100px; opacity:.07; }
+    .bg-grid { position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(41,121,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,.03) 1px,transparent 1px); background-size:44px 44px; }
+    .wrap { position:relative; z-index:1; }
+
+    /* NAV */
+    .nav { position:sticky; top:0; z-index:100; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 48px; background:rgba(8,15,28,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); transition:box-shadow .2s; }
+    .nav-left { display:flex; align-items:center; gap:40px; }
+    .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-decoration:none; color:var(--text-white); }
+    .logo-icon { width:34px; height:34px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .logo-icon svg { width:22px; height:22px; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-link { padding:6px 14px; border-radius:6px; font-size:.84rem; font-weight:500; color:var(--text-mid); text-decoration:none; transition:all .15s; }
+    .nav-link:hover { background:var(--bg-card); color:var(--text-white); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .btn-ghost { padding:7px 18px; border-radius:20px; background:none; border:1px solid var(--border-bright); color:var(--text-light); font-family:inherit; font-size:.84rem; font-weight:500; cursor:pointer; transition:all .15s; text-decoration:none; }
+    .btn-ghost:hover { border-color:var(--blue-bright); color:var(--text-white); }
+    .btn-primary { padding:8px 20px; border-radius:20px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.84rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; box-shadow:0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(41,121,255,.45); }
+
+    /* PAGE HERO */
+    .page-hero { max-width:860px; margin:0 auto; padding:72px 48px 56px; }
+    .page-hero-inner { display:flex; align-items:flex-start; gap:32px; }
+    .hero-badge { width:56px; height:56px; border-radius:14px; background:rgba(41,121,255,.15); border:1px solid rgba(41,121,255,.2); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; }
+    .breadcrumb { font-size:.73rem; color:var(--text-dim); margin-bottom:8px; }
+    .breadcrumb a { color:var(--text-dim); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--text-light); }
+    .page-title { font-size:2.4rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:10px; }
+    .page-meta { font-size:.78rem; color:var(--text-dim); }
+    .page-meta strong { color:var(--text-mid); }
+
+    /* DOC LAYOUT */
+    .doc-outer { max-width:1060px; margin:0 auto; padding:0 48px 80px; }
+    .doc-layout { display:grid; grid-template-columns:220px 1fr; gap:48px; align-items:start; }
+
+    /* TOC */
+    .toc { position:sticky; top:80px; background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; }
+    .toc-title { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:14px; }
+    .toc-list { list-style:none; display:flex; flex-direction:column; gap:2px; }
+    .toc-item a { display:block; padding:6px 10px; border-radius:6px; font-size:.77rem; color:var(--text-mid); text-decoration:none; transition:all .15s; line-height:1.4; }
+    .toc-item a:hover { background:var(--bg-hover); color:var(--text-white); }
+    .toc-item a.active { background:rgba(41,121,255,.15); color:var(--blue-glow); font-weight:600; }
+
+    /* DOC CONTENT */
+    .doc-content { min-width:0; }
+    .doc-section { padding:40px 0; border-bottom:1px solid var(--border); }
+    .doc-section:last-child { border-bottom:none; }
+    .section-header { display:flex; align-items:baseline; gap:12px; margin-bottom:18px; }
+    .section-num { font-size:.72rem; font-weight:800; letter-spacing:.08em; color:var(--blue-glow); background:rgba(41,121,255,.12); border:1px solid rgba(41,121,255,.2); border-radius:5px; padding:3px 8px; flex-shrink:0; }
+    .section-title { font-size:1.25rem; font-weight:700; letter-spacing:-.02em; }
+    .doc-section p { font-size:.88rem; color:var(--text-light); line-height:1.8; margin-bottom:14px; }
+    .doc-section p:last-child { margin-bottom:0; }
+    .doc-section a { color:var(--blue-glow); text-decoration:none; }
+    .doc-section a:hover { text-decoration:underline; }
+
+    /* NOTICE CARD */
+    .notice-card { background:var(--bg-card); border:1px solid var(--border-bright); border-radius:12px; padding:20px 22px; margin:16px 0; }
+    .notice-card-title { font-size:.78rem; font-weight:700; letter-spacing:.05em; color:var(--text-mid); margin-bottom:12px; text-transform:uppercase; }
+    .notice-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .notice-list li { display:flex; align-items:flex-start; gap:10px; font-size:.84rem; color:var(--text-light); line-height:1.6; }
+    .notice-list li::before { content:''; display:block; width:6px; height:6px; border-radius:50%; background:var(--blue-glow); margin-top:7px; flex-shrink:0; }
+
+    /* PROCESS STEPS */
+    .steps { display:flex; flex-direction:column; gap:0; margin:16px 0; }
+    .step { display:flex; gap:16px; padding:16px 0; border-bottom:1px solid rgba(26,45,80,.5); }
+    .step:last-child { border-bottom:none; }
+    .step-num { width:28px; height:28px; border-radius:50%; background:rgba(41,121,255,.2); border:1px solid rgba(41,121,255,.3); display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:800; color:var(--blue-glow); flex-shrink:0; margin-top:1px; }
+    .step-body { flex:1; }
+    .step-title { font-size:.85rem; font-weight:700; margin-bottom:4px; }
+    .step-desc { font-size:.82rem; color:var(--text-mid); line-height:1.6; }
+
+    /* WARNING BOX */
+    .warn-box { background:rgba(245,166,35,.07); border:1px solid rgba(245,166,35,.2); border-radius:10px; padding:16px 18px; margin:16px 0; font-size:.82rem; color:var(--accent-gold); line-height:1.7; }
+    .warn-box strong { color:#f5b84c; }
+
+    /* CONTACT CHIP */
+    .contact-chip { display:inline-flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border-bright); border-radius:8px; padding:10px 16px; font-size:.84rem; color:var(--blue-glow); text-decoration:none; margin-top:8px; transition:all .15s; }
+    .contact-chip:hover { border-color:var(--blue-bright); background:var(--bg-hover); }
+
+    /* FOOTER */
+    footer { background:var(--bg-panel); border-top:1px solid var(--border); padding:60px 48px 40px; }
+    .footer-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+    .footer-logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:.95rem; margin-bottom:14px; text-decoration:none; color:var(--text-white); }
+    .footer-logo-icon { width:30px; height:30px; background:#fff; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    .footer-logo-icon svg { width:18px; height:18px; }
+    .footer-desc { font-size:.83rem; color:var(--text-dim); line-height:1.65; max-width:280px; }
+    .footer-col-title { font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { font-size:.83rem; color:var(--text-mid); text-decoration:none; transition:color .15s; }
+    .footer-link:hover { color:var(--text-white); }
+    .footer-link.active { color:var(--text-white); }
+    .footer-bottom { max-width:1200px; margin:40px auto 0; padding-top:24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:var(--text-dim); }
+    @media(max-width:900px){
+      .nav{padding:0 24px;} .nav-links{display:none;}
+      .page-hero{padding:48px 24px 36px;} .page-title{font-size:1.9rem;}
+      .doc-outer{padding:0 24px 60px;}
+      .doc-layout{grid-template-columns:1fr;}
+      .toc{position:static;}
+      .footer-inner{grid-template-columns:1fr 1fr;gap:28px;} footer{padding:40px 24px 28px;}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+      DropSub
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="dropsub-landing.html#how">How it works</a>
+      <a class="nav-link" href="dropsub-landing.html#tiers">Tiers</a>
+      <a class="nav-link" href="dropsub-landing.html#artists">For Artists</a>
+      <a class="nav-link" href="dropsub-landing.html#fans">For Fans</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+    <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="hero-badge">⚖️</div>
+    <div>
+      <div class="breadcrumb"><a href="dropsub-landing.html">DropSub</a> › Legal › DMCA / Copyright Policy</div>
+      <h1 class="page-title">DMCA &amp; Copyright Policy</h1>
+      <p class="page-meta">Effective date: <strong>January 1, 2025</strong> &nbsp;·&nbsp; Last updated: <strong>January 1, 2025</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="doc-outer">
+  <div class="doc-layout">
+
+    <aside class="toc">
+      <div class="toc-title">Sections</div>
+      <ul class="toc-list">
+        <li class="toc-item"><a href="#overview">1. Overview</a></li>
+        <li class="toc-item"><a href="#what-is-dmca">2. What is the DMCA?</a></li>
+        <li class="toc-item"><a href="#our-policy">3. Our Copyright Policy</a></li>
+        <li class="toc-item"><a href="#how-to-submit">4. How to Submit a Takedown Notice</a></li>
+        <li class="toc-item"><a href="#required-info">5. Required Information</a></li>
+        <li class="toc-item"><a href="#how-we-respond">6. How DropSub Responds</a></li>
+        <li class="toc-item"><a href="#counter-notice">7. Counter-Notices</a></li>
+        <li class="toc-item"><a href="#repeat-infringers">8. Repeat Infringers</a></li>
+        <li class="toc-item"><a href="#good-faith">9. Good Faith Requirement</a></li>
+        <li class="toc-item"><a href="#contact">10. Contact</a></li>
+      </ul>
+    </aside>
+
+    <div class="doc-content">
+
+      <div class="doc-section" id="overview">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <h2 class="section-title">Overview</h2>
+        </div>
+        <p>DropSub LLC ("DropSub", "we", "us") takes copyright infringement seriously. We comply with the Digital Millennium Copyright Act (DMCA), 17 U.S.C. § 512, and have implemented a policy to respond to valid notices of copyright infringement from rights holders or their authorized agents.</p>
+        <p>This document explains how to file a takedown notice, what information is required, and what you can expect from us in response.</p>
+      </div>
+
+      <div class="doc-section" id="what-is-dmca">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <h2 class="section-title">What is the DMCA?</h2>
+        </div>
+        <p>The Digital Millennium Copyright Act is a United States copyright law that provides a framework for copyright holders to request the removal of content that infringes their rights from online services. It also protects online service providers from liability for content posted by their users, provided the service provider acts expeditiously to remove infringing content upon receiving a proper notice.</p>
+        <p>DropSub is a storage and distribution platform for artist content. Artists upload their own work — photos, videos, audio, documents — and provide fan access through subscription tiers. We do not create, edit, or own the content stored on our platform.</p>
+      </div>
+
+      <div class="doc-section" id="our-policy">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <h2 class="section-title">Our Copyright Policy</h2>
+        </div>
+        <p>DropSub's platform is built for artists to share and monetize their own creative work. By accepting our Terms of Service, every artist certifies that they own or hold the necessary rights to any content they upload.</p>
+        <p>Despite these safeguards, infringing content may occasionally appear. We will respond promptly to valid DMCA takedown notices. If you believe content on DropSub infringes your copyright, please follow the process described below.</p>
+        <div class="warn-box">
+          <strong>Important:</strong> Filing a false or misleading DMCA notice can expose you to legal liability for damages, including costs and attorneys' fees. Only file a notice if you have a good-faith belief that the content is infringing.
+        </div>
+      </div>
+
+      <div class="doc-section" id="how-to-submit">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <h2 class="section-title">How to Submit a Takedown Notice</h2>
+        </div>
+        <p>Please send your DMCA takedown notice to our designated copyright agent by email:</p>
+        <a class="contact-chip" href="mailto:legal@dropsub.com">⚖️ legal@dropsub.com</a>
+        <p style="margin-top:16px;">You may also send written notice by mail to:</p>
+        <div class="notice-card">
+          <div class="notice-card-title">Mailing address — Copyright Agent</div>
+          <p style="color:var(--text-light);font-size:.84rem;line-height:1.8;">DropSub LLC<br/>Attn: DMCA / Copyright Agent<br/>c/o Richard Frias<br/>[Address on file]<br/>United States</p>
+        </div>
+        <p>Email is the fastest path — we monitor legal@dropsub.com and respond to notices within 1–2 business days.</p>
+      </div>
+
+      <div class="doc-section" id="required-info">
+        <div class="section-header">
+          <span class="section-num">05</span>
+          <h2 class="section-title">Required Information</h2>
+        </div>
+        <p>A valid DMCA takedown notice must include all of the following elements (17 U.S.C. § 512(c)(3)):</p>
+        <div class="notice-card">
+          <div class="notice-card-title">Required elements</div>
+          <ul class="notice-list">
+            <li>A physical or electronic signature of the copyright owner, or a person authorized to act on their behalf.</li>
+            <li>Identification of the copyrighted work claimed to have been infringed. If multiple works are covered by a single notice, a representative list is acceptable.</li>
+            <li>Identification of the material on DropSub that is claimed to be infringing, with enough detail for us to locate it (e.g., the URL of the folder or file).</li>
+            <li>Your contact information: name, mailing address, telephone number, and email address.</li>
+            <li>A statement that you have a good-faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.</li>
+            <li>A statement, under penalty of perjury, that the information in the notification is accurate, and that you are the copyright owner or are authorized to act on the copyright owner's behalf.</li>
+          </ul>
+        </div>
+        <p>Notices that are materially incomplete may not be actioned. We may request additional information if your notice is unclear.</p>
+      </div>
+
+      <div class="doc-section" id="how-we-respond">
+        <div class="section-header">
+          <span class="section-num">06</span>
+          <h2 class="section-title">How DropSub Responds</h2>
+        </div>
+        <p>Upon receipt of a valid DMCA takedown notice, we will act expeditiously in the following sequence:</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Review</div>
+              <div class="step-desc">We verify that the notice includes all required elements and that the identified content is accessible on our platform.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Disable access</div>
+              <div class="step-desc">We disable public access to the identified content while the dispute is pending. The content is not permanently deleted immediately.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Notify the uploader</div>
+              <div class="step-desc">We notify the artist (uploader) that their content has been subject to a DMCA notice, without revealing your personal contact information. We provide them information about filing a counter-notice.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Counter-notice window</div>
+              <div class="step-desc">The uploader has 10–14 business days to submit a counter-notice if they believe the takedown was improper.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">Resolution</div>
+              <div class="step-desc">If no counter-notice is received, the content is permanently removed. If a valid counter-notice is received, we may restore the content after notifying you, unless you inform us that you have filed a court action to restrain the uploader.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-section" id="counter-notice">
+        <div class="section-header">
+          <span class="section-num">07</span>
+          <h2 class="section-title">Counter-Notices</h2>
+        </div>
+        <p>If your content was removed in response to a DMCA notice and you believe the removal was in error (e.g., you own the rights, the use is licensed, or the use is covered by fair use), you may submit a counter-notice to legal@dropsub.com.</p>
+        <p>A valid counter-notice must include:</p>
+        <div class="notice-card">
+          <div class="notice-card-title">Required elements for counter-notice</div>
+          <ul class="notice-list">
+            <li>Your physical or electronic signature.</li>
+            <li>Identification of the content that was removed, and its location on DropSub before removal.</li>
+            <li>A statement under penalty of perjury that you have a good-faith belief that the content was removed or disabled as a result of mistake or misidentification.</li>
+            <li>Your name, address, and telephone number, and a statement that you consent to the jurisdiction of the Federal District Court for the judicial district in which your address is located (or any judicial district in which DropSub may be found if your address is outside the United States), and that you will accept service of process from the person who provided the original takedown notice.</li>
+          </ul>
+        </div>
+        <p>Upon receipt of a valid counter-notice, we will forward it to the original complainant. If the complainant does not notify us within 10–14 business days that they have filed a court action, we may restore the content.</p>
+      </div>
+
+      <div class="doc-section" id="repeat-infringers">
+        <div class="section-header">
+          <span class="section-num">08</span>
+          <h2 class="section-title">Repeat Infringers</h2>
+        </div>
+        <p>DropSub maintains a policy of terminating the accounts of users who are found to be repeat infringers. An account may be suspended or terminated if we receive multiple valid DMCA notices relating to content uploaded by the same account, even if counter-notices are filed, and we determine in our reasonable discretion that the account holder is engaging in a pattern of infringing activity.</p>
+        <p>Repeat infringers will be permanently banned from creating new DropSub accounts. We reserve the right to escalate cases to relevant law enforcement or rights-holder organizations.</p>
+      </div>
+
+      <div class="doc-section" id="good-faith">
+        <div class="section-header">
+          <span class="section-num">09</span>
+          <h2 class="section-title">Good Faith Requirement</h2>
+        </div>
+        <p>The DMCA provides remedies for knowingly materially misrepresenting that content is infringing (17 U.S.C. § 512(f)). If you knowingly misrepresent in a notification that material or activity is infringing, you may be liable for any resulting damages, including costs and attorneys' fees incurred by us or the accused infringer.</p>
+        <p>Before filing a notice, please consider whether the content may be covered by a license, fair use, or other exception. We take abuse of the DMCA process seriously and reserve the right to forward notices to the uploader in their entirety, including your contact details, as required by law.</p>
+      </div>
+
+      <div class="doc-section" id="contact">
+        <div class="section-header">
+          <span class="section-num">10</span>
+          <h2 class="section-title">Contact</h2>
+        </div>
+        <p>All DMCA-related communications should be directed to our designated copyright agent:</p>
+        <a class="contact-chip" href="mailto:legal@dropsub.com">⚖️ legal@dropsub.com</a>
+        <p style="margin-top:16px;">For general support, please use <a href="mailto:support@dropsub.com">support@dropsub.com</a> or our <a href="dropsub-contact.html">contact page</a>.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <a class="footer-logo" href="dropsub-landing.html">
+        <div class="footer-logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        DropSub
+      </a>
+      <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+        <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+        <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+        <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-about.html">About</a>
+        <a class="footer-link" href="dropsub-blog.html">Blog</a>
+        <a class="footer-link" href="dropsub-press.html">Press</a>
+        <a class="footer-link" href="dropsub-contact.html">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-terms.html">Terms of Service</a>
+        <a class="footer-link" href="dropsub-privacy.html">Privacy Policy</a>
+        <a class="footer-link active" href="dropsub-dmca.html">Copyright / DMCA</a>
+        <a class="footer-link" href="dropsub-cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+    <span>Seeking seed round · $500K · dropsub.com</span>
+  </div>
+</footer>
+
+</div>
+<script>
+  window.addEventListener('scroll',function(){document.getElementById('nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.4)':'none';});
+
+  // TOC active section highlight
+  var tocLinks = document.querySelectorAll('.toc-item a');
+  var sections = document.querySelectorAll('.doc-section');
+  function setActive() {
+    var scrollY = window.scrollY + 120;
+    var active = null;
+    sections.forEach(function(sec) {
+      if (sec.offsetTop <= scrollY) active = sec.id;
+    });
+    tocLinks.forEach(function(a) {
+      a.classList.toggle('active', active && a.getAttribute('href') === '#' + active);
+    });
+  }
+  window.addEventListener('scroll', setActive, {passive:true});
+  setActive();
+</script>
+</body>
+</html>

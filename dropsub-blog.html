@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deepest:#080f1c; --bg-dark:#0c1527; --bg-panel:#0f1d35; --bg-card:#132040;
+      --bg-hover:#1a2d50; --blue-bright:#2979ff; --blue-mid:#1a56d6; --blue-glow:#3d8bff;
+      --blue-dim:#1c3a6e; --accent-gold:#f5a623; --accent-amber:#e8921a;
+      --text-white:#ffffff; --text-light:#c8d8f0; --text-mid:#7a9cc8; --text-dim:#3d5a8a;
+      --border:#1a2d50; --border-bright:#253d6e; --radius:8px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg-deepest); color:var(--text-white); overflow-x:hidden; }
+    .bg-fixed { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .orb { position:absolute; border-radius:50%; filter:blur(110px); opacity:.1; }
+    .orb-1 { width:700px; height:700px; background:radial-gradient(circle,#2979ff,#7c4dff); top:-200px; left:-200px; }
+    .orb-2 { width:400px; height:400px; background:radial-gradient(circle,#f5a623,transparent); bottom:20%; right:-100px; opacity:.07; }
+    .bg-grid { position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(41,121,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,.03) 1px,transparent 1px); background-size:44px 44px; }
+    .wrap { position:relative; z-index:1; }
+
+    /* NAV */
+    .nav { position:sticky; top:0; z-index:100; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 48px; background:rgba(8,15,28,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); transition:box-shadow .2s; }
+    .nav-left { display:flex; align-items:center; gap:40px; }
+    .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-decoration:none; color:var(--text-white); }
+    .logo-icon { width:34px; height:34px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .logo-icon svg { width:22px; height:22px; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-link { padding:6px 14px; border-radius:6px; font-size:.84rem; font-weight:500; color:var(--text-mid); text-decoration:none; transition:all .15s; }
+    .nav-link:hover { background:var(--bg-card); color:var(--text-white); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .btn-ghost { padding:7px 18px; border-radius:20px; background:none; border:1px solid var(--border-bright); color:var(--text-light); font-family:inherit; font-size:.84rem; font-weight:500; cursor:pointer; transition:all .15s; text-decoration:none; }
+    .btn-ghost:hover { border-color:var(--blue-bright); color:var(--text-white); }
+    .btn-primary { padding:8px 20px; border-radius:20px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.84rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; box-shadow:0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(41,121,255,.45); }
+
+    /* PAGE */
+    .page-hero { max-width:800px; margin:0 auto; padding:80px 48px 56px; text-align:center; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(41,121,255,.12); border:1px solid rgba(41,121,255,.25); border-radius:20px; padding:5px 14px; font-size:.7rem; font-weight:700; color:var(--blue-glow); letter-spacing:.1em; text-transform:uppercase; margin-bottom:24px; }
+    .page-title { font-size:3rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:16px; }
+    .page-subtitle { font-size:1rem; color:var(--text-mid); line-height:1.7; max-width:520px; margin:0 auto; }
+
+    /* COMING SOON */
+    .soon-wrap { max-width:680px; margin:0 auto 80px; padding:0 48px; }
+    .soon-card { background:var(--bg-panel); border:1px solid var(--border-bright); border-radius:24px; padding:56px 48px; text-align:center; position:relative; overflow:hidden; }
+    .soon-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue-bright),var(--accent-gold)); }
+    .soon-icon { font-size:3.5rem; margin-bottom:20px; animation:float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+    .soon-title { font-size:1.6rem; font-weight:900; letter-spacing:-.02em; margin-bottom:10px; }
+    .soon-desc { font-size:.9rem; color:var(--text-mid); line-height:1.7; max-width:440px; margin:0 auto 32px; }
+    .signup-form { display:flex; gap:10px; max-width:420px; margin:0 auto 16px; }
+    .signup-input { flex:1; background:var(--bg-card); border:1px solid var(--border-bright); border-radius:10px; padding:11px 16px; font-size:.88rem; color:var(--text-white); font-family:inherit; outline:none; transition:border-color .15s; }
+    .signup-input::placeholder { color:var(--text-dim); }
+    .signup-input:focus { border-color:var(--blue-bright); }
+    .btn-signup { padding:11px 20px; border-radius:10px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.88rem; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap; box-shadow:0 4px 14px rgba(41,121,255,.35); }
+    .btn-signup:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(41,121,255,.45); }
+    .signup-note { font-size:.72rem; color:var(--text-dim); }
+    .signup-success { display:none; background:rgba(63,160,106,.12); border:1px solid rgba(63,160,106,.25); border-radius:10px; padding:12px 20px; font-size:.85rem; color:#3fa06a; font-weight:600; max-width:420px; margin:0 auto; }
+
+    /* UPCOMING TOPICS */
+    .topics-wrap { max-width:1100px; margin:0 auto; padding:0 48px 80px; }
+    .topics-head { text-align:center; margin-bottom:36px; }
+    .topics-label { font-size:.65rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; }
+    .topics-title { font-size:1.4rem; font-weight:800; color:var(--text-light); }
+    .topics-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .topic-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; opacity:.65; transition:all .2s; position:relative; overflow:hidden; }
+    .topic-card::after { content:'Coming soon'; position:absolute; top:12px; right:12px; background:var(--bg-hover); border:1px solid var(--border-bright); border-radius:20px; padding:2px 10px; font-size:.62rem; font-weight:700; color:var(--text-dim); letter-spacing:.06em; text-transform:uppercase; }
+    .topic-card:hover { opacity:.9; border-color:var(--border-bright); transform:translateY(-2px); }
+    .topic-tag { font-size:.65rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--blue-glow); margin-bottom:10px; }
+    .topic-title { font-size:.95rem; font-weight:800; color:var(--text-white); line-height:1.35; margin-bottom:8px; }
+    .topic-desc { font-size:.78rem; color:var(--text-dim); line-height:1.6; }
+    .topic-meta { display:flex; align-items:center; gap:8px; margin-top:14px; font-size:.7rem; color:var(--text-dim); }
+    .topic-author-dot { width:20px; height:20px; border-radius:50%; background:linear-gradient(135deg,var(--blue-dim),var(--blue-mid)); display:flex; align-items:center; justify-content:center; font-size:.55rem; font-weight:700; }
+
+    /* FOOTER */
+    footer { background:var(--bg-panel); border-top:1px solid var(--border); padding:60px 48px 40px; }
+    .footer-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+    .footer-logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:.95rem; margin-bottom:14px; text-decoration:none; color:var(--text-white); }
+    .footer-logo-icon { width:30px; height:30px; background:#fff; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    .footer-logo-icon svg { width:18px; height:18px; }
+    .footer-desc { font-size:.83rem; color:var(--text-dim); line-height:1.65; max-width:280px; margin-bottom:20px; }
+    .footer-col-title { font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { font-size:.83rem; color:var(--text-mid); text-decoration:none; transition:color .15s; }
+    .footer-link:hover { color:var(--text-white); }
+    .footer-link.active { color:var(--text-white); }
+    .footer-bottom { max-width:1200px; margin:40px auto 0; padding-top:24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:var(--text-dim); }
+    @media(max-width:900px){
+      .nav{padding:0 24px;} .nav-links{display:none;}
+      .page-hero{padding:60px 24px 40px;} .page-title{font-size:2.2rem;}
+      .soon-wrap,.topics-wrap{padding:0 24px 60px;}
+      .signup-form{flex-direction:column;}
+      .topics-grid{grid-template-columns:1fr;}
+      .footer-inner{grid-template-columns:1fr 1fr;gap:28px;} footer{padding:40px 24px 28px;}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+      DropSub
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="dropsub-landing.html#how">How it works</a>
+      <a class="nav-link" href="dropsub-landing.html#tiers">Tiers</a>
+      <a class="nav-link" href="dropsub-landing.html#artists">For Artists</a>
+      <a class="nav-link" href="dropsub-landing.html#fans">For Fans</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+    <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="eyebrow">✍️ DropSub Journal</div>
+  <h1 class="page-title">Insights from inside<br>the creator economy</h1>
+  <p class="page-subtitle">Guides for artists and managers, analysis on content monetization, and stories from the people building DropSub.</p>
+</div>
+
+<div class="soon-wrap">
+  <div class="soon-card">
+    <div class="soon-icon">📝</div>
+    <div class="soon-title">Articles coming soon</div>
+    <div class="soon-desc">The DropSub Journal launches with our public beta. Drop your email and we'll notify you the moment our first articles go live — no spam, just signal.</div>
+    <form class="signup-form" id="signupForm" onsubmit="handleSignup(event)">
+      <input class="signup-input" type="email" id="emailInput" placeholder="you@example.com" required/>
+      <button class="btn-signup" type="submit">Notify me</button>
+    </form>
+    <div class="signup-success" id="signupSuccess">✓ You're on the list — we'll email you when we publish.</div>
+    <div class="signup-note">No spam. Unsubscribe any time.</div>
+  </div>
+</div>
+
+<div class="topics-wrap">
+  <div class="topics-head">
+    <div class="topics-label">What we're writing</div>
+    <div class="topics-title">Topics coming to the DropSub Journal</div>
+  </div>
+  <div class="topics-grid">
+    <div class="topic-card">
+      <div class="topic-tag">For Artists</div>
+      <div class="topic-title">How MIYAVI turned 180 GB of unused content into $80K+ in revenue</div>
+      <div class="topic-desc">A step-by-step breakdown of the folder structure, pricing strategy, and fan communication that made it work.</div>
+      <div class="topic-meta"><div class="topic-author-dot">RF</div>Richard Frias · Founder</div>
+    </div>
+    <div class="topic-card">
+      <div class="topic-tag">Strategy</div>
+      <div class="topic-title">Free vs. Subscription vs. Premium: how to tier your archive</div>
+      <div class="topic-desc">The mental model for deciding which content belongs at which access level — and why giving some away free is the key to everything.</div>
+      <div class="topic-meta"><div class="topic-author-dot">RF</div>Richard Frias · Founder</div>
+    </div>
+    <div class="topic-card">
+      <div class="topic-tag">Industry</div>
+      <div class="topic-title">The content gap: why artists create more than they ever publish</div>
+      <div class="topic-desc">An analysis of the economic forces that leave 99% of artist content unmonetized — and why that's finally changing.</div>
+      <div class="topic-meta"><div class="topic-author-dot">RF</div>Richard Frias · Founder</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <a class="footer-logo" href="dropsub-landing.html">
+        <div class="footer-logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        DropSub
+      </a>
+      <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+        <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+        <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+        <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-about.html">About</a>
+        <a class="footer-link active" href="dropsub-blog.html">Blog</a>
+        <a class="footer-link" href="dropsub-press.html">Press</a>
+        <a class="footer-link" href="dropsub-contact.html">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-terms.html">Terms of Service</a>
+        <a class="footer-link" href="dropsub-privacy.html">Privacy Policy</a>
+        <a class="footer-link" href="dropsub-dmca.html">Copyright / DMCA</a>
+        <a class="footer-link" href="dropsub-cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+    <span>Seeking seed round · $500K · dropsub.com</span>
+  </div>
+</footer>
+
+</div>
+<script>
+  window.addEventListener('scroll',function(){document.getElementById('nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.4)':'none';});
+  function handleSignup(e) {
+    e.preventDefault();
+    var email = document.getElementById('emailInput').value;
+    if (!email) return;
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('signupSuccess').style.display = 'block';
+  }
+</script>
+</body>
+</html>

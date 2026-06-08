@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cookie Policy — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deepest:#080f1c; --bg-dark:#0c1527; --bg-panel:#0f1d35; --bg-card:#132040;
+      --bg-hover:#1a2d50; --blue-bright:#2979ff; --blue-mid:#1a56d6; --blue-glow:#3d8bff;
+      --blue-dim:#1c3a6e; --accent-gold:#f5a623; --accent-amber:#e8921a;
+      --text-white:#ffffff; --text-light:#c8d8f0; --text-mid:#7a9cc8; --text-dim:#3d5a8a;
+      --border:#1a2d50; --border-bright:#253d6e; --success:#3fa06a; --error:#ff4f6a; --radius:8px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; background:var(--bg-deepest); color:var(--text-white); overflow-x:hidden; }
+    .bg-fixed { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .orb { position:absolute; border-radius:50%; filter:blur(110px); opacity:.1; }
+    .orb-1 { width:700px; height:700px; background:radial-gradient(circle,#2979ff,#7c4dff); top:-200px; left:-200px; }
+    .orb-2 { width:400px; height:400px; background:radial-gradient(circle,#f5a623,transparent); bottom:10%; right:-100px; opacity:.07; }
+    .bg-grid { position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(41,121,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(41,121,255,.03) 1px,transparent 1px); background-size:44px 44px; }
+    .wrap { position:relative; z-index:1; }
+
+    /* NAV */
+    .nav { position:sticky; top:0; z-index:100; height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 48px; background:rgba(8,15,28,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); transition:box-shadow .2s; }
+    .nav-left { display:flex; align-items:center; gap:40px; }
+    .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-decoration:none; color:var(--text-white); }
+    .logo-icon { width:34px; height:34px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .logo-icon svg { width:22px; height:22px; }
+    .nav-links { display:flex; gap:2px; }
+    .nav-link { padding:6px 14px; border-radius:6px; font-size:.84rem; font-weight:500; color:var(--text-mid); text-decoration:none; transition:all .15s; }
+    .nav-link:hover { background:var(--bg-card); color:var(--text-white); }
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .btn-ghost { padding:7px 18px; border-radius:20px; background:none; border:1px solid var(--border-bright); color:var(--text-light); font-family:inherit; font-size:.84rem; font-weight:500; cursor:pointer; transition:all .15s; text-decoration:none; }
+    .btn-ghost:hover { border-color:var(--blue-bright); color:var(--text-white); }
+    .btn-primary { padding:8px 20px; border-radius:20px; background:linear-gradient(135deg,var(--blue-bright),#5a4dff); border:none; color:#fff; font-family:inherit; font-size:.84rem; font-weight:700; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; box-shadow:0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(41,121,255,.45); }
+
+    /* PAGE HERO */
+    .page-hero { max-width:860px; margin:0 auto; padding:72px 48px 56px; }
+    .page-hero-inner { display:flex; align-items:flex-start; gap:32px; }
+    .hero-badge { width:56px; height:56px; border-radius:14px; background:rgba(245,166,35,.1); border:1px solid rgba(245,166,35,.2); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; }
+    .breadcrumb { font-size:.73rem; color:var(--text-dim); margin-bottom:8px; }
+    .breadcrumb a { color:var(--text-dim); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--text-light); }
+    .page-title { font-size:2.4rem; font-weight:900; letter-spacing:-.04em; line-height:1.1; margin-bottom:10px; }
+    .page-meta { font-size:.78rem; color:var(--text-dim); }
+    .page-meta strong { color:var(--text-mid); }
+
+    /* DOC LAYOUT */
+    .doc-outer { max-width:1060px; margin:0 auto; padding:0 48px 80px; }
+    .doc-layout { display:grid; grid-template-columns:220px 1fr; gap:48px; align-items:start; }
+
+    /* TOC */
+    .toc { position:sticky; top:80px; background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; }
+    .toc-title { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:14px; }
+    .toc-list { list-style:none; display:flex; flex-direction:column; gap:2px; }
+    .toc-item a { display:block; padding:6px 10px; border-radius:6px; font-size:.77rem; color:var(--text-mid); text-decoration:none; transition:all .15s; line-height:1.4; }
+    .toc-item a:hover { background:var(--bg-hover); color:var(--text-white); }
+    .toc-item a.active { background:rgba(245,166,35,.12); color:var(--accent-gold); font-weight:600; }
+
+    /* DOC CONTENT */
+    .doc-content { min-width:0; }
+    .doc-section { padding:40px 0; border-bottom:1px solid var(--border); }
+    .doc-section:last-child { border-bottom:none; }
+    .section-header { display:flex; align-items:baseline; gap:12px; margin-bottom:18px; }
+    .section-num { font-size:.72rem; font-weight:800; letter-spacing:.08em; color:var(--accent-gold); background:rgba(245,166,35,.1); border:1px solid rgba(245,166,35,.2); border-radius:5px; padding:3px 8px; flex-shrink:0; }
+    .section-title { font-size:1.25rem; font-weight:700; letter-spacing:-.02em; }
+    .doc-section p { font-size:.88rem; color:var(--text-light); line-height:1.8; margin-bottom:14px; }
+    .doc-section p:last-child { margin-bottom:0; }
+    .doc-section a { color:var(--blue-glow); text-decoration:none; }
+    .doc-section a:hover { text-decoration:underline; }
+
+    /* STORAGE TABLE */
+    .storage-table { width:100%; border-collapse:collapse; margin:18px 0; font-size:.82rem; }
+    .storage-table th { text-align:left; padding:10px 14px; font-size:.68rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text-dim); border-bottom:1px solid var(--border-bright); }
+    .storage-table td { padding:12px 14px; border-bottom:1px solid rgba(26,45,80,.4); color:var(--text-light); vertical-align:top; line-height:1.55; }
+    .storage-table tr:last-child td { border-bottom:none; }
+    .storage-table td:first-child { font-family:'Courier New',monospace; font-size:.78rem; color:var(--accent-gold); white-space:nowrap; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.65rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-left:6px; vertical-align:middle; }
+    .tag.ls { background:rgba(245,166,35,.15); color:var(--accent-gold); }
+    .tag.ss { background:rgba(41,121,255,.15); color:var(--blue-glow); }
+    .tag.cookie { background:rgba(63,160,106,.12); color:var(--success); }
+
+    /* INFO BOX */
+    .info-box { background:rgba(41,121,255,.07); border:1px solid rgba(41,121,255,.18); border-radius:10px; padding:16px 18px; margin:16px 0; font-size:.83rem; color:var(--text-light); line-height:1.7; }
+    .info-box strong { color:var(--blue-glow); }
+
+    /* THIRD-PARTY GRID */
+    .third-party-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0; }
+    .tp-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:16px; }
+    .tp-name { font-size:.83rem; font-weight:700; margin-bottom:4px; }
+    .tp-purpose { font-size:.77rem; color:var(--text-mid); line-height:1.55; margin-bottom:8px; }
+    .tp-link a { font-size:.72rem; color:var(--blue-glow); text-decoration:none; }
+    .tp-link a:hover { text-decoration:underline; }
+
+    /* CONTACT CHIP */
+    .contact-chip { display:inline-flex; align-items:center; gap:8px; background:var(--bg-card); border:1px solid var(--border-bright); border-radius:8px; padding:10px 16px; font-size:.84rem; color:var(--blue-glow); text-decoration:none; margin-top:8px; transition:all .15s; }
+    .contact-chip:hover { border-color:var(--blue-bright); background:var(--bg-hover); }
+
+    /* FOOTER */
+    footer { background:var(--bg-panel); border-top:1px solid var(--border); padding:60px 48px 40px; }
+    .footer-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+    .footer-logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:.95rem; margin-bottom:14px; text-decoration:none; color:var(--text-white); }
+    .footer-logo-icon { width:30px; height:30px; background:#fff; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+    .footer-logo-icon svg { width:18px; height:18px; }
+    .footer-desc { font-size:.83rem; color:var(--text-dim); line-height:1.65; max-width:280px; }
+    .footer-col-title { font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { font-size:.83rem; color:var(--text-mid); text-decoration:none; transition:color .15s; }
+    .footer-link:hover { color:var(--text-white); }
+    .footer-link.active { color:var(--text-white); }
+    .footer-bottom { max-width:1200px; margin:40px auto 0; padding-top:24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:var(--text-dim); }
+    @media(max-width:900px){
+      .nav{padding:0 24px;} .nav-links{display:none;}
+      .page-hero{padding:48px 24px 36px;} .page-title{font-size:1.9rem;}
+      .doc-outer{padding:0 24px 60px;}
+      .doc-layout{grid-template-columns:1fr;}
+      .toc{position:static;}
+      .third-party-grid{grid-template-columns:1fr;}
+      .storage-table{font-size:.76rem;}
+      .footer-inner{grid-template-columns:1fr 1fr;gap:28px;} footer{padding:40px 24px 28px;}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+<nav class="nav" id="nav">
+  <div class="nav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+      DropSub
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="dropsub-landing.html#how">How it works</a>
+      <a class="nav-link" href="dropsub-landing.html#tiers">Tiers</a>
+      <a class="nav-link" href="dropsub-landing.html#artists">For Artists</a>
+      <a class="nav-link" href="dropsub-landing.html#fans">For Fans</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+    <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="hero-badge">🍪</div>
+    <div>
+      <div class="breadcrumb"><a href="dropsub-landing.html">DropSub</a> › Legal › Cookie Policy</div>
+      <h1 class="page-title">Cookie Policy</h1>
+      <p class="page-meta">Effective date: <strong>January 1, 2025</strong> &nbsp;·&nbsp; Last updated: <strong>January 1, 2025</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="doc-outer">
+  <div class="doc-layout">
+
+    <aside class="toc">
+      <div class="toc-title">Sections</div>
+      <ul class="toc-list">
+        <li class="toc-item"><a href="#overview">1. Overview</a></li>
+        <li class="toc-item"><a href="#what-are-cookies">2. What Are Cookies?</a></li>
+        <li class="toc-item"><a href="#what-we-use">3. What DropSub Uses</a></li>
+        <li class="toc-item"><a href="#storage-table">4. Storage Reference Table</a></li>
+        <li class="toc-item"><a href="#third-party">5. Third-Party Cookies</a></li>
+        <li class="toc-item"><a href="#auth-tokens">6. Authentication Tokens</a></li>
+        <li class="toc-item"><a href="#your-choices">7. Your Choices</a></li>
+        <li class="toc-item"><a href="#changes">8. Changes to This Policy</a></li>
+        <li class="toc-item"><a href="#contact">9. Contact</a></li>
+      </ul>
+    </aside>
+
+    <div class="doc-content">
+
+      <div class="doc-section" id="overview">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <h2 class="section-title">Overview</h2>
+        </div>
+        <p>This Cookie Policy explains how DropSub LLC ("DropSub", "we", "us") uses cookies and similar browser storage technologies when you visit dropsub.com or use the DropSub application.</p>
+        <p>DropSub is a minimal-footprint platform. We do not use advertising cookies, cross-site tracking, or analytics data brokers. The storage we use exists to keep you logged in and to make the product work correctly.</p>
+      </div>
+
+      <div class="doc-section" id="what-are-cookies">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <h2 class="section-title">What Are Cookies?</h2>
+        </div>
+        <p>Cookies are small text files that a website saves to your browser. They are sent back to the server on subsequent requests so the server can recognize your browser session. Cookies can be "session cookies" (deleted when you close the browser) or "persistent cookies" (stored for a defined period).</p>
+        <p>Modern web applications also use two related browser storage mechanisms: <strong>localStorage</strong> and <strong>sessionStorage</strong>. These work differently from cookies:</p>
+        <div class="info-box">
+          <strong>localStorage</strong> — data persists indefinitely across browser sessions and tab closures, until explicitly cleared by the site or the user.<br/><br/>
+          <strong>sessionStorage</strong> — data persists only for the lifetime of the current browser tab. Closing the tab destroys it. It is never sent to the server automatically.
+        </div>
+        <p>DropSub uses <em>localStorage</em> and <em>sessionStorage</em> for authentication, not traditional cookies. This section explains exactly what we store and why.</p>
+      </div>
+
+      <div class="doc-section" id="what-we-use">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <h2 class="section-title">What DropSub Uses</h2>
+        </div>
+        <p>DropSub's own first-party storage consists exclusively of authentication tokens. We do not set tracking pixels, session-replay scripts, or behavioral analytics cookies.</p>
+        <p><strong>Authentication tokens</strong> are issued by our backend (api.dropsub.com) when you log in. They are JSON Web Tokens (JWTs) that prove your identity to our API. Without a valid token in browser storage, you cannot access any protected page or API endpoint.</p>
+        <p>When you log in with <strong>"Keep me signed in"</strong> checked, the token is stored in <code>localStorage</code> and survives until it expires or you log out. When you log in <em>without</em> that option, the token is stored in <code>sessionStorage</code> and is destroyed when you close the tab.</p>
+      </div>
+
+      <div class="doc-section" id="storage-table">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <h2 class="section-title">Storage Reference Table</h2>
+        </div>
+        <p>The table below lists every key DropSub reads or writes in your browser storage.</p>
+        <table class="storage-table">
+          <thead>
+            <tr>
+              <th>Key name</th>
+              <th>Storage type</th>
+              <th>Purpose</th>
+              <th>Lifespan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>access_token <span class="tag ls">localStorage</span></td>
+              <td>localStorage</td>
+              <td>Persistent login — Bearer token sent with every authenticated API request. Set when "Keep me signed in" is selected at login.</td>
+              <td>Until token expiry (~7 days) or explicit logout</td>
+            </tr>
+            <tr>
+              <td>access_token <span class="tag ss">sessionStorage</span></td>
+              <td>sessionStorage</td>
+              <td>Session-only login — same Bearer token, but destroyed when the tab is closed. Set when "Keep me signed in" is NOT selected.</td>
+              <td>Until tab close or explicit logout</td>
+            </tr>
+            <tr>
+              <td>ds_theme <span class="tag ls">localStorage</span></td>
+              <td>localStorage</td>
+              <td>Reserved for future UI theme preference (light/dark). Not currently active.</td>
+              <td>Indefinite (small string value)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>No other keys are set by DropSub at this time. This table is updated whenever new storage use is introduced.</p>
+      </div>
+
+      <div class="doc-section" id="third-party">
+        <div class="section-header">
+          <span class="section-num">05</span>
+          <h2 class="section-title">Third-Party Cookies</h2>
+        </div>
+        <p>Some third-party services embedded in or connected to DropSub may set their own cookies. These are governed by those services' own privacy and cookie policies.</p>
+        <div class="third-party-grid">
+          <div class="tp-card">
+            <div class="tp-name">Stripe</div>
+            <div class="tp-purpose">Used for payment processing and Stripe Connect onboarding. Stripe may set fraud-prevention and session cookies during checkout flows.</div>
+            <div class="tp-link"><a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a></div>
+          </div>
+          <div class="tp-card">
+            <div class="tp-name">Google Fonts</div>
+            <div class="tp-purpose">DropSub pages load the Inter typeface from Google Fonts CDN. Google may log the request IP and User-Agent. No tracking cookie is set in this context.</div>
+            <div class="tp-link"><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></div>
+          </div>
+          <div class="tp-card">
+            <div class="tp-name">AWS CloudFront</div>
+            <div class="tp-purpose">Content delivery for static assets. CloudFront may set a session cookie (AWSALB) for load-balancing stickiness on API calls.</div>
+            <div class="tp-link"><a href="https://aws.amazon.com/privacy/" target="_blank" rel="noopener">aws.amazon.com/privacy</a></div>
+          </div>
+          <div class="tp-card">
+            <div class="tp-name">Vercel</div>
+            <div class="tp-purpose">Hosts the DropSub frontend. Vercel may set analytics or edge-routing cookies (e.g., vc-id) for performance and abuse prevention.</div>
+            <div class="tp-link"><a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">vercel.com/legal/privacy-policy</a></div>
+          </div>
+        </div>
+        <p>DropSub does not use Google Analytics, Facebook Pixel, Segment, Mixpanel, Intercom, Hotjar, or any advertising network. If this changes we will update this policy and notify users.</p>
+      </div>
+
+      <div class="doc-section" id="auth-tokens">
+        <div class="section-header">
+          <span class="section-num">06</span>
+          <h2 class="section-title">Authentication Tokens in Detail</h2>
+        </div>
+        <p>When you log in to DropSub, our API issues a signed JWT (JSON Web Token). The token payload contains your user ID, role (artist or fan), and an expiration timestamp. The token is signed with a server-side secret — it cannot be forged or tampered with.</p>
+        <p>This token is stored client-side under the key <code>access_token</code> in either <code>localStorage</code> or <code>sessionStorage</code>, depending on your login preference. Every subsequent request to our API includes this token in the <code>Authorization: Bearer &lt;token&gt;</code> HTTP header.</p>
+        <p>When you log out, DropSub deletes <code>access_token</code> from both storage locations and redirects you to the login page. We also invalidate the token server-side where possible.</p>
+        <div class="info-box">
+          <strong>Security note:</strong> localStorage is accessible to JavaScript running on the same origin. DropSub does not load untrusted third-party scripts on authenticated pages. We follow OWASP recommendations for token storage and have no server-rendered HTML that would introduce XSS vectors via token injection.
+        </div>
+        <p>If you believe your account has been compromised, log out immediately from all sessions using the account settings page, or contact <a href="mailto:support@dropsub.com">support@dropsub.com</a>.</p>
+      </div>
+
+      <div class="doc-section" id="your-choices">
+        <div class="section-header">
+          <span class="section-num">07</span>
+          <h2 class="section-title">Your Choices</h2>
+        </div>
+        <p>You have several options for controlling how storage is used:</p>
+        <p><strong>Session vs. persistent login:</strong> At the login screen, leave "Keep me signed in" unchecked to use sessionStorage instead of localStorage. Your session will end when you close the tab.</p>
+        <p><strong>Explicit logout:</strong> Clicking "Log out" removes your access token from storage immediately.</p>
+        <p><strong>Clear browser storage:</strong> You can clear localStorage and sessionStorage for dropsub.com at any time through your browser's Developer Tools (Application → Storage) or browser settings (Clear browsing data). Doing so will log you out.</p>
+        <p><strong>Block third-party cookies:</strong> Most modern browsers allow you to block third-party cookies. This may affect Stripe payment flows but will not affect DropSub's own authentication.</p>
+        <p>Because DropSub does not use advertising or analytics cookies, there is no cookie consent banner — the only essential storage is the auth token, which is necessary for the service to function once logged in.</p>
+      </div>
+
+      <div class="doc-section" id="changes">
+        <div class="section-header">
+          <span class="section-num">08</span>
+          <h2 class="section-title">Changes to This Policy</h2>
+        </div>
+        <p>We may update this Cookie Policy as the platform evolves. If we introduce materially new tracking or analytics, we will update the "Last updated" date at the top of this page and notify users by email at least 14 days before the change takes effect.</p>
+        <p>Continued use of DropSub after a policy update constitutes acceptance of the new terms. If you have questions about any change, please contact us before the effective date.</p>
+      </div>
+
+      <div class="doc-section" id="contact">
+        <div class="section-header">
+          <span class="section-num">09</span>
+          <h2 class="section-title">Contact</h2>
+        </div>
+        <p>Questions about this Cookie Policy or data practices in general can be directed to:</p>
+        <a class="contact-chip" href="mailto:legal@dropsub.com">⚖️ legal@dropsub.com</a>
+        <p style="margin-top:16px;">See also our <a href="dropsub-privacy.html">Privacy Policy</a> for a broader explanation of how we collect and use your data.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <a class="footer-logo" href="dropsub-landing.html">
+        <div class="footer-logo-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        DropSub
+      </a>
+      <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+        <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+        <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+        <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-about.html">About</a>
+        <a class="footer-link" href="dropsub-blog.html">Blog</a>
+        <a class="footer-link" href="dropsub-press.html">Press</a>
+        <a class="footer-link" href="dropsub-contact.html">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Legal</div>
+      <div class="footer-links">
+        <a class="footer-link" href="dropsub-terms.html">Terms of Service</a>
+        <a class="footer-link" href="dropsub-privacy.html">Privacy Policy</a>
+        <a class="footer-link" href="dropsub-dmca.html">Copyright / DMCA</a>
+        <a class="footer-link active" href="dropsub-cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+    <span>Seeking seed round · $500K · dropsub.com</span>
+  </div>
+</footer>
+
+</div>
+<script>
+  window.addEventListener('scroll',function(){document.getElementById('nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.4)':'none';});
+
+  var tocLinks = document.querySelectorAll('.toc-item a');
+  var sections = document.querySelectorAll('.doc-section');
+  function setActive() {
+    var scrollY = window.scrollY + 120;
+    var active = null;
+    sections.forEach(function(sec) {
+      if (sec.offsetTop <= scrollY) active = sec.id;
+    });
+    tocLinks.forEach(function(a) {
+      a.classList.toggle('active', active && a.getAttribute('href') === '#' + active);
+    });
+  }
+  window.addEventListener('scroll', setActive, {passive:true});
+  setActive();
+</script>
+</body>
+</html>
