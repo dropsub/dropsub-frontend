@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Discover Artists</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-sidebar:    #0d1a30;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --success:       #3fa06a;
+      --error:         #ff4f6a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+    }
+
+    html, body {
+      height: 100%; font-family: 'Inter', sans-serif;
+      background: var(--bg-deepest); color: var(--text-white);
+      display: flex; flex-direction: column;
+    }
+
+    /* ── TOP NAV ──────────────────────────────────── */
+    .topnav {
+      background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      height: 48px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 20px;
+      flex-shrink: 0; z-index: 50; position: sticky; top: 0;
+    }
+    .topnav-left { display: flex; align-items: center; gap: 20px; }
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: .95rem; text-decoration: none; color: var(--text-white);
+    }
+    .logo-icon { width: 30px; height: 30px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link {
+      padding: 5px 12px; border-radius: 6px; font-size: .82rem;
+      font-weight: 500; color: var(--text-mid); cursor: pointer;
+      transition: all .15s; text-decoration: none;
+    }
+    .nav-link:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-link.active { background: var(--bg-card); color: var(--text-white); }
+    .nav-tabs { display: flex; gap: 2px; }
+    .nav-tab {
+      padding: 5px 12px; border-radius: 6px; font-size: .8rem;
+      font-weight: 500; color: var(--text-mid); cursor: pointer;
+      transition: all .15s; text-decoration: none;
+    }
+    .nav-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-tab.active { background: var(--bg-card); color: var(--text-white); }
+    .topnav-right { display: flex; align-items: center; gap: 10px; }
+    .search-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      border-radius: 20px; padding: 5px 14px; width: 200px;
+    }
+    .search-bar input {
+      background: none; border: none; outline: none; color: var(--text-light);
+      font-size: .82rem; font-family: inherit; width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--text-dim); }
+    .notif-btn {
+      width: 30px; height: 30px; background: var(--bg-card);
+      border: 1px solid var(--border-bright); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; cursor: pointer; position: relative;
+    }
+    .notif-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; background: var(--blue-bright); border-radius: 50%; border: 1px solid var(--bg-panel); }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--blue-bright);
+      background: linear-gradient(135deg, #2979ff, #7c4dff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-upgrade {
+      background: linear-gradient(135deg, var(--blue-bright), #7c4dff);
+      color: #fff; border: none; border-radius: 16px;
+      padding: 5px 14px; font-size: .78rem; font-weight: 700; cursor: pointer;
+    }
+    /* Artist nav user dropdown */
+    .user-menu-wrap { position: relative; }
+    .user-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 12px; min-width: 200px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 100; overflow: hidden;
+    }
+    .user-dropdown.open { display: block; }
+    .user-dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .user-dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; font-size: .82rem; color: var(--text-light);
+      cursor: pointer; transition: background .12s;
+    }
+    .user-dropdown-item:hover { background: var(--bg-hover); }
+    .user-dropdown-item.signout { color: var(--error); }
+    .user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ── PAGE BODY ────────────────────────────────── */
+    .page-body { flex: 1; overflow-y: auto; }
+    .page-body::-webkit-scrollbar { width: 6px; }
+    .page-body::-webkit-scrollbar-track { background: transparent; }
+    .page-body::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+    /* ── DISCOVER HERO ────────────────────────────── */
+    .discover-hero {
+      background: linear-gradient(135deg, rgba(41,121,255,.1), rgba(90,77,255,.07), rgba(245,166,35,.04));
+      border-bottom: 1px solid rgba(41,121,255,.18);
+      padding: 32px 36px 28px;
+    }
+    .hero-eyebrow {
+      font-size: .65rem; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--blue-glow); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 24px; height: 2px; background: var(--blue-bright); border-radius: 1px; }
+    .hero-title { font-size: 1.6rem; font-weight: 900; letter-spacing: -.04em; margin-bottom: 6px; line-height: 1.1; }
+    .hero-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--blue-glow), #7c4dff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub { font-size: .85rem; color: var(--text-mid); margin-bottom: 22px; }
+
+    .hero-search {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      border-radius: 12px; padding: 11px 16px; max-width: 600px;
+      transition: all .2s;
+    }
+    .hero-search:focus-within { border-color: var(--blue-bright); box-shadow: 0 0 0 3px rgba(41,121,255,.12); }
+    .hero-search-icon { font-size: 1rem; flex-shrink: 0; }
+    .hero-search input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text-white); font-family: inherit; font-size: .9rem;
+    }
+    .hero-search input::placeholder { color: var(--text-dim); }
+    .hero-search-clear {
+      background: var(--bg-hover); border: none; border-radius: 6px;
+      padding: 4px 10px; font-size: .72rem; font-weight: 600; color: var(--text-mid);
+      cursor: pointer; font-family: inherit; display: none; flex-shrink: 0;
+    }
+    .hero-search-clear:hover { color: var(--text-white); }
+    .hero-search-clear.show { display: block; }
+
+    /* ── FILTER BAR ───────────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 36px; border-bottom: 1px solid var(--border);
+      background: var(--bg-dark); gap: 16px; flex-wrap: wrap;
+    }
+    .filter-tabs { display: flex; gap: 4px; }
+    .filter-tab {
+      padding: 5px 14px; border-radius: 20px;
+      font-size: .78rem; font-weight: 600; color: var(--text-mid);
+      cursor: pointer; transition: all .15s; border: 1px solid transparent;
+    }
+    .filter-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .filter-tab.active {
+      background: rgba(41,121,255,.14); border-color: rgba(41,121,255,.4);
+      color: var(--blue-glow);
+    }
+    .filter-right { display: flex; align-items: center; gap: 10px; }
+    .sort-label { font-size: .73rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+    .sort-select {
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      border-radius: 7px; color: var(--text-light); font-family: inherit;
+      font-size: .78rem; padding: 5px 10px; outline: none; cursor: pointer;
+    }
+    .sort-select:focus { border-color: var(--blue-bright); }
+    option { background: var(--bg-card); }
+    .result-count { font-size: .73rem; color: var(--text-dim); white-space: nowrap; }
+
+    /* ── CONTENT AREA ─────────────────────────────── */
+    .content-area { padding: 28px 36px 48px; }
+
+    .section-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-size: .95rem; font-weight: 800; letter-spacing: -.01em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title-badge {
+      font-size: .6rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+      background: rgba(245,166,35,.14); color: var(--accent-gold);
+      border: 1px solid rgba(245,166,35,.25);
+    }
+
+    /* ── FEATURED CARDS ───────────────────────────── */
+    .featured-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 40px;
+    }
+    .featured-card {
+      border-radius: 16px; overflow: hidden; cursor: pointer;
+      border: 1px solid var(--border); transition: all .22s; position: relative;
+    }
+    .featured-card:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(0,0,0,.45); border-color: var(--border-bright); }
+    .fc-banner { height: 108px; position: relative; }
+    .fc-banner-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(245,166,35,.9); backdrop-filter: blur(4px);
+      color: #080f1c; font-size: .58rem; font-weight: 900; letter-spacing: .1em;
+      padding: 3px 9px; border-radius: 4px; text-transform: uppercase;
+    }
+    .fc-verified {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--blue-bright); color: #fff;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800;
+    }
+    .fc-body { background: var(--bg-panel); padding: 0 18px 18px; }
+    .fc-avatar-wrap { margin-top: -28px; margin-bottom: 12px; }
+    .fc-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 3px solid var(--bg-panel);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; background: var(--bg-card);
+    }
+    .fc-name { font-size: .9rem; font-weight: 800; margin-bottom: 3px; }
+    .fc-genre { font-size: .71rem; color: var(--text-mid); margin-bottom: 13px; }
+    .fc-stats { display: flex; gap: 16px; margin-bottom: 14px; }
+    .fc-stat { display: flex; align-items: center; gap: 5px; font-size: .72rem; color: var(--text-mid); }
+    .fc-stat-val { font-weight: 700; color: var(--text-light); }
+    .fc-btn {
+      width: 100%; padding: 8px; border-radius: 8px;
+      font-family: inherit; font-size: .78rem; font-weight: 700;
+      cursor: pointer; transition: all .16s;
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; box-shadow: 0 4px 14px rgba(41,121,255,.3);
+    }
+    .fc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(41,121,255,.4); }
+    .fc-btn.following {
+      background: var(--bg-card); border: 1px solid var(--success);
+      color: var(--success); box-shadow: none;
+    }
+    .fc-btn.following:hover { background: rgba(63,160,106,.08); transform: none; }
+
+    /* ── ARTIST GRID ──────────────────────────────── */
+    .artists-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    }
+    .artist-card {
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; cursor: pointer; transition: all .2s;
+    }
+    .artist-card:hover { border-color: var(--border-bright); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.32); }
+    .ac-banner { height: 62px; position: relative; }
+    .ac-category {
+      position: absolute; top: 7px; right: 8px;
+      background: rgba(8,15,28,.72); backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 4px; padding: 2px 6px;
+      font-size: .56rem; font-weight: 700; color: var(--text-dim); letter-spacing: .06em; text-transform: uppercase;
+    }
+    .ac-new-badge {
+      position: absolute; top: 7px; left: 8px;
+      background: rgba(63,160,106,.85); color: #fff;
+      font-size: .56rem; font-weight: 800; letter-spacing: .06em;
+      padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+    }
+    .ac-body { padding: 0 13px 13px; }
+    .ac-avatar-wrap { margin-top: -20px; margin-bottom: 9px; }
+    .ac-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 3px solid var(--bg-panel);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem; background: var(--bg-card);
+    }
+    .ac-name { font-size: .8rem; font-weight: 800; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ac-genre { font-size: .65rem; color: var(--text-mid); margin-bottom: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ac-stats { display: flex; gap: 10px; margin-bottom: 11px; }
+    .ac-stat { display: flex; align-items: center; gap: 3px; font-size: .66rem; color: var(--text-dim); }
+    .ac-stat-val { font-weight: 700; color: var(--text-mid); }
+    .ac-btn {
+      width: 100%; padding: 6px; border-radius: 7px;
+      font-family: inherit; font-size: .72rem; font-weight: 700;
+      cursor: pointer; transition: all .15s;
+    }
+    .ac-btn.subscribe {
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; box-shadow: 0 3px 10px rgba(41,121,255,.28);
+    }
+    .ac-btn.subscribe:hover { transform: translateY(-1px); }
+    .ac-btn.follow {
+      background: transparent; border: 1px solid var(--border-bright); color: var(--text-mid);
+    }
+    .ac-btn.follow:hover { border-color: var(--blue-bright); color: var(--text-white); background: rgba(41,121,255,.06); }
+    .ac-btn.following {
+      background: transparent; border: 1px solid var(--success); color: var(--success);
+    }
+    .ac-btn.following:hover { background: rgba(63,160,106,.08); }
+
+    /* ── EMPTY STATE ──────────────────────────────── */
+    .empty-state {
+      grid-column: 1/-1; text-align: center; padding: 52px 24px; color: var(--text-dim);
+    }
+    .empty-state-icon { font-size: 2.8rem; margin-bottom: 14px; }
+    .empty-state-title { font-size: .9rem; font-weight: 700; color: var(--text-mid); margin-bottom: 6px; }
+    .empty-state-sub { font-size: .78rem; }
+
+    /* ── TOAST ────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: var(--bg-hover); border: 1px solid var(--border-bright);
+      border-radius: 24px; padding: 9px 18px;
+      font-size: .81rem; color: var(--text-white); font-weight: 500;
+      opacity: 0; transition: all .25s; z-index: 400; white-space: nowrap;
+      box-shadow: 0 6px 20px rgba(0,0,0,.4);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
+
+<!-- ── FAN NAV (shown for fans) ──────────────────────────────── -->
+<nav class="topnav" id="fanNav" style="display:none;">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 7C3 5.89543 3.89543 5 5 5H10L12 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" fill="#111" stroke="#111" stroke-width="1.5"/><text x="6.5" y="15.5" font-size="5.5" font-weight="900" fill="white" font-family="Arial">DS</text></svg>
+      </div>
+      <span>DropSub</span>
+    </a>
+    <nav class="nav-links">
+      <a class="nav-link" href="dropsub-mockup_copy.html">My Artists</a>
+      <a class="nav-link active" href="dropsub-discover.html">Discover</a>
+      <a class="nav-link" href="dropsub-subscriptions.html">Subscriptions</a>
+      <a class="nav-link" href="dropsub-mockup_copy.html">Drops</a>
+      <a class="nav-link" href="dropsub-account-settings.html">Settings</a>
+    </nav>
+  </div>
+  <div class="topnav-right">
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search artists…"/>
+    </div>
+    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="user-avatar nav-avatar">RF</div>
+    <button class="btn-upgrade">PRO</button>
+  </div>
+</nav>
+
+<!-- ── ARTIST NAV (shown for artists/managers) ───────────────── -->
+<div class="topnav" id="artistNav" style="display:none;">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      DropSub
+    </a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="dropsub-mockup_copy.html">Fan View</a>
+      <a class="nav-tab" href="dropsub-artist-dashboard.html">Artist Dashboard</a>
+      <a class="nav-tab active" href="dropsub-discover.html">Discover</a>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <div class="notif-btn" onclick="showToast('No new notifications')">🔔<div class="notif-dot"></div></div>
+    <div class="user-menu-wrap">
+      <div class="user-avatar nav-avatar" onclick="toggleUserMenu(event)">RF</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="dropdownName">—</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-artist-dashboard.html'">📊 Dashboard</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'">⚙️ Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'">🚪 Sign out</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PAGE BODY ─────────────────────────────────────────────── -->
+<div class="page-body">
+
+  <!-- Hero / Search -->
+  <div class="discover-hero">
+    <div class="hero-eyebrow">Discover</div>
+    <div class="hero-title">Find your next <em>favorite artist</em></div>
+    <div class="hero-sub">Explore exclusive content from musicians, photographers, filmmakers, and more.</div>
+    <div class="hero-search">
+      <span class="hero-search-icon">🔍</span>
+      <input type="text" id="heroSearch" placeholder="Search artists, genres, tags…" oninput="onSearch(this.value)" autocomplete="off"/>
+      <button class="hero-search-clear" id="searchClearBtn" onclick="clearSearch()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-tabs" id="filterTabs">
+      <div class="filter-tab active" data-cat="all"       onclick="setFilter('all')">All</div>
+      <div class="filter-tab"        data-cat="music"     onclick="setFilter('music')">🎵 Music</div>
+      <div class="filter-tab"        data-cat="photography" onclick="setFilter('photography')">📸 Photography</div>
+      <div class="filter-tab"        data-cat="film"      onclick="setFilter('film')">🎬 Film</div>
+      <div class="filter-tab"        data-cat="art"       onclick="setFilter('art')">🎨 Art</div>
+      <div class="filter-tab"        data-cat="sports"    onclick="setFilter('sports')">🏆 Sports</div>
+    </div>
+    <div class="filter-right">
+      <span class="result-count" id="resultCount"></span>
+      <span class="sort-label">Sort:</span>
+      <select class="sort-select" id="sortSelect" onchange="setSort(this.value)">
+        <option value="featured">Featured</option>
+        <option value="popular">Popular</option>
+        <option value="new">New</option>
+        <option value="alpha">Alphabetical</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+
+    <!-- Featured section -->
+    <div id="featuredSection">
+      <div class="section-hd">
+        <div class="section-title">⭐ Featured Artists <span class="section-title-badge">HANDPICKED</span></div>
+      </div>
+      <div class="featured-row" id="featuredGrid"></div>
+    </div>
+
+    <!-- All artists grid -->
+    <div class="section-hd" id="gridHeader">
+      <div class="section-title" id="gridTitle">🔥 Trending Now</div>
+    </div>
+    <div class="artists-grid" id="artistsGrid"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Artist data ──────────────────────────────────────────────
+  var ARTISTS = [
+    // ── Featured ──
+    { id: 'miyavi',    name: 'MIYAVI',            emoji: '⚡', genre: 'Rock · J-Glam',         cat: 'music',       followers: '48.2K',  fNum: 48200,  drops: 24, featured: true,  sub: true,  bg: ['#1a0d3e','#0a1428'], av: 'linear-gradient(135deg,#2979ff,#7c4dff)', verified: true,  isNew: false },
+    { id: 'bangchan',  name: 'BANGCHAN',           emoji: '🎤', genre: 'K-Pop · Stray Kids',    cat: 'music',       followers: '2.1M',   fNum: 2100000, drops: 31, featured: true,  sub: true,  bg: ['#0a1e3a','#163560'], av: 'linear-gradient(135deg,#1565c0,#00bcd4)', verified: true,  isNew: false },
+    { id: 'kendrick',  name: 'KENDRICK LAMAR',     emoji: '🏆', genre: 'Hip-Hop · PG&E',        cat: 'music',       followers: '5.4M',   fNum: 5400000, drops: 18, featured: true,  sub: true,  bg: ['#1a0a08','#3d1a10'], av: 'linear-gradient(135deg,#b71c1c,#e53935)', verified: true,  isNew: false },
+
+    // ── Music ──
+    { id: 'doechii',   name: 'DOECHII',            emoji: '🎵', genre: 'Hip-Hop · TDE',         cat: 'music',       followers: '1.8M',   fNum: 1800000, drops: 12, featured: false, sub: true,  bg: ['#1a0030','#3d007a'], av: 'linear-gradient(135deg,#7b1fa2,#e040fb)', verified: true,  isNew: false },
+    { id: 'sabrina',   name: 'SABRINA CARPENTER',  emoji: '🌟', genre: 'Pop · Island Records',   cat: 'music',       followers: '3.2M',   fNum: 3200000, drops: 15, featured: false, sub: true,  bg: ['#2a0a18','#5a1a38'], av: 'linear-gradient(135deg,#c62828,#e91e63)', verified: true,  isNew: false },
+    { id: 'deadboyz',  name: 'DEAD BOYZ',           emoji: '🎸', genre: 'Alternative · Indie',    cat: 'music',       followers: '82.4K',  fNum: 82400,  drops: 8,  featured: false, sub: false, bg: ['#0a140a','#182818'], av: 'linear-gradient(135deg,#1b5e20,#43a047)', verified: false, isNew: false },
+    { id: 'rosalia',   name: 'ROSALÍA',             emoji: '🌹', genre: 'Flamenco Pop',           cat: 'music',       followers: '4.1M',   fNum: 4100000, drops: 9,  featured: false, sub: true,  bg: ['#2a0814','#4a1030'], av: 'linear-gradient(135deg,#880e4f,#e91e63)', verified: true,  isNew: false },
+    { id: 'fredagain', name: 'FRED AGAIN..',        emoji: '🎛', genre: 'Electronic · Dance',     cat: 'music',       followers: '620K',   fNum: 620000, drops: 22, featured: false, sub: false, bg: ['#00141a','#003040'], av: 'linear-gradient(135deg,#006064,#00bcd4)', verified: true,  isNew: false },
+    { id: 'mitski',    name: 'MITSKI',              emoji: '🌙', genre: 'Indie Rock · Alt-Pop',   cat: 'music',       followers: '940K',   fNum: 940000, drops: 11, featured: false, sub: true,  bg: ['#0a0a20','#16163a'], av: 'linear-gradient(135deg,#4527a0,#7c4dff)', verified: true,  isNew: false },
+    { id: 'charli',    name: 'CHARLI XCX',          emoji: '💿', genre: 'Hyperpop · PC Music',    cat: 'music',       followers: '2.8M',   fNum: 2800000, drops: 17, featured: false, sub: true,  bg: ['#1a001a','#2d0030'], av: 'linear-gradient(135deg,#880e4f,#e91e63)', verified: true,  isNew: false },
+    { id: 'caroline',  name: 'CAROLINE POLACHEK',   emoji: '🎼', genre: 'Art Pop · Avant-Pop',    cat: 'music',       followers: '380K',   fNum: 380000, drops: 14, featured: false, sub: false, bg: ['#1a1500','#2e2500'], av: 'linear-gradient(135deg,#e65100,#ff6d00)', verified: false, isNew: true  },
+    { id: 'jpegmafia', name: 'JPEGMAFIA',           emoji: '🔊', genre: 'Alt Hip-Hop',            cat: 'music',       followers: '210K',   fNum: 210000, drops: 19, featured: false, sub: false, bg: ['#0a0a0a','#181818'], av: 'linear-gradient(135deg,#37474f,#78909c)', verified: false, isNew: false },
+    { id: 'aurora_m',  name: 'AURORA',              emoji: '🌌', genre: 'Nordic Folk · Art Pop',  cat: 'music',       followers: '1.4M',   fNum: 1400000, drops: 10, featured: false, sub: true,  bg: ['#00080a','#001a20'], av: 'linear-gradient(135deg,#00695c,#4db6ac)', verified: true,  isNew: true  },
+    { id: 'jpbloom',   name: 'JAPANESE BREAKFAST', emoji: '🌸', genre: 'Indie Pop · Experimental',cat: 'music',       followers: '520K',   fNum: 520000, drops: 13, featured: false, sub: false, bg: ['#1a080a','#300814'], av: 'linear-gradient(135deg,#ad1457,#e91e63)', verified: false, isNew: false },
+
+    // ── Photography ──
+    { id: 'auroralens',name: 'AURORA LENS',         emoji: '📸', genre: 'Concert Photography',   cat: 'photography', followers: '128K',   fNum: 128000, drops: 42, featured: false, sub: true,  bg: ['#001428','#001e3a'], av: 'linear-gradient(135deg,#0d47a1,#1976d2)', verified: false, isNew: true  },
+    { id: 'shotbykai', name: 'SHOT BY KAI',         emoji: '🎞', genre: 'Documentary · Portrait', cat: 'photography', followers: '74K',    fNum: 74000,  drops: 28, featured: false, sub: false, bg: ['#141414','#202020'], av: 'linear-gradient(135deg,#37474f,#607d8b)', verified: false, isNew: false },
+    { id: 'darklens',  name: 'DARK ROOM STUDIO',    emoji: '🔬', genre: 'Analog · Fine Art',      cat: 'photography', followers: '41K',    fNum: 41000,  drops: 18, featured: false, sub: false, bg: ['#0a0a0a','#1a0a10'], av: 'linear-gradient(135deg,#4a148c,#7b1fa2)', verified: false, isNew: false },
+
+    // ── Film ──
+    { id: 'lenawint',  name: 'LENA WINTERS',        emoji: '🎬', genre: 'Music Video · Short Film',cat: 'film',       followers: '58K',    fNum: 58000,  drops: 7,  featured: false, sub: true,  bg: ['#1a0a00','#2e1400'], av: 'linear-gradient(135deg,#bf360c,#e64a19)', verified: false, isNew: false },
+    { id: 'neonframe', name: 'NEON FRAME',          emoji: '🎥', genre: 'Experimental Film',      cat: 'film',       followers: '32K',    fNum: 32000,  drops: 5,  featured: false, sub: false, bg: ['#001a10','#002a18'], av: 'linear-gradient(135deg,#1b5e20,#4caf50)', verified: false, isNew: true  },
+
+    // ── Art ──
+    { id: 'diegohern', name: 'DIEGO HERNANDEZ',     emoji: '🎨', genre: 'Visual Art · Digital',   cat: 'art',         followers: '241K',   fNum: 241000, drops: 33, featured: false, sub: true,  bg: ['#0a0020','#14003a'], av: 'linear-gradient(135deg,#4527a0,#9c27b0)', verified: true,  isNew: false },
+    { id: 'xrayink',   name: 'XRAY INK',            emoji: '✏️', genre: 'Illustration · Tattoo',  cat: 'art',         followers: '91K',    fNum: 91000,  drops: 16, featured: false, sub: false, bg: ['#080808','#141428'], av: 'linear-gradient(135deg,#263238,#455a64)', verified: false, isNew: false },
+    { id: 'voidpixel', name: 'VOID PIXEL',          emoji: '🖥', genre: 'Generative · NFT Art',   cat: 'art',         followers: '167K',   fNum: 167000, drops: 29, featured: false, sub: true,  bg: ['#000a14','#001428'], av: 'linear-gradient(135deg,#1565c0,#42a5f5)', verified: false, isNew: true  },
+
+    // ── Sports ──
+    { id: 'kairun',    name: 'KAI RUN',             emoji: '🏃', genre: 'Track & Field · Marathon',cat: 'sports',     followers: '186K',   fNum: 186000, drops: 12, featured: false, sub: false, bg: ['#001a10','#002a18'], av: 'linear-gradient(135deg,#1b5e20,#4caf50)', verified: true,  isNew: false },
+    { id: 'zarawaves', name: 'ZARA WAVES',          emoji: '🏄', genre: 'Surfing · Extreme Sports',cat: 'sports',     followers: '312K',   fNum: 312000, drops: 20, featured: false, sub: true,  bg: ['#001420','#002038'], av: 'linear-gradient(135deg,#01579b,#0288d1)', verified: false, isNew: true  },
+  ];
+
+  // ── State ─────────────────────────────────────────────────────
+  var _filter  = 'all';
+  var _sort    = 'featured';
+  var _query   = '';
+  var _followed = {};
+
+  // ── Filter + sort helpers ─────────────────────────────────────
+  function getFiltered() {
+    return ARTISTS.filter(function(a) {
+      if (_filter !== 'all' && a.cat !== _filter) return false;
+      if (_query) {
+        var q = _query.toLowerCase();
+        return a.name.toLowerCase().indexOf(q) !== -1 || a.genre.toLowerCase().indexOf(q) !== -1;
+      }
+      return true;
+    }).sort(function(a, b) {
+      if (_sort === 'popular')  return b.fNum - a.fNum;
+      if (_sort === 'new')      return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || b.fNum - a.fNum;
+      if (_sort === 'alpha')    return a.name.localeCompare(b.name);
+      // featured: featured first, then by followers
+      if (a.featured !== b.featured) return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      return b.fNum - a.fNum;
+    });
+  }
+
+  // ── Render featured ───────────────────────────────────────────
+  function renderFeatured() {
+    var featured = ARTISTS.filter(function(a) { return a.featured; });
+    document.getElementById('featuredGrid').innerHTML = featured.map(function(a) {
+      var following = !!_followed[a.id];
+      return '<div class="featured-card" onclick="openProfile(\'' + a.id + '\')">' +
+        '<div class="fc-banner" style="background:linear-gradient(135deg,' + a.bg[0] + ',' + a.bg[1] + ');">' +
+          '<span class="fc-banner-badge">FEATURED</span>' +
+          (a.verified ? '<span class="fc-verified">✓</span>' : '') +
+        '</div>' +
+        '<div class="fc-body">' +
+          '<div class="fc-avatar-wrap"><div class="fc-avatar" style="background:' + a.av + ';">' + a.emoji + '</div></div>' +
+          '<div class="fc-name">' + a.name + '</div>' +
+          '<div class="fc-genre">' + a.genre + '</div>' +
+          '<div class="fc-stats">' +
+            '<div class="fc-stat">👥 <span class="fc-stat-val">' + a.followers + '</span> followers</div>' +
+            '<div class="fc-stat">📁 <span class="fc-stat-val">' + a.drops + '</span> drops</div>' +
+          '</div>' +
+          '<button class="fc-btn' + (following ? ' following' : '') + '" onclick="event.stopPropagation();toggleFollow(\'' + a.id + '\',\'' + a.name + '\',true)">' +
+            (following ? '✓ Following' : 'Subscribe') +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ── Render artist cards ───────────────────────────────────────
+  function renderGrid(list) {
+    var grid = document.getElementById('artistsGrid');
+    if (!list.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">No artists found</div><div class="empty-state-sub">Try a different search term or filter.</div></div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(a) {
+      var following = !!_followed[a.id];
+      var btnCls  = following ? 'following' : (a.sub ? 'subscribe' : 'follow');
+      var btnText = following ? '✓ Following' : (a.sub ? 'Subscribe' : 'Follow');
+      return '<div class="artist-card" onclick="openProfile(\'' + a.id + '\')">' +
+        '<div class="ac-banner" style="background:linear-gradient(135deg,' + a.bg[0] + ',' + a.bg[1] + ');">' +
+          (a.isNew ? '<span class="ac-new-badge">NEW</span>' : '') +
+          '<span class="ac-category">' + a.cat.toUpperCase() + '</span>' +
+        '</div>' +
+        '<div class="ac-body">' +
+          '<div class="ac-avatar-wrap"><div class="ac-avatar" style="background:' + a.av + ';">' + a.emoji + '</div></div>' +
+          '<div class="ac-name">' + a.name + '</div>' +
+          '<div class="ac-genre">' + a.genre + '</div>' +
+          '<div class="ac-stats">' +
+            '<div class="ac-stat">👥 <span class="ac-stat-val">' + a.followers + '</span></div>' +
+            '<div class="ac-stat">📁 <span class="ac-stat-val">' + a.drops + '</span> drops</div>' +
+          '</div>' +
+          '<button class="ac-btn ' + btnCls + '" onclick="event.stopPropagation();toggleFollow(\'' + a.id + '\',\'' + a.name + '\',' + a.sub + ')">' + btnText + '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ── Full page render ──────────────────────────────────────────
+  function renderPage() {
+    var filtered = getFiltered();
+    var showFeatured = (_filter === 'all' && !_query);
+
+    document.getElementById('featuredSection').style.display = showFeatured ? 'block' : 'none';
+
+    var gridList = showFeatured ? filtered.filter(function(a) { return !a.featured; }) : filtered;
+
+    var titleEl = document.getElementById('gridTitle');
+    if (_query) {
+      titleEl.innerHTML = '🔍 Results for "' + _query + '"';
+    } else if (_filter !== 'all') {
+      var labels = { music:'🎵 Music', photography:'📸 Photography', film:'🎬 Film', art:'🎨 Art', sports:'🏆 Sports' };
+      titleEl.textContent = (labels[_filter] || _filter);
+    } else {
+      titleEl.textContent = '🔥 Trending Now';
+    }
+
+    var total = _query || _filter !== 'all' ? filtered.length : ARTISTS.length;
+    document.getElementById('resultCount').textContent = total + ' artist' + (total !== 1 ? 's' : '');
+
+    renderGrid(gridList);
+  }
+
+  // ── Interactions ──────────────────────────────────────────────
+  function setFilter(cat) {
+    _filter = cat;
+    document.querySelectorAll('.filter-tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.cat === cat);
+    });
+    renderPage();
+  }
+
+  function setSort(val) {
+    _sort = val;
+    renderPage();
+  }
+
+  var _searchTimer;
+  function onSearch(val) {
+    _query = val.trim();
+    document.getElementById('searchClearBtn').classList.toggle('show', !!_query);
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(renderPage, 160);
+  }
+
+  function clearSearch() {
+    document.getElementById('heroSearch').value = '';
+    _query = '';
+    document.getElementById('searchClearBtn').classList.remove('show');
+    renderPage();
+  }
+
+  function toggleFollow(id, name, isSub) {
+    _followed[id] = !_followed[id];
+    if (_followed[id]) {
+      showToast(isSub ? '✓ Subscribed to ' + name + '!' : '✓ Following ' + name + '!');
+    } else {
+      showToast('Unfollowed ' + name);
+    }
+    renderFeatured();
+    renderPage();
+  }
+
+  function openProfile(id) {
+    showToast('Opening artist profile…');
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────
+  var _toastTimer;
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2400);
+  }
+
+  // ── User menu (artist nav) ────────────────────────────────────
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    var dd = document.getElementById('userDropdown');
+    if (dd && !e.target.closest('.user-menu-wrap')) dd.classList.remove('open');
+  });
+
+  // ── Role detection + nav init ─────────────────────────────────
+  (function() {
+    var role = 'fan';
+    var initials = 'RF';
+    var name = '';
+    var email = '';
+    try {
+      var p = JSON.parse(sessionStorage.getItem('ds_profile') || '{}');
+      role    = p.role || 'fan';
+      name    = p.full_name || p.name || '';
+      email   = p.email || '';
+      var parts = name.trim().split(/\s+/).filter(Boolean);
+      if (parts.length >= 2)      initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      else if (parts.length === 1) initials = parts[0].slice(0, 2).toUpperCase();
+    } catch(e) {}
+
+    var isArtist = (role === 'artist' || role === 'manager');
+    document.getElementById(isArtist ? 'artistNav' : 'fanNav').style.display = 'flex';
+
+    document.querySelectorAll('.nav-avatar').forEach(function(el) { el.textContent = initials; });
+    if (name) {
+      var dn = document.getElementById('dropdownName');
+      if (dn) dn.textContent = name;
+    }
+    if (email) {
+      var de = document.getElementById('dropdownEmail');
+      if (de) de.textContent = email;
+    }
+  })();
+
+  // ── Init ─────────────────────────────────────────────────────
+  renderFeatured();
+  renderPage();
+</script>
+</body>
+</html>
