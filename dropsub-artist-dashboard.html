@@ -655,6 +655,39 @@
       color: var(--accent-gold);
     }
     .collab-toggle.on:hover { background: rgba(245,166,35,.22); }
+    .privacy-toggle-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 20px; font-size: .65rem; font-weight: 700;
+      border: 1px solid; cursor: pointer; transition: all .18s; white-space: nowrap;
+      font-family: inherit; letter-spacing: .04em;
+    }
+    .privacy-toggle-btn.pub { background: rgba(41,200,120,.08); border-color: rgba(41,200,120,.3); color: #29c878; }
+    .privacy-toggle-btn.pub:hover { background: rgba(41,200,120,.18); }
+    .privacy-toggle-btn.priv { background: rgba(245,166,35,.08); border-color: rgba(245,166,35,.3); color: var(--accent-gold); }
+    .privacy-toggle-btn.priv:hover { background: rgba(245,166,35,.16); }
+    .folder-select-wrap { margin-top:18px; }
+    .folder-select-wrap label { display:block; font-size:.78rem; font-weight:600; color:var(--text-light); margin-bottom:6px; }
+    .folder-select-wrap select {
+      width:100%; background:var(--bg-card); border:1px solid var(--border-bright);
+      color:var(--text-white); border-radius:8px; padding:9px 12px;
+      font-size:.85rem; cursor:pointer; font-family:inherit;
+    }
+    .folder-select-wrap select:focus { outline:none; border-color:var(--blue-bright); }
+    .new-folder-section {
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:10px; padding:14px 14px 6px; margin-top:12px;
+    }
+    .priv-row { display:flex; align-items:center; gap:10px; margin-top:6px; }
+    .priv-btn {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 14px;
+      border-radius:20px; font-size:.8rem; font-weight:600; cursor:pointer;
+      border:1.5px solid; transition:all .18s; background:none; font-family:inherit;
+    }
+    .priv-btn.pub { border-color:rgba(41,200,120,.4); color:#29c878; }
+    .priv-btn.pub:hover { background:rgba(41,200,120,.1); }
+    .priv-btn.priv { border-color:rgba(245,166,35,.4); color:var(--accent-gold); }
+    .priv-btn.priv:hover { background:rgba(245,166,35,.08); }
+    .priv-desc { font-size:.72rem; color:var(--text-dim); line-height:1.4; }
 
     /* ── COLLAB MODAL ────────────────────────── */
     .collab-modal-overlay {
@@ -1057,16 +1090,24 @@
         </div>
       </div>
 
-      <!-- Folder details form — always visible -->
-      <div class="mform" style="margin-top:18px;">
+      <!-- Folder selector -->
+      <div class="folder-select-wrap">
+        <label>Drop Folder</label>
+        <select id="folderSelect" onchange="onFolderSelectChange()">
+          <option value="">— Select a folder —</option>
+          <option value="__new__">+ Create new folder</option>
+        </select>
+      </div>
+      <!-- New folder fields — shown when "Create new folder" selected -->
+      <div id="newFolderSection" class="new-folder-section" style="display:none;">
         <div class="mform-row">
           <div class="mfield">
             <label>Folder name</label>
-            <input type="text" placeholder="e.g. Tokyo Tour 2025 · Backstage"/>
+            <input type="text" id="newFolderName" placeholder="e.g. Tokyo Tour 2025 · Backstage"/>
           </div>
           <div class="mfield">
             <label>Date / Event</label>
-            <input type="text" placeholder="e.g. 2025-06 · Coachella"/>
+            <input type="text" id="newFolderDate" placeholder="e.g. 2025-06 · Coachella"/>
           </div>
         </div>
         <div class="mfield">
@@ -1091,7 +1132,7 @@
             <label>Price</label>
             <div class="price-input-wrap">
               <span class="price-symbol">$</span>
-              <input type="number" placeholder="9.99" min="0.99" step="0.01"/>
+              <input type="number" id="newFolderPrice" placeholder="9.99" min="0.99" step="0.01"/>
             </div>
           </div>
           <div class="mfield">
@@ -1104,12 +1145,15 @@
           </div>
         </div>
         <div class="mfield">
-          <label>Tags</label>
-          <input type="text" placeholder="#tour #backstage #2025 (comma separated)"/>
+          <label>Visibility</label>
+          <div class="priv-row">
+            <button class="priv-btn pub" id="uploadPrivBtn" onclick="toggleUploadPrivacy()">🌐 Public</button>
+            <span class="priv-desc" id="uploadPrivDesc">Visible to anyone browsing your page</span>
+          </div>
         </div>
         <div class="mfield">
           <label>Description <span style="font-size:.68rem;color:var(--text-dim);font-weight:400;">(optional)</span></label>
-          <textarea placeholder="Tell fans what's in this folder…"></textarea>
+          <textarea id="newFolderDesc" placeholder="Tell fans what's in this folder…"></textarea>
         </div>
       </div>
     </div>
@@ -1237,12 +1281,12 @@
 <script>
   // ── Folder data ──────────────────────────────────
   var DEMO_FOLDERS = [
-    { name: 'Kiyomizu Temple 2021', icon: '📁', type: 'sub', files: 422, size: '14 GB', revenue: '$1,240', subs: 310, date: '2021-09-15', collab: false },
-    { name: 'NA Tour 2021', icon: '📁', type: 'sub', files: 640, size: '22 GB', revenue: '$980', subs: 245, date: '2021-10-01', collab: true },
-    { name: 'Coachella 2022', icon: '📁', type: 'sub', files: 510, size: '18 GB', revenue: '$860', subs: 215, date: '2022-04-17', collab: false },
-    { name: 'Birthday Event 2022', icon: '📂', type: 'free', files: 145, size: '3.2 GB', revenue: '—', subs: '—', date: '2022-09-14', collab: true },
-    { name: '20th Anniversary Futurism', icon: '⭐', type: 'premium', files: 1200, size: '42 GB', revenue: '$1,200', subs: 60, date: '2022-10-21', collab: false },
-    { name: 'Serbia 2022 Backstage', icon: '📁', type: 'sub', files: 310, size: '9.4 GB', revenue: '$720', subs: 180, date: '2022-03-08', collab: false },
+    { name: 'Kiyomizu Temple 2021', icon: '📁', type: 'sub', files: 422, size: '14 GB', revenue: '$1,240', subs: 310, date: '2021-09-15', collab: false, is_public: true },
+    { name: 'NA Tour 2021', icon: '📁', type: 'sub', files: 640, size: '22 GB', revenue: '$980', subs: 245, date: '2021-10-01', collab: true, is_public: true },
+    { name: 'Coachella 2022', icon: '📁', type: 'sub', files: 510, size: '18 GB', revenue: '$860', subs: 215, date: '2022-04-17', collab: false, is_public: true },
+    { name: 'Birthday Event 2022', icon: '📂', type: 'free', files: 145, size: '3.2 GB', revenue: '—', subs: '—', date: '2022-09-14', collab: true, is_public: true },
+    { name: '20th Anniversary Futurism', icon: '⭐', type: 'premium', files: 1200, size: '42 GB', revenue: '$1,200', subs: 60, date: '2022-10-21', collab: false, is_public: false },
+    { name: 'Serbia 2022 Backstage', icon: '📁', type: 'sub', files: 310, size: '9.4 GB', revenue: '$720', subs: 180, date: '2022-03-08', collab: false, is_public: false },
   ];
 
   var _currentFolders = [];
@@ -1286,6 +1330,7 @@
       const d = new Date(f.date);
       const date = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
       const collabOn = f.collab === true;
+      const isPublic = f.is_public !== false;
       return `
         <tr onclick="showToast('Opening ${f.name}…')">
           <td>
@@ -1303,10 +1348,13 @@
           <td class="subs-cell">${typeof f.subs === 'number' ? f.subs.toLocaleString() : f.subs}</td>
           <td style="font-size:.75rem;color:var(--text-dim);">${date}</td>
           <td>
-            <div class="folder-actions">
-              <div class="fol-btn" onclick="event.stopPropagation();showToast('Share link copied!')" title="Share">🔗</div>
-              <div class="fol-btn" onclick="event.stopPropagation();showToast('Edit folder coming soon')" title="Edit">✏️</div>
-              <div class="fol-btn" onclick="event.stopPropagation();showToast('More options coming soon')" title="More">⋯</div>
+            <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+              <button class="privacy-toggle-btn ${isPublic ? 'pub' : 'priv'}" onclick="event.stopPropagation();toggleFolderPrivacy(${idx})" title="${isPublic ? 'Public — click to make private' : 'Private — click to make public'}">${isPublic ? '🌐 Public' : '🔒 Private'}</button>
+              <div class="folder-actions">
+                <div class="fol-btn" onclick="event.stopPropagation();showToast('Share link copied!')" title="Share">🔗</div>
+                <div class="fol-btn" onclick="event.stopPropagation();showToast('Edit folder coming soon')" title="Edit">✏️</div>
+                <div class="fol-btn" onclick="event.stopPropagation();showToast('More options coming soon')" title="More">⋯</div>
+              </div>
             </div>
           </td>
         </tr>`;
@@ -1384,6 +1432,7 @@
   // ── Upload modal ─────────────────────────────────
   function openUploadModal() {
     document.getElementById('uploadModal').classList.add('open');
+    populateFolderSelect();
   }
   function closeUploadModal() {
     document.getElementById('uploadModal').classList.remove('open');
@@ -1398,6 +1447,18 @@
     document.getElementById('fileSummary').textContent = '';
     var fi = document.getElementById('fileInput');
     if (fi) fi.value = '';
+    // Reset folder selector
+    var sel = document.getElementById('folderSelect');
+    if (sel) sel.value = '';
+    document.getElementById('newFolderSection').style.display = 'none';
+    var nfn = document.getElementById('newFolderName'); if (nfn) nfn.value = '';
+    var nfd = document.getElementById('newFolderDate'); if (nfd) nfd.value = '';
+    var nfds = document.getElementById('newFolderDesc'); if (nfds) nfds.value = '';
+    _uploadIsPublic = true;
+    var pb = document.getElementById('uploadPrivBtn');
+    if (pb) { pb.className = 'priv-btn pub'; pb.textContent = '🌐 Public'; }
+    var pd = document.getElementById('uploadPrivDesc');
+    if (pd) pd.textContent = 'Visible to anyone browsing your page';
     var cb = document.getElementById('contentPolicyCheck');
     if (cb) cb.checked = false;
     var btn = document.getElementById('submitUploadBtn');
@@ -1512,6 +1573,51 @@
     if (checked) document.getElementById('policyError').style.display = 'none';
   }
 
+  // ── Folder selector ──────────────────────────────
+  var _uploadIsPublic = true;
+
+  function populateFolderSelect() {
+    var sel = document.getElementById('folderSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Select a folder —</option>';
+    _currentFolders.forEach(function(f) {
+      var opt = document.createElement('option');
+      opt.value = f.id || f.name;
+      opt.textContent = f.icon + ' ' + f.name;
+      sel.appendChild(opt);
+    });
+    var newOpt = document.createElement('option');
+    newOpt.value = '__new__';
+    newOpt.textContent = '+ Create new folder';
+    sel.appendChild(newOpt);
+  }
+
+  function onFolderSelectChange() {
+    var val = document.getElementById('folderSelect').value;
+    document.getElementById('newFolderSection').style.display = val === '__new__' ? 'block' : 'none';
+  }
+
+  function toggleUploadPrivacy() {
+    _uploadIsPublic = !_uploadIsPublic;
+    var btn = document.getElementById('uploadPrivBtn');
+    var desc = document.getElementById('uploadPrivDesc');
+    if (_uploadIsPublic) {
+      btn.className = 'priv-btn pub'; btn.textContent = '🌐 Public';
+      desc.textContent = 'Visible to anyone browsing your page';
+    } else {
+      btn.className = 'priv-btn priv'; btn.textContent = '🔒 Private';
+      desc.textContent = 'Only visible to paying subscribers or people with a direct link';
+    }
+  }
+
+  function toggleFolderPrivacy(idx) {
+    _currentFolders[idx].is_public = !_currentFolders[idx].is_public;
+    var name = _currentFolders[idx].name;
+    var isPublic = _currentFolders[idx].is_public;
+    renderFolders(_currentFolders);
+    showToast(isPublic ? '🌐 "' + name + '" is now Public' : '🔒 "' + name + '" is now Private');
+  }
+
   // ── Upload ───────────────────────────────────────
   function doUpload() {
     if (!document.getElementById('contentPolicyCheck').checked) {
@@ -1522,9 +1628,53 @@
       showToast('Please select files to upload');
       return;
     }
+    var folderVal = document.getElementById('folderSelect').value;
+    if (!folderVal) {
+      showToast('Please select or create a folder first');
+      return;
+    }
+    if (folderVal === '__new__') {
+      var folderName = (document.getElementById('newFolderName').value || '').trim();
+      if (!folderName) {
+        showToast('Please enter a folder name');
+        document.getElementById('newFolderName').focus();
+        return;
+      }
+      _createFolderThenUpload(folderName);
+    } else {
+      _performUpload(folderVal);
+    }
+  }
+
+  function _createFolderThenUpload(folderName) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var payload = {
+      name: folderName,
+      type: selectedTier || 'sub',
+      is_public: _uploadIsPublic,
+      description: (document.getElementById('newFolderDesc').value || '').trim()
+    };
+    fetch('https://api.dropsub.com/api/folders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function(data) {
+      var folderId = (data.folder && data.folder.id) || data.id || null;
+      _performUpload(folderId);
+    })
+    .catch(function() {
+      // Folder API unavailable — proceed without folder_id
+      _performUpload(null);
+    });
+  }
+
+  function _performUpload(folderId) {
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     var formData = new FormData();
     _selectedFiles.forEach(function(f) { formData.append('files', f); });
+    if (folderId) formData.append('folder_id', folderId);
 
     var progressWrap = document.getElementById('uploadProgress');
     var progressBar  = document.getElementById('uploadProgressBar');
@@ -1558,6 +1708,7 @@
         var count = _selectedFiles.length;
         setTimeout(function() {
           closeUploadModal();
+          fetchArtistFolders();
           showToast('✓ ' + count + ' file' + (count !== 1 ? 's' : '') + ' uploaded successfully!');
         }, 400);
       } else {
