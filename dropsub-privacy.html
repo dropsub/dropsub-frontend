@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Privacy Policy — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-deepest); color: var(--text-white); overflow-x: hidden; }
+
+    /* ── BACKGROUND ──────────────────────────────── */
+    .bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .07; }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, #2979ff, #7c4dff); top: -200px; left: -200px; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #f5a623, transparent); bottom: 20%; right: -100px; opacity: .05; }
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(41,121,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(41,121,255,.025) 1px, transparent 1px); background-size: 44px 44px; }
+
+    /* ── WRAPPER ─────────────────────────────────── */
+    .wrap { position: relative; z-index: 1; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav { position: sticky; top: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; background: rgba(8,15,28,.9); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); transition: box-shadow .2s; }
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: .02em; text-decoration: none; color: var(--text-white); }
+    .logo-icon { width: 34px; height: 34px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .nav-breadcrumb { font-size: .82rem; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+    .nav-breadcrumb a { color: var(--text-mid); text-decoration: none; transition: color .15s; }
+    .nav-breadcrumb a:hover { color: var(--text-white); }
+    .nav-breadcrumb span { color: var(--text-dim); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost { padding: 7px 18px; border-radius: 20px; background: none; border: 1px solid var(--border-bright); color: var(--text-light); font-family: inherit; font-size: .84rem; font-weight: 500; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; }
+    .btn-ghost:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-primary { padding: 8px 20px; border-radius: 20px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; color: #fff; font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; box-shadow: 0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(41,121,255,.45); }
+
+    /* ── PAGE HERO ───────────────────────────────── */
+    .doc-hero { padding: 64px 48px 48px; max-width: 1100px; margin: 0 auto; }
+    .doc-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(41,121,255,.12); border: 1px solid rgba(41,121,255,.25); border-radius: 20px; padding: 5px 14px; font-size: .7rem; font-weight: 700; color: var(--blue-glow); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 20px; }
+    .doc-title { font-size: 2.8rem; font-weight: 900; letter-spacing: -.04em; line-height: 1.1; margin-bottom: 14px; }
+    .doc-meta { font-size: .82rem; color: var(--text-dim); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .doc-meta a { color: var(--blue-glow); text-decoration: none; }
+
+    /* ── CONTENT LAYOUT ──────────────────────────── */
+    .doc-layout { max-width: 1100px; margin: 0 auto; padding: 0 48px 80px; display: grid; grid-template-columns: 220px 1fr; gap: 48px; align-items: start; }
+
+    /* ── TOC ─────────────────────────────────────── */
+    .toc { position: sticky; top: 80px; }
+    .toc-title { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+    .toc-links { display: flex; flex-direction: column; gap: 2px; }
+    .toc-link { padding: 6px 10px; border-radius: 6px; font-size: .78rem; color: var(--text-dim); text-decoration: none; transition: all .12s; border-left: 2px solid transparent; line-height: 1.4; }
+    .toc-link:hover { color: var(--text-light); background: var(--bg-card); border-left-color: var(--blue-dim); }
+    .toc-link.active { color: var(--blue-glow); background: rgba(41,121,255,.08); border-left-color: var(--blue-bright); }
+    .toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+    .toc-other { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+    .toc-other a { font-size: .74rem; color: var(--text-dim); text-decoration: none; padding: 4px 10px; border-radius: 6px; transition: all .12s; }
+    .toc-other a:hover { color: var(--text-mid); background: var(--bg-card); }
+
+    /* ── DOCUMENT CONTENT ────────────────────────── */
+    .doc-content { min-width: 0; }
+    .doc-intro { background: var(--bg-card); border: 1px solid var(--border-bright); border-left: 3px solid var(--accent-gold); border-radius: 0 10px 10px 0; padding: 16px 20px; margin-bottom: 36px; font-size: .85rem; color: var(--text-light); line-height: 1.65; }
+    .doc-intro strong { color: var(--text-white); }
+
+    .doc-section { margin-bottom: 40px; scroll-margin-top: 88px; }
+    .doc-section + .doc-section { padding-top: 40px; border-top: 1px solid var(--border); }
+    .section-num { font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px; }
+    .section-title { font-size: 1.2rem; font-weight: 800; color: var(--text-white); margin-bottom: 14px; letter-spacing: -.01em; }
+    .doc-p { font-size: .9rem; color: var(--text-light); line-height: 1.8; margin-bottom: 14px; }
+    .doc-p:last-child { margin-bottom: 0; }
+    .doc-p a { color: var(--blue-glow); text-decoration: none; transition: color .12s; }
+    .doc-p a:hover { color: var(--text-white); text-decoration: underline; }
+    .doc-list { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 14px; }
+    .doc-list li { display: flex; align-items: flex-start; gap: 10px; font-size: .88rem; color: var(--text-light); line-height: 1.65; }
+    .doc-list li::before { content: '→'; color: var(--accent-gold); font-size: .78rem; margin-top: 3px; flex-shrink: 0; }
+    .doc-callout { background: rgba(41,121,255,.08); border: 1px solid rgba(41,121,255,.2); border-radius: 8px; padding: 14px 16px; margin: 14px 0; font-size: .83rem; color: var(--text-light); line-height: 1.65; }
+    .doc-callout strong { color: var(--blue-glow); }
+    .doc-h3 { font-size: .95rem; font-weight: 700; color: var(--text-white); margin: 18px 0 8px; }
+
+    /* Third-party provider cards */
+    .provider-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+    .provider-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .provider-name { font-size: .84rem; font-weight: 800; color: var(--text-white); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .provider-role { font-size: .72rem; color: var(--accent-gold); font-weight: 600; margin-bottom: 8px; }
+    .provider-desc { font-size: .74rem; color: var(--text-mid); line-height: 1.55; }
+    .provider-link { font-size: .72rem; color: var(--blue-glow); text-decoration: none; display: inline-block; margin-top: 8px; }
+    .provider-link:hover { text-decoration: underline; }
+
+    /* User rights table */
+    .rights-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .83rem; }
+    .rights-table th { text-align: left; padding: 10px 14px; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); background: var(--bg-card); }
+    .rights-table td { padding: 11px 14px; border-bottom: 1px solid rgba(26,45,80,.4); vertical-align: top; color: var(--text-light); line-height: 1.5; }
+    .rights-table tr:last-child td { border-bottom: none; }
+    .rights-table tr:hover td { background: var(--bg-hover); }
+    .right-name { font-weight: 700; color: var(--text-white); white-space: nowrap; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 60px 48px 40px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+    .footer-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: .95rem; margin-bottom: 14px; text-decoration: none; color: var(--text-white); }
+    .footer-logo-icon { width: 30px; height: 30px; background: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+    .footer-logo-icon svg { width: 18px; height: 18px; }
+    .footer-desc { font-size: .83rem; color: var(--text-dim); line-height: 1.65; max-width: 280px; margin-bottom: 20px; }
+    .footer-col-title { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
+    .footer-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-link { font-size: .83rem; color: var(--text-mid); text-decoration: none; transition: color .15s; }
+    .footer-link:hover { color: var(--text-white); }
+    .footer-link.active { color: var(--text-white); }
+    .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: .78rem; color: var(--text-dim); }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 860px) {
+      .doc-hero { padding: 40px 24px 32px; }
+      .doc-hero .doc-title { font-size: 2rem; }
+      .doc-layout { grid-template-columns: 1fr; padding: 0 24px 60px; gap: 0; }
+      .toc { display: none; }
+      .nav { padding: 0 24px; }
+      .nav-breadcrumb { display: none; }
+      footer { padding: 40px 24px 28px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+      .provider-grid { grid-template-columns: 1fr; }
+      .rights-table { font-size: .78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-fixed">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="wrap">
+
+  <!-- ── NAV ──────────────────────────────────────── -->
+  <nav class="nav" id="nav">
+    <div class="nav-left">
+      <a class="logo" href="dropsub-landing.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+            <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        DropSub
+      </a>
+      <div class="nav-breadcrumb">
+        <a href="dropsub-landing.html">Home</a>
+        <span>/</span>
+        <span>Privacy Policy</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+      <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+    </div>
+  </nav>
+
+  <!-- ── PAGE HERO ─────────────────────────────────── -->
+  <div class="doc-hero">
+    <div class="doc-eyebrow">🔒 Legal</div>
+    <h1 class="doc-title">Privacy Policy</h1>
+    <div class="doc-meta">
+      <div>📅 Last updated: June 1, 2025</div>
+      <div>✉️ Questions: <a href="mailto:legal@dropsub.com">legal@dropsub.com</a></div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ───────────────────────────────────── -->
+  <div class="doc-layout">
+
+    <!-- TOC -->
+    <aside class="toc">
+      <div class="toc-title">Contents</div>
+      <div class="toc-links">
+        <a class="toc-link" href="#s1">1. Information We Collect</a>
+        <a class="toc-link" href="#s2">2. How We Use Information</a>
+        <a class="toc-link" href="#s3">3. Third-Party Sharing</a>
+        <a class="toc-link" href="#s4">4. Cookies &amp; Tracking</a>
+        <a class="toc-link" href="#s5">5. Data Retention</a>
+        <a class="toc-link" href="#s6">6. Your Rights</a>
+        <a class="toc-link" href="#s7">7. Children's Privacy</a>
+        <a class="toc-link" href="#s8">8. Contact Us</a>
+      </div>
+      <div class="toc-divider"></div>
+      <div class="toc-other">
+        <a href="dropsub-terms.html">Terms of Service →</a>
+        <a href="mailto:legal@dropsub.com">Contact Legal →</a>
+      </div>
+    </aside>
+
+    <!-- Document body -->
+    <div class="doc-content">
+
+      <div class="doc-intro">
+        <strong>Your privacy matters to us.</strong> This Privacy Policy explains how DropSub LLC ("DropSub," "we," "us," "our") collects, uses, discloses, and safeguards your personal information when you use the DropSub platform. Please read this policy carefully. By using the Service, you agree to the practices described here.
+      </div>
+
+      <!-- §1 -->
+      <div class="doc-section" id="s1">
+        <div class="section-num">Section 01</div>
+        <div class="section-title">Information We Collect</div>
+        <p class="doc-p">We collect information you provide directly, information generated through your use of the Service, and information from third-party sources integrated into the platform.</p>
+
+        <div class="doc-h3">Information You Provide</div>
+        <ul class="doc-list">
+          <li><strong>Account information:</strong> When you register, we collect your full name, username, email address, password (stored as a cryptographic hash), and account role (Artist, Manager, Assistant, Fan).</li>
+          <li><strong>Profile information:</strong> Optional profile data including artist/fan biography, profile image, and associated social media handles.</li>
+          <li><strong>Content you upload:</strong> Photos, videos, audio recordings, documents, and other files that Artists upload to the platform, along with associated metadata (file names, sizes, types, upload dates).</li>
+          <li><strong>Payment information:</strong> Billing address and payment card details submitted during checkout. Full card numbers are transmitted directly to Stripe and are never stored on DropSub servers.</li>
+          <li><strong>Communications:</strong> Messages you send to DropSub support, feedback submissions, and responses to surveys or research.</li>
+        </ul>
+
+        <div class="doc-h3">Information Collected Automatically</div>
+        <ul class="doc-list">
+          <li><strong>Usage data:</strong> Pages visited, content viewed, search queries, subscription actions, purchase history, and feature interactions.</li>
+          <li><strong>Device and technical data:</strong> IP address, browser type and version, operating system, device identifiers, screen resolution, and referring URLs.</li>
+          <li><strong>Log data:</strong> Server logs including timestamps, request paths, response codes, and error information for security and debugging purposes.</li>
+          <li><strong>Content engagement data:</strong> For Artists, aggregate statistics on folder views, file plays, subscriber counts, and revenue metrics made available through the analytics dashboard.</li>
+        </ul>
+
+        <div class="doc-h3">Information from Third Parties</div>
+        <ul class="doc-list">
+          <li><strong>Stripe:</strong> Upon Stripe Connect onboarding, we receive confirmation of identity verification status, payout account details (bank account last 4 digits, routing information), and transaction records from Stripe.</li>
+          <li><strong>Authentication providers:</strong> If you choose to sign in using a third-party authentication provider, we receive basic profile information (name, email) from that provider.</li>
+        </ul>
+      </div>
+
+      <!-- §2 -->
+      <div class="doc-section" id="s2">
+        <div class="section-num">Section 02</div>
+        <div class="section-title">How We Use Information</div>
+        <p class="doc-p">We use the information we collect for the following purposes, all of which are necessary to provide, operate, and improve the Service:</p>
+        <ul class="doc-list">
+          <li><strong>Account management:</strong> To create and manage your account, verify your identity, and authenticate your sessions.</li>
+          <li><strong>Service delivery:</strong> To deliver content you have purchased access to, process subscriptions, and manage recurring billing through Stripe.</li>
+          <li><strong>Artist analytics:</strong> To generate and display subscriber counts, revenue metrics, content engagement statistics, and payout summaries in Artist dashboards.</li>
+          <li><strong>Notifications:</strong> To send transactional emails (purchase confirmations, subscription renewals, payout notifications, account security alerts) and, where you have opted in, marketing communications about new features or promotions.</li>
+          <li><strong>Customer support:</strong> To respond to your inquiries, investigate disputes, and resolve technical issues.</li>
+          <li><strong>Safety and fraud prevention:</strong> To detect, investigate, and prevent fraudulent transactions, unauthorized access, content policy violations, and other illegal activity.</li>
+          <li><strong>Legal compliance:</strong> To comply with applicable laws, regulations, tax obligations, and respond to lawful requests from government authorities.</li>
+          <li><strong>Product improvement:</strong> To analyze usage patterns, diagnose bugs, conduct A/B testing, and improve the platform's features, performance, and design.</li>
+        </ul>
+        <div class="doc-callout"><strong>We do not sell your personal information.</strong> DropSub does not sell, rent, or trade your personal data to third parties for their marketing purposes.</div>
+      </div>
+
+      <!-- §3 -->
+      <div class="doc-section" id="s3">
+        <div class="section-num">Section 03</div>
+        <div class="section-title">Sharing with Third Parties</div>
+        <p class="doc-p">We share your information only with the service providers necessary to operate the platform. All third-party providers are contractually required to process your data only as directed by DropSub and to maintain appropriate security measures.</p>
+
+        <div class="provider-grid">
+          <div class="provider-card">
+            <div class="provider-name">💳 Stripe, Inc.</div>
+            <div class="provider-role">Payment Processing</div>
+            <div class="provider-desc">Handles all payment card processing, subscription billing, and Artist payouts through Stripe Connect. Stripe processes payment data under their own privacy policy and PCI-DSS compliance.</div>
+            <a class="provider-link" href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy ↗</a>
+          </div>
+          <div class="provider-card">
+            <div class="provider-name">☁️ Amazon Web Services</div>
+            <div class="provider-role">Cloud Storage (AWS S3)</div>
+            <div class="provider-desc">Artist content (files, media) is stored on AWS S3 in encrypted form. AWS serves as our primary infrastructure provider for file storage and delivery. Data is stored in US-East regions by default.</div>
+            <a class="provider-link" href="https://aws.amazon.com/privacy" target="_blank" rel="noopener">aws.amazon.com/privacy ↗</a>
+          </div>
+          <div class="provider-card">
+            <div class="provider-name">🗄️ Supabase</div>
+            <div class="provider-role">Database &amp; Authentication</div>
+            <div class="provider-desc">User accounts, subscriptions, content metadata, and transaction records are stored in a Supabase-hosted PostgreSQL database. Supabase also handles authentication and session management.</div>
+            <a class="provider-link" href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy ↗</a>
+          </div>
+        </div>
+
+        <div class="doc-h3">Other Disclosures</div>
+        <ul class="doc-list">
+          <li><strong>Business transfers:</strong> If DropSub is acquired, merges with another entity, or undergoes a corporate restructuring, your information may be transferred as part of that transaction. We will notify you before your data is subject to a materially different privacy policy.</li>
+          <li><strong>Legal obligations:</strong> We may disclose your information when required by law, court order, subpoena, or other legal process, or when we believe disclosure is necessary to protect our rights, your safety, or the safety of others.</li>
+          <li><strong>With your consent:</strong> We may share your information with third parties in other circumstances with your explicit consent.</li>
+        </ul>
+        <p class="doc-p">We do not share personal information with advertisers, data brokers, or analytics companies for targeted advertising purposes.</p>
+      </div>
+
+      <!-- §4 -->
+      <div class="doc-section" id="s4">
+        <div class="section-num">Section 04</div>
+        <div class="section-title">Cookies &amp; Tracking Technologies</div>
+        <p class="doc-p">DropSub uses cookies and similar tracking technologies to operate the Service, remember your preferences, and understand how users interact with the platform.</p>
+
+        <div class="doc-h3">Types of Cookies We Use</div>
+        <ul class="doc-list">
+          <li><strong>Essential cookies:</strong> Required for the platform to function. These include session authentication tokens, CSRF protection tokens, and load-balancing cookies. You cannot opt out of essential cookies without losing access to the Service.</li>
+          <li><strong>Preference cookies:</strong> Remember your settings such as preferred language, display mode, and content filters.</li>
+          <li><strong>Analytics cookies:</strong> Help us understand how visitors use the platform — which features are used most, where users encounter friction, and how pages perform. We use aggregated, anonymized data from these cookies to improve the Service.</li>
+          <li><strong>Security cookies:</strong> Used to detect and prevent fraudulent activity, account takeovers, and other malicious behavior.</li>
+        </ul>
+
+        <div class="doc-h3">Authentication Storage</div>
+        <p class="doc-p">DropSub stores authentication tokens in your browser's <code style="background:var(--bg-hover);padding:1px 5px;border-radius:4px;font-size:.82em;">localStorage</code> (for persistent "remember me" sessions) or <code style="background:var(--bg-hover);padding:1px 5px;border-radius:4px;font-size:.82em;">sessionStorage</code> (for session-only authentication that clears when you close the browser tab). These tokens are used solely to authenticate your requests to the DropSub API.</p>
+
+        <div class="doc-h3">Managing Cookies</div>
+        <p class="doc-p">Most web browsers accept cookies by default, but you can instruct your browser to refuse cookies or notify you when a cookie is being sent. Note that refusing essential cookies will prevent you from accessing the Service. Refer to your browser's help documentation for instructions on managing cookies.</p>
+      </div>
+
+      <!-- §5 -->
+      <div class="doc-section" id="s5">
+        <div class="section-num">Section 05</div>
+        <div class="section-title">Data Retention</div>
+        <p class="doc-p">We retain your personal information for as long as your account remains active and for a reasonable period thereafter as necessary to provide the Service, comply with legal obligations, resolve disputes, and enforce our agreements.</p>
+        <ul class="doc-list">
+          <li><strong>Active account data:</strong> Retained for the lifetime of your account plus 90 days following account closure to allow for dispute resolution.</li>
+          <li><strong>Uploaded content:</strong> Artist content is retained for the duration of the Artist's account. Upon account deletion, content files are removed from active storage within 30 days and from backup systems within 90 days.</li>
+          <li><strong>Transaction records:</strong> Payment and subscription records are retained for seven (7) years from the transaction date for tax and legal compliance purposes, even after account deletion.</li>
+          <li><strong>Security and fraud logs:</strong> Access logs, IP records, and fraud-related data are retained for up to two (2) years.</li>
+          <li><strong>Support communications:</strong> Customer support tickets and related correspondence are retained for three (3) years.</li>
+          <li><strong>Anonymized analytics:</strong> Aggregated, de-identified usage data may be retained indefinitely for product improvement purposes and cannot be traced back to individual users.</li>
+        </ul>
+        <p class="doc-p">When we no longer have a legitimate need to retain your data, we securely delete or anonymize it. You may request deletion of your account data at any time through account settings, subject to the retention periods above required by law.</p>
+      </div>
+
+      <!-- §6 -->
+      <div class="doc-section" id="s6">
+        <div class="section-num">Section 06</div>
+        <div class="section-title">Your Rights</div>
+        <p class="doc-p">Depending on your location, you may have the following rights with respect to your personal information. To exercise any of these rights, please contact us at <a href="mailto:legal@dropsub.com">legal@dropsub.com</a>. We will respond to verified requests within 30 days.</p>
+
+        <table class="rights-table">
+          <thead>
+            <tr>
+              <th>Right</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="right-name">Access</div></td>
+              <td>Request a copy of the personal information we hold about you, including what categories we have and how we use it.</td>
+            </tr>
+            <tr>
+              <td><div class="right-name">Correction</div></td>
+              <td>Request that we correct inaccurate or incomplete personal information. You can also update most information directly in your account settings.</td>
+            </tr>
+            <tr>
+              <td><div class="right-name">Deletion</div></td>
+              <td>Request that we delete your personal information, subject to legal retention requirements. You can also delete your account directly from account settings.</td>
+            </tr>
+            <tr>
+              <td><div class="right-name">Portability</div></td>
+              <td>Request a machine-readable export of your personal data in a commonly used format (JSON or CSV).</td>
+            </tr>
+            <tr>
+              <td><div class="right-name">Opt-out</div></td>
+              <td>Opt out of marketing communications at any time via the unsubscribe link in any email or by updating your notification preferences in account settings.</td>
+            </tr>
+            <tr>
+              <td><div class="right-name">Restriction</div></td>
+              <td>Request that we restrict processing of your data in certain circumstances, such as while a dispute about accuracy is being resolved.</td>
+            </tr>
+            <tr>
+              <td><div class="right-name">Objection</div></td>
+              <td>Object to processing of your personal data for direct marketing or in other circumstances where we process it based on legitimate interests.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="doc-p">California residents may have additional rights under the California Consumer Privacy Act (CCPA), including the right to know about personal information sold or disclosed for business purposes (DropSub does not sell personal information) and the right to non-discrimination for exercising your rights.</p>
+        <p class="doc-p">EEA and UK residents may have additional rights under the General Data Protection Regulation (GDPR) or UK GDPR, including the right to lodge a complaint with your local supervisory authority.</p>
+      </div>
+
+      <!-- §7 -->
+      <div class="doc-section" id="s7">
+        <div class="section-num">Section 07</div>
+        <div class="section-title">Children's Privacy</div>
+        <p class="doc-p">DropSub is not directed to children under the age of 13 (or 16 in the European Economic Area), and we do not knowingly collect personal information from children below these ages. Our Terms of Service require all users to be at least 18 years of age or the age of majority in their jurisdiction.</p>
+        <p class="doc-p">If we become aware that we have inadvertently collected personal information from a child under the applicable age threshold, we will take immediate steps to delete that information from our systems. If you believe we may have collected information from a minor, please contact us immediately at <a href="mailto:legal@dropsub.com">legal@dropsub.com</a>.</p>
+        <p class="doc-p">Parents or legal guardians who have concerns about their child's privacy in connection with the DropSub platform should contact us directly. We take these concerns seriously and will respond promptly.</p>
+      </div>
+
+      <!-- §8 -->
+      <div class="doc-section" id="s8">
+        <div class="section-num">Section 08</div>
+        <div class="section-title">Contact Us</div>
+        <p class="doc-p">If you have questions, concerns, or requests regarding this Privacy Policy or DropSub's data practices, please contact our privacy team:</p>
+        <ul class="doc-list">
+          <li><strong>Email:</strong> <a href="mailto:legal@dropsub.com">legal@dropsub.com</a> — for privacy inquiries, data subject requests, and legal notices</li>
+          <li><strong>Response time:</strong> We aim to respond to all privacy inquiries within 5 business days and to fulfill data subject requests within 30 days</li>
+          <li><strong>Company:</strong> DropSub LLC</li>
+        </ul>
+        <p class="doc-p">If you are not satisfied with our response, you have the right to lodge a complaint with the appropriate data protection authority in your jurisdiction. For EEA residents, this would be the supervisory authority in your EU member state. For UK residents, this is the Information Commissioner's Office (ICO).</p>
+        <p class="doc-p">We reserve the right to update this Privacy Policy at any time. Material changes will be communicated via email or a prominent notice on our website at least 14 days before the changes take effect. Your continued use of the Service following notice of changes constitutes acceptance of the updated policy.</p>
+      </div>
+
+    </div><!-- /doc-content -->
+  </div><!-- /doc-layout -->
+
+  <!-- ── FOOTER ────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a class="footer-logo" href="dropsub-landing.html">
+          <div class="footer-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+              <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          DropSub
+        </a>
+        <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives. Built for artists, managers, and the fans who love them.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <div class="footer-links">
+          <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+          <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+          <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+          <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a class="footer-link" href="#">About</a>
+          <a class="footer-link" href="#">Blog</a>
+          <a class="footer-link" href="#">Press</a>
+          <a class="footer-link" href="mailto:legal@dropsub.com">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <div class="footer-links">
+          <a class="footer-link" href="dropsub-terms.html">Terms of Service</a>
+          <a class="footer-link active" href="dropsub-privacy.html">Privacy Policy</a>
+          <a class="footer-link" href="#">Copyright / DMCA</a>
+          <a class="footer-link" href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+      <span>Seeking seed round · $500K · dropsub.com</span>
+    </div>
+  </footer>
+
+</div><!-- /wrap -->
+
+<script>
+  // Highlight active TOC item on scroll
+  var sections = document.querySelectorAll('.doc-section');
+  var tocLinks = document.querySelectorAll('.toc-link');
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY + 100;
+    var active = null;
+    sections.forEach(function(s) {
+      if (s.offsetTop <= scrollY) active = s.id;
+    });
+    tocLinks.forEach(function(l) {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + active);
+    });
+    document.getElementById('nav').style.boxShadow = window.scrollY > 10 ? '0 4px 24px rgba(0,0,0,.4)' : 'none';
+  });
+</script>
+</body>
+</html>

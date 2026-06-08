@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terms of Service — DropSub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-deepest); color: var(--text-white); overflow-x: hidden; }
+
+    /* ── BACKGROUND ──────────────────────────────── */
+    .bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .07; }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, #2979ff, #7c4dff); top: -200px; left: -200px; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #2979ff, transparent); bottom: 20%; right: -100px; opacity: .05; }
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(41,121,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(41,121,255,.025) 1px, transparent 1px); background-size: 44px 44px; }
+
+    /* ── WRAPPER ─────────────────────────────────── */
+    .wrap { position: relative; z-index: 1; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav { position: sticky; top: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; background: rgba(8,15,28,.9); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); transition: box-shadow .2s; }
+    .nav-left { display: flex; align-items: center; gap: 40px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: .02em; text-decoration: none; color: var(--text-white); }
+    .logo-icon { width: 34px; height: 34px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .nav-breadcrumb { font-size: .82rem; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+    .nav-breadcrumb a { color: var(--text-mid); text-decoration: none; transition: color .15s; }
+    .nav-breadcrumb a:hover { color: var(--text-white); }
+    .nav-breadcrumb span { color: var(--text-dim); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost { padding: 7px 18px; border-radius: 20px; background: none; border: 1px solid var(--border-bright); color: var(--text-light); font-family: inherit; font-size: .84rem; font-weight: 500; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; }
+    .btn-ghost:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-primary { padding: 8px 20px; border-radius: 20px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; color: #fff; font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; box-shadow: 0 4px 16px rgba(41,121,255,.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(41,121,255,.45); }
+
+    /* ── PAGE HERO ───────────────────────────────── */
+    .doc-hero { padding: 64px 48px 48px; max-width: 1100px; margin: 0 auto; }
+    .doc-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(41,121,255,.12); border: 1px solid rgba(41,121,255,.25); border-radius: 20px; padding: 5px 14px; font-size: .7rem; font-weight: 700; color: var(--blue-glow); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 20px; }
+    .doc-title { font-size: 2.8rem; font-weight: 900; letter-spacing: -.04em; line-height: 1.1; margin-bottom: 14px; }
+    .doc-meta { font-size: .82rem; color: var(--text-dim); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .doc-meta-item { display: flex; align-items: center; gap: 5px; }
+
+    /* ── CONTENT LAYOUT ──────────────────────────── */
+    .doc-layout { max-width: 1100px; margin: 0 auto; padding: 0 48px 80px; display: grid; grid-template-columns: 220px 1fr; gap: 48px; align-items: start; }
+
+    /* ── TOC ─────────────────────────────────────── */
+    .toc { position: sticky; top: 80px; }
+    .toc-title { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+    .toc-links { display: flex; flex-direction: column; gap: 2px; }
+    .toc-link { padding: 6px 10px; border-radius: 6px; font-size: .78rem; color: var(--text-dim); text-decoration: none; transition: all .12s; border-left: 2px solid transparent; line-height: 1.4; }
+    .toc-link:hover { color: var(--text-light); background: var(--bg-card); border-left-color: var(--blue-dim); }
+    .toc-link.active { color: var(--blue-glow); background: rgba(41,121,255,.08); border-left-color: var(--blue-bright); }
+    .toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+    .toc-other { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+    .toc-other a { font-size: .74rem; color: var(--text-dim); text-decoration: none; padding: 4px 10px; border-radius: 6px; transition: all .12s; }
+    .toc-other a:hover { color: var(--text-mid); background: var(--bg-card); }
+
+    /* ── DOCUMENT CONTENT ────────────────────────── */
+    .doc-content { min-width: 0; }
+    .doc-intro { background: var(--bg-card); border: 1px solid var(--border-bright); border-left: 3px solid var(--blue-bright); border-radius: 0 10px 10px 0; padding: 16px 20px; margin-bottom: 36px; font-size: .85rem; color: var(--text-light); line-height: 1.65; }
+    .doc-intro strong { color: var(--text-white); }
+
+    .doc-section { margin-bottom: 40px; scroll-margin-top: 88px; }
+    .doc-section + .doc-section { padding-top: 40px; border-top: 1px solid var(--border); }
+    .section-num { font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue-bright); margin-bottom: 6px; }
+    .section-title { font-size: 1.2rem; font-weight: 800; color: var(--text-white); margin-bottom: 14px; letter-spacing: -.01em; }
+    .doc-p { font-size: .9rem; color: var(--text-light); line-height: 1.8; margin-bottom: 14px; }
+    .doc-p:last-child { margin-bottom: 0; }
+    .doc-p a { color: var(--blue-glow); text-decoration: none; transition: color .12s; }
+    .doc-p a:hover { color: var(--text-white); text-decoration: underline; }
+    .doc-list { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 10px 0 14px; }
+    .doc-list li { display: flex; align-items: flex-start; gap: 10px; font-size: .88rem; color: var(--text-light); line-height: 1.65; }
+    .doc-list li::before { content: '→'; color: var(--blue-bright); font-size: .78rem; margin-top: 3px; flex-shrink: 0; }
+    .doc-callout { background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.2); border-radius: 8px; padding: 14px 16px; margin: 14px 0; font-size: .83rem; color: var(--text-light); line-height: 1.65; }
+    .doc-callout strong { color: var(--accent-gold); }
+    .doc-h3 { font-size: .95rem; font-weight: 700; color: var(--text-white); margin: 18px 0 8px; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 60px 48px 40px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+    .footer-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: .95rem; margin-bottom: 14px; text-decoration: none; color: var(--text-white); }
+    .footer-logo-icon { width: 30px; height: 30px; background: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+    .footer-logo-icon svg { width: 18px; height: 18px; }
+    .footer-desc { font-size: .83rem; color: var(--text-dim); line-height: 1.65; max-width: 280px; margin-bottom: 20px; }
+    .footer-col-title { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; }
+    .footer-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-link { font-size: .83rem; color: var(--text-mid); text-decoration: none; transition: color .15s; }
+    .footer-link:hover { color: var(--text-white); }
+    .footer-link.active { color: var(--text-white); }
+    .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: .78rem; color: var(--text-dim); }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 860px) {
+      .doc-hero { padding: 40px 24px 32px; }
+      .doc-hero .doc-title { font-size: 2rem; }
+      .doc-layout { grid-template-columns: 1fr; padding: 0 24px 60px; gap: 0; }
+      .toc { display: none; }
+      .nav { padding: 0 24px; }
+      .nav-breadcrumb { display: none; }
+      footer { padding: 40px 24px 28px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-fixed">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="wrap">
+
+  <!-- ── NAV ──────────────────────────────────────── -->
+  <nav class="nav" id="nav">
+    <div class="nav-left">
+      <a class="logo" href="dropsub-landing.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+            <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        DropSub
+      </a>
+      <div class="nav-breadcrumb">
+        <a href="dropsub-landing.html">Home</a>
+        <span>/</span>
+        <span>Terms of Service</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a class="btn-ghost" href="dropsub-login.html">Sign in</a>
+      <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+    </div>
+  </nav>
+
+  <!-- ── PAGE HERO ─────────────────────────────────── -->
+  <div class="doc-hero">
+    <div class="doc-eyebrow">📄 Legal</div>
+    <h1 class="doc-title">Terms of Service</h1>
+    <div class="doc-meta">
+      <div class="doc-meta-item">📅 Last updated: June 1, 2025</div>
+      <div class="doc-meta-item">✉️ Questions: <a href="mailto:legal@dropsub.com" style="color:var(--blue-glow);text-decoration:none;">legal@dropsub.com</a></div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ───────────────────────────────────── -->
+  <div class="doc-layout">
+
+    <!-- TOC -->
+    <aside class="toc">
+      <div class="toc-title">Contents</div>
+      <div class="toc-links">
+        <a class="toc-link" href="#s1">1. Acceptance of Terms</a>
+        <a class="toc-link" href="#s2">2. Description of Service</a>
+        <a class="toc-link" href="#s3">3. User Accounts</a>
+        <a class="toc-link" href="#s4">4. Artist Obligations</a>
+        <a class="toc-link" href="#s5">5. Fan Subscriptions &amp; Purchases</a>
+        <a class="toc-link" href="#s6">6. Payment Terms</a>
+        <a class="toc-link" href="#s7">7. Content Ownership &amp; Licensing</a>
+        <a class="toc-link" href="#s8">8. Prohibited Content</a>
+        <a class="toc-link" href="#s9">9. Termination</a>
+        <a class="toc-link" href="#s10">10. Disclaimers</a>
+        <a class="toc-link" href="#s11">11. Limitation of Liability</a>
+        <a class="toc-link" href="#s12">12. Governing Law</a>
+      </div>
+      <div class="toc-divider"></div>
+      <div class="toc-other">
+        <a href="dropsub-privacy.html">Privacy Policy →</a>
+        <a href="mailto:legal@dropsub.com">Contact Legal →</a>
+      </div>
+    </aside>
+
+    <!-- Document body -->
+    <div class="doc-content">
+
+      <div class="doc-intro">
+        <strong>Please read these Terms carefully before using DropSub.</strong> By creating an account or using any part of the DropSub platform, you agree to be bound by these Terms. If you do not agree, do not use the Service.
+      </div>
+
+      <!-- §1 -->
+      <div class="doc-section" id="s1">
+        <div class="section-num">Section 01</div>
+        <div class="section-title">Acceptance of Terms</div>
+        <p class="doc-p">These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and DropSub LLC ("DropSub," "we," "us," or "our"), governing your access to and use of the DropSub platform, website, mobile applications, and all related services (collectively, the "Service").</p>
+        <p class="doc-p">By registering for an account, accessing any portion of the Service, or clicking "I agree," you represent that: (a) you have read and understand these Terms; (b) you are at least 18 years of age or the age of majority in your jurisdiction; (c) you have the legal authority to enter into this agreement; and (d) your use of the Service will comply with all applicable laws and regulations.</p>
+        <p class="doc-p">DropSub reserves the right to update or modify these Terms at any time. We will notify you of material changes by posting a notice on our website or by email. Your continued use of the Service following the posting of changes constitutes your acceptance of the revised Terms. If you disagree with any modification, your sole remedy is to discontinue use of the Service.</p>
+      </div>
+
+      <!-- §2 -->
+      <div class="doc-section" id="s2">
+        <div class="section-num">Section 02</div>
+        <div class="section-title">Description of Service</div>
+        <p class="doc-p">DropSub is a content monetization platform that enables artists, musicians, managers, and creative teams ("Artists") to upload, organize, and monetize their creative archives — including photos, videos, audio recordings, documents, and other digital content — and enables fans and subscribers ("Fans") to access that content through tiered subscription or one-time purchase arrangements.</p>
+        <p class="doc-p">The Service provides three primary access tiers:</p>
+        <ul class="doc-list">
+          <li><strong>Free:</strong> Content designated by the Artist as publicly accessible at no charge, used for promotional and discovery purposes.</li>
+          <li><strong>Subscription:</strong> Monthly recurring access to designated content folders, priced at the Artist's discretion.</li>
+          <li><strong>Premium Drop:</strong> One-time purchase access to exclusive content collections, priced at the Artist's discretion.</li>
+        </ul>
+        <p class="doc-p">DropSub acts as a technology platform and is not a party to any transaction between Artists and Fans. DropSub does not produce, curate, or endorse any content uploaded by Artists. Payment processing is facilitated through our third-party payment processor, Stripe, Inc.</p>
+      </div>
+
+      <!-- §3 -->
+      <div class="doc-section" id="s3">
+        <div class="section-num">Section 03</div>
+        <div class="section-title">User Accounts</div>
+        <p class="doc-p">To access most features of the Service, you must create an account. You agree to provide accurate, current, and complete information during registration and to update such information as necessary. You are solely responsible for maintaining the confidentiality of your account credentials and for all activity that occurs under your account.</p>
+        <p class="doc-p">You agree to immediately notify DropSub at <a href="mailto:legal@dropsub.com">legal@dropsub.com</a> of any unauthorized use of your account or any other security breach. DropSub will not be liable for any losses arising from unauthorized access to your account due to your failure to safeguard your credentials.</p>
+        <p class="doc-p">You may not create accounts using automated means, create accounts on behalf of others without authorization, or maintain multiple accounts for the purpose of evading restrictions or suspensions. One person may not share a single account with multiple individuals.</p>
+        <div class="doc-callout"><strong>Account roles:</strong> When you register, you designate a role (Artist, Manager, Assistant, or Fan) that determines your permissions within the platform. Artists and their designated team members gain access to upload, content management, and monetization features.</div>
+      </div>
+
+      <!-- §4 -->
+      <div class="doc-section" id="s4">
+        <div class="section-num">Section 04</div>
+        <div class="section-title">Artist Obligations</div>
+        <p class="doc-p">As an Artist or member of an artist team using the Service to publish and monetize content, you represent, warrant, and agree to the following:</p>
+        <div class="doc-h3">Content Rights</div>
+        <ul class="doc-list">
+          <li>You own or have all necessary rights, licenses, consents, and permissions to upload, publish, and monetize all content you submit to the Service.</li>
+          <li>Your content does not infringe the intellectual property rights, privacy rights, publicity rights, or any other rights of any third party.</li>
+          <li>You have obtained appropriate releases from any individuals depicted in your content, including photographers, videographers, and any other collaborators.</li>
+          <li>You are responsible for paying all royalties, licensing fees, and other obligations owed to third parties in connection with the content you upload.</li>
+        </ul>
+        <div class="doc-h3">Pricing and Availability</div>
+        <ul class="doc-list">
+          <li>You may set subscription prices and one-time purchase prices at your discretion, subject to DropSub's minimum and maximum price thresholds as communicated from time to time.</li>
+          <li>You agree not to engage in deceptive pricing, misrepresent the nature or quantity of content accessible through a tier, or artificially inflate perceived value.</li>
+          <li>Once a Fan has purchased access to a Premium Drop, you agree not to reduce or remove content from that drop without offering a refund.</li>
+        </ul>
+        <div class="doc-h3">Team Access</div>
+        <p class="doc-p">If you grant team access (Manager, Assistant roles) to other individuals, you are fully responsible for all actions taken by those individuals within your account. You agree to promptly revoke access for any team member who departs or whose access should be restricted.</p>
+      </div>
+
+      <!-- §5 -->
+      <div class="doc-section" id="s5">
+        <div class="section-num">Section 05</div>
+        <div class="section-title">Fan Subscriptions and Purchases</div>
+        <p class="doc-p">As a Fan purchasing access to content on DropSub, you acknowledge and agree to the following:</p>
+        <div class="doc-h3">Subscriptions</div>
+        <ul class="doc-list">
+          <li>Subscriptions are billed on a recurring monthly basis at the price set by the Artist at the time of your initial subscription. Prices may change with reasonable notice.</li>
+          <li>Your subscription will automatically renew at the end of each billing period unless you cancel before the renewal date.</li>
+          <li>You may cancel your subscription at any time through your account settings. Cancellation takes effect at the end of the current billing period; no partial refunds are issued for unused time.</li>
+          <li>DropSub does not guarantee minimum content output from Artists. Artists retain full editorial control over their content uploads and schedules.</li>
+        </ul>
+        <div class="doc-h3">Premium Purchases</div>
+        <ul class="doc-list">
+          <li>Premium Drop purchases grant you lifetime, personal, non-transferable access to the specific content collection purchased.</li>
+          <li>Premium purchases are final and non-refundable, except as required by applicable consumer protection law or in cases where the content purchased is materially different from what was described.</li>
+          <li>Your access to purchased content is contingent on your account remaining active and in good standing with DropSub.</li>
+        </ul>
+        <div class="doc-callout"><strong>Access is personal:</strong> Content access is licensed to you as an individual. You may not share, redistribute, sublicense, or resell access to any content on DropSub to third parties.</div>
+      </div>
+
+      <!-- §6 -->
+      <div class="doc-section" id="s6">
+        <div class="section-num">Section 06</div>
+        <div class="section-title">Payment Terms</div>
+        <p class="doc-p">All payments on the DropSub platform are processed by Stripe, Inc. By making a payment on DropSub, you also agree to Stripe's Terms of Service and Privacy Policy. DropSub does not store your full payment card details.</p>
+        <div class="doc-h3">For Fans</div>
+        <ul class="doc-list">
+          <li>All prices are displayed and charged in US Dollars (USD) unless otherwise indicated. Currency conversion fees, if any, are the responsibility of the cardholder.</li>
+          <li>Your payment method will be charged at the time of subscription activation or purchase. For subscriptions, it will be charged again automatically at each renewal.</li>
+          <li>If a payment fails, we will attempt to process it again. If payment cannot be collected, your access may be suspended until payment is resolved.</li>
+        </ul>
+        <div class="doc-h3">For Artists</div>
+        <ul class="doc-list">
+          <li>DropSub charges a platform fee, which is deducted from each transaction before funds are paid out to Artists. Current platform fees are disclosed in your Artist account settings and may be updated with 30 days' notice.</li>
+          <li>Payouts are processed through Stripe Connect. Artists must complete Stripe's identity verification process to receive payouts.</li>
+          <li>DropSub reserves the right to withhold payouts pending investigation of suspected fraud, chargebacks, or violations of these Terms.</li>
+          <li>You are responsible for all applicable taxes on income received through the platform. DropSub will issue tax reporting forms (e.g., Form 1099-K) as required by law.</li>
+        </ul>
+      </div>
+
+      <!-- §7 -->
+      <div class="doc-section" id="s7">
+        <div class="section-num">Section 07</div>
+        <div class="section-title">Content Ownership and Licensing</div>
+        <p class="doc-p">Artists retain all ownership of their content. By uploading content to DropSub, you grant DropSub a limited, non-exclusive, royalty-free, worldwide license to host, store, display, transcode, and transmit your content solely for the purpose of providing and improving the Service.</p>
+        <p class="doc-p">This license does not permit DropSub to sell, redistribute, or commercially exploit your content for any purpose other than operating the Service. DropSub will not use your content in marketing materials, advertising campaigns, or for any purpose beyond delivering it to authorized users without your explicit written consent.</p>
+        <p class="doc-p">When a Fan purchases access to content, that Fan receives a limited, personal, non-transferable, non-sublicensable license to view and access the purchased content through the DropSub platform. No other rights are granted. Fans do not acquire any ownership interest in content through their subscriptions or purchases.</p>
+        <div class="doc-callout"><strong>DMCA:</strong> DropSub respects intellectual property rights and complies with the Digital Millennium Copyright Act (DMCA). If you believe content on DropSub infringes your copyright, please send a takedown notice to <a href="mailto:legal@dropsub.com" style="color:var(--blue-glow);">legal@dropsub.com</a>.</div>
+      </div>
+
+      <!-- §8 -->
+      <div class="doc-section" id="s8">
+        <div class="section-num">Section 08</div>
+        <div class="section-title">Prohibited Content</div>
+        <p class="doc-p">You agree not to upload, post, or transmit any content on DropSub that:</p>
+        <ul class="doc-list">
+          <li>Is unlawful, harmful, threatening, abusive, harassing, defamatory, or otherwise objectionable</li>
+          <li>Infringes any patent, trademark, trade secret, copyright, or other intellectual property rights of any party</li>
+          <li>Contains child sexual abuse material (CSAM) or any content that sexually exploits minors — violations will be reported to law enforcement and the National Center for Missing &amp; Exploited Children</li>
+          <li>Depicts or promotes non-consensual sexual acts or intimate partner violence</li>
+          <li>Constitutes unauthorized advertising, spam, or unsolicited promotional material</li>
+          <li>Contains malware, viruses, or any code designed to disrupt, damage, or interfere with the Service</li>
+          <li>Impersonates any person or entity or misrepresents your affiliation with a person or entity</li>
+          <li>Violates the privacy rights of any individual, including unauthorized use of personal information or recordings made without consent</li>
+        </ul>
+        <p class="doc-p">DropSub reserves the right to remove any content that violates these Terms or that we determine, in our sole discretion, is otherwise inappropriate, without prior notice or liability. Repeated or egregious violations will result in account termination and, where required by law, reporting to appropriate authorities.</p>
+      </div>
+
+      <!-- §9 -->
+      <div class="doc-section" id="s9">
+        <div class="section-num">Section 09</div>
+        <div class="section-title">Termination</div>
+        <p class="doc-p">You may terminate your account at any time by visiting your account settings and selecting "Delete Account." Upon deletion, your content will be removed from the platform within 30 days (subject to our data retention practices described in our Privacy Policy), and Fans' ongoing access to your content will be revoked.</p>
+        <p class="doc-p">DropSub may suspend or terminate your account at any time, with or without notice, for any reason, including but not limited to: violation of these Terms, suspected fraud or unauthorized activity, chargebacks exceeding acceptable thresholds, content policy violations, or extended periods of inactivity.</p>
+        <p class="doc-p">Upon termination of an Artist account:</p>
+        <ul class="doc-list">
+          <li>Active Fan subscriptions will be immediately canceled and no further charges will be made</li>
+          <li>Pending payouts will be processed according to our standard schedule unless withheld under investigation</li>
+          <li>Your content and data will be handled per our Privacy Policy and data retention schedule</li>
+        </ul>
+        <p class="doc-p">Sections of these Terms that by their nature should survive termination (including without limitation Sections 6, 7, 10, 11, and 12) shall survive any termination of your account or these Terms.</p>
+      </div>
+
+      <!-- §10 -->
+      <div class="doc-section" id="s10">
+        <div class="section-num">Section 10</div>
+        <div class="section-title">Disclaimers</div>
+        <p class="doc-p">THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, DROPSUB EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING WITHOUT LIMITATION IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND TITLE.</p>
+        <p class="doc-p">DropSub does not warrant that: (a) the Service will be uninterrupted, secure, or error-free; (b) defects will be corrected; (c) the Service or any content available through it is free of viruses or other harmful components; or (d) the results of using the Service will meet your expectations.</p>
+        <p class="doc-p">DropSub does not endorse, guarantee, or assume responsibility for any content uploaded by Artists or any transactions between Artists and Fans. Your use of content accessed through the Service is at your own risk.</p>
+      </div>
+
+      <!-- §11 -->
+      <div class="doc-section" id="s11">
+        <div class="section-num">Section 11</div>
+        <div class="section-title">Limitation of Liability</div>
+        <p class="doc-p">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL DROPSUB, ITS AFFILIATES, OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION LOSS OF PROFITS, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES, EVEN IF DROPSUB HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+        <p class="doc-p">IN NO EVENT WILL DROPSUB'S TOTAL CUMULATIVE LIABILITY TO YOU ARISING OUT OF OR RELATED TO THESE TERMS OR YOUR USE OF THE SERVICE EXCEED THE GREATER OF: (A) THE TOTAL AMOUNT PAID BY YOU TO DROPSUB IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED US DOLLARS ($100).</p>
+        <p class="doc-p">Some jurisdictions do not allow the exclusion of certain warranties or the limitation or exclusion of liability for incidental or consequential damages. Accordingly, some of the above limitations may not apply to you.</p>
+      </div>
+
+      <!-- §12 -->
+      <div class="doc-section" id="s12">
+        <div class="section-num">Section 12</div>
+        <div class="section-title">Governing Law</div>
+        <p class="doc-p">These Terms are governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to its conflict of law principles. You agree that any legal action or proceeding arising out of or relating to these Terms or your use of the Service shall be brought exclusively in the federal or state courts located in Delaware, and you hereby consent to personal jurisdiction in such courts.</p>
+        <p class="doc-p">Any dispute, controversy, or claim arising out of or relating to these Terms or the Service that cannot be resolved through good-faith negotiation shall be submitted to binding arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules. The arbitration shall take place in Delaware. Nothing in this section shall prevent either party from seeking injunctive or other equitable relief in any court of competent jurisdiction.</p>
+        <p class="doc-p">If any provision of these Terms is found by a court of competent jurisdiction to be invalid or unenforceable, the remaining provisions will remain in full force and effect. These Terms constitute the entire agreement between you and DropSub with respect to the Service and supersede all prior agreements.</p>
+        <p class="doc-p">For questions regarding these Terms, please contact us at <a href="mailto:legal@dropsub.com">legal@dropsub.com</a> or write to: DropSub LLC, Legal Department, legal@dropsub.com.</p>
+      </div>
+
+    </div><!-- /doc-content -->
+  </div><!-- /doc-layout -->
+
+  <!-- ── FOOTER ────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a class="footer-logo" href="dropsub-landing.html">
+          <div class="footer-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+              <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          DropSub
+        </a>
+        <p class="footer-desc">The alternative to Dropbox where fans pay to access an artist's creative assets and archives. Built for artists, managers, and the fans who love them.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <div class="footer-links">
+          <a class="footer-link" href="dropsub-landing.html#how">How it works</a>
+          <a class="footer-link" href="dropsub-landing.html#tiers">Pricing tiers</a>
+          <a class="footer-link" href="dropsub-landing.html#artists">For artists</a>
+          <a class="footer-link" href="dropsub-landing.html#fans">For fans</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a class="footer-link" href="#">About</a>
+          <a class="footer-link" href="#">Blog</a>
+          <a class="footer-link" href="#">Press</a>
+          <a class="footer-link" href="mailto:legal@dropsub.com">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <div class="footer-links">
+          <a class="footer-link active" href="dropsub-terms.html">Terms of Service</a>
+          <a class="footer-link" href="dropsub-privacy.html">Privacy Policy</a>
+          <a class="footer-link" href="#">Copyright / DMCA</a>
+          <a class="footer-link" href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 DropSub LLC — Confidential by Richard Frias</span>
+      <span>Seeking seed round · $500K · dropsub.com</span>
+    </div>
+  </footer>
+
+</div><!-- /wrap -->
+
+<script>
+  // Highlight active TOC item on scroll
+  var sections = document.querySelectorAll('.doc-section');
+  var tocLinks = document.querySelectorAll('.toc-link');
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY + 100;
+    var active = null;
+    sections.forEach(function(s) {
+      if (s.offsetTop <= scrollY) active = s.id;
+    });
+    tocLinks.forEach(function(l) {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + active);
+    });
+    document.getElementById('nav').style.boxShadow = window.scrollY > 10 ? '0 4px 24px rgba(0,0,0,.4)' : 'none';
+  });
+</script>
+</body>
+</html>
