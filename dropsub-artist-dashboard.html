@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DropSub — Artist Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -879,7 +878,7 @@
             <div class="mu-title">📱 Upload from your phone</div>
             <div class="mu-desc">Scan this QR code on your phone to instantly upload photos and videos from your camera roll directly to your archive.</div>
             <div class="qr-wrap" onclick="openQRModal()">
-              <canvas id="qrSidebar" style="width:100%;max-width:130px;height:auto;display:block;margin:0 auto;border-radius:6px;"></canvas>
+              <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=https://dropsub.com/dropsub-artist-dashboard.html" alt="QR Code" style="width:100%;max-width:130px;height:auto;display:block;margin:0 auto;border-radius:6px;"/>
             </div>
             <div class="mu-steps">
               <div class="mu-step"><div class="mu-step-num">1</div>Open your phone camera</div>
@@ -1009,7 +1008,7 @@
       <div id="phoneUpload" class="phone-upload">
         <div class="phone-upload-inner">
           <div class="phone-qr-large">
-            <canvas id="qrPhone" style="display:block;border-radius:8px;"></canvas>
+            <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=https://dropsub.com/dropsub-artist-dashboard.html" alt="QR Code" style="display:block;border-radius:8px;width:160px;height:160px;"/>
           </div>
           <div class="phone-ul-title">Scan to upload from your phone</div>
           <div class="phone-ul-desc">Open your camera app, point at this QR code, and you'll be taken to a mobile-optimized upload page. Select photos or videos from your camera roll to add them directly to your archive.</div>
@@ -1089,9 +1088,16 @@
         </div>
       </div>
     </div>
+    <div id="uploadPolicyWrap" style="margin:12px 20px 0;padding:12px 14px;background:rgba(255,79,106,.06);border:1px solid rgba(255,79,106,.25);border-radius:8px;">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:.78rem;color:var(--text-light);line-height:1.5;">
+        <input type="checkbox" id="contentPolicyCheck" onchange="onPolicyCheck()" style="margin-top:2px;accent-color:var(--blue-bright);width:15px;height:15px;flex-shrink:0;outline:2px solid #ff4f6a;outline-offset:2px;cursor:pointer;"/>
+        I confirm this upload does NOT contain adult material, nudity, or explicit content. DropSub has a strict no-adult-content policy. Uploads are subject to AI content moderation review.
+      </label>
+      <div id="policyError" style="display:none;color:#ff4f6a;font-size:.73rem;font-weight:600;margin-top:8px;">&#9888; You must confirm the content policy before uploading.</div>
+    </div>
     <div class="modal-footer">
       <button class="mfooter-btn cancel" onclick="closeUploadModal()">Cancel</button>
-      <button class="mfooter-btn submit" onclick="simulateUpload()">⬆ Upload & Archive</button>
+      <button class="mfooter-btn submit" id="submitUploadBtn" onclick="simulateUpload()" disabled style="opacity:.45;cursor:not-allowed;">⬆ Upload & Archive</button>
     </div>
   </div>
 </div>
@@ -1102,7 +1108,7 @@
     <div class="qr-modal-title">📱 Upload from Your Phone</div>
     <div class="qr-modal-sub">Scan this code with your phone camera to access the mobile upload page for your MIYAVI archive.</div>
     <div class="qr-modal-code" onclick="showToast('QR code enlarged')">
-      <canvas id="qrLarge" style="display:block;border-radius:8px;"></canvas>
+      <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=https://dropsub.com/dropsub-artist-dashboard.html" alt="QR Code" style="display:block;border-radius:8px;width:180px;height:180px;"/>
     </div>
     <div class="qr-modal-url">dropsub.com/dropsub-artist-dashboard.html</div>
     <div class="qr-modal-actions">
@@ -1361,6 +1367,12 @@
     document.getElementById('pb2').style.width = '0%';
     document.getElementById('pp1').textContent = '0%';
     document.getElementById('pp2').textContent = '0%';
+    var cb = document.getElementById('contentPolicyCheck');
+    if (cb) cb.checked = false;
+    var btn = document.getElementById('submitUploadBtn');
+    if (btn) { btn.disabled = true; btn.style.opacity = '.45'; btn.style.cursor = 'not-allowed'; }
+    var err = document.getElementById('policyError');
+    if (err) err.style.display = 'none';
   }
   document.getElementById('uploadModal').addEventListener('click', function(e) {
     if (e.target === this) closeUploadModal();
@@ -1397,8 +1409,22 @@
     document.getElementById('priceRow').style.display = tier === 'free' ? 'none' : 'grid';
   }
 
+  // ── Content policy checkbox ──────────────────────
+  function onPolicyCheck() {
+    var checked = document.getElementById('contentPolicyCheck').checked;
+    var btn = document.getElementById('submitUploadBtn');
+    btn.disabled = !checked;
+    btn.style.opacity = checked ? '1' : '.45';
+    btn.style.cursor = checked ? 'pointer' : 'not-allowed';
+    if (checked) document.getElementById('policyError').style.display = 'none';
+  }
+
   // ── Simulate upload progress ─────────────────────
   function simulateUpload() {
+    if (!document.getElementById('contentPolicyCheck').checked) {
+      document.getElementById('policyError').style.display = 'block';
+      return;
+    }
     closeUploadModal();
     showToast('⬆ Uploading files to your archive…');
   }
@@ -1648,30 +1674,12 @@
     document.getElementById('cpriceRow').style.display = tier === 'free' ? 'none' : 'grid';
   }
 
-  // ── QR code generation ───────────────────────────
-  function generateQRCodes() {
-    if (typeof QRCode === 'undefined') { setTimeout(generateQRCodes, 200); return; }
-    var url = 'https://dropsub.com/dropsub-artist-dashboard.html';
-    var targets = [
-      { id: 'qrSidebar', size: 130 },
-      { id: 'qrPhone',   size: 160 },
-      { id: 'qrLarge',   size: 180 },
-    ];
-    targets.forEach(function(t) {
-      var el = document.getElementById(t.id);
-      if (!el) return;
-      QRCode.toCanvas(el, url, { width: t.size, margin: 1, color: { dark: '#080f1c', light: '#ffffff' } },
-        function(err) { if (err) console.error(err); });
-    });
-  }
-
   // ── Init ─────────────────────────────────────────
   fetchArtistFolders();
   renderChart();
   renderActivity();
   fetchUserProfile();
   fetchTaxStatus();
-  generateQRCodes();
 </script>
 </body>
 </html>
