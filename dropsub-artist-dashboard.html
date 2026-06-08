@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DropSub — Artist Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -878,7 +879,7 @@
             <div class="mu-title">📱 Upload from your phone</div>
             <div class="mu-desc">Scan this QR code on your phone to instantly upload photos and videos from your camera roll directly to your archive.</div>
             <div class="qr-wrap" onclick="openQRModal()">
-              <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=https://dropsub.com/dropsub-artist-dashboard.html" alt="QR Code" style="width:100%;max-width:130px;height:auto;display:block;margin:0 auto;border-radius:6px;"/>
+              <div id="qrcode-sidebar" style="width:130px;height:130px;display:block;margin:0 auto;border-radius:6px;overflow:hidden;"></div>
             </div>
             <div class="mu-steps">
               <div class="mu-step"><div class="mu-step-num">1</div>Open your phone camera</div>
@@ -1008,7 +1009,7 @@
       <div id="phoneUpload" class="phone-upload">
         <div class="phone-upload-inner">
           <div class="phone-qr-large">
-            <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=https://dropsub.com/dropsub-artist-dashboard.html" alt="QR Code" style="display:block;border-radius:8px;width:160px;height:160px;"/>
+            <div id="qrcode-phone" style="width:160px;height:160px;border-radius:8px;overflow:hidden;"></div>
           </div>
           <div class="phone-ul-title">Scan to upload from your phone</div>
           <div class="phone-ul-desc">Open your camera app, point at this QR code, and you'll be taken to a mobile-optimized upload page. Select photos or videos from your camera roll to add them directly to your archive.</div>
@@ -1108,7 +1109,7 @@
     <div class="qr-modal-title">📱 Upload from Your Phone</div>
     <div class="qr-modal-sub">Scan this code with your phone camera to access the mobile upload page for your MIYAVI archive.</div>
     <div class="qr-modal-code" onclick="showToast('QR code enlarged')">
-      <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=https://dropsub.com/dropsub-artist-dashboard.html" alt="QR Code" style="display:block;border-radius:8px;width:180px;height:180px;"/>
+      <div id="qrcode-modal" style="width:180px;height:180px;border-radius:8px;overflow:hidden;"></div>
     </div>
     <div class="qr-modal-url">dropsub.com/dropsub-artist-dashboard.html</div>
     <div class="qr-modal-actions">
@@ -1680,6 +1681,23 @@
   renderActivity();
   fetchUserProfile();
   fetchTaxStatus();
+
+  // ── QR codes ─────────────────────────────────────
+  var _qrUrl = 'https://dropsub.com/dropsub-artist-dashboard.html';
+  var _qrDefs = [
+    { id: 'qrcode-sidebar', size: 130 },
+    { id: 'qrcode-phone',   size: 160 },
+    { id: 'qrcode-modal',   size: 180 },
+  ];
+  _qrDefs.forEach(function(q) {
+    new QRCode(document.getElementById(q.id), {
+      text: _qrUrl,
+      width: q.size,
+      height: q.size,
+      colorDark: '#000000',
+      colorLight: '#ffffff'
+    });
+  });
 </script>
 </body>
 </html>
