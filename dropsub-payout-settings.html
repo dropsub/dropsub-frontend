@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Payouts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-sidebar:    #0d1a30;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --bg-row:        #0e1a2e;
+      --bg-row-alt:    #0b1525;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --success:       #3fa06a;
+      --error:         #ff4f6a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+      --stripe-purple: #635bff;
+    }
+
+    html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--bg-deepest); color: var(--text-white); display: flex; flex-direction: column; }
+
+    /* ── TOP NAV ──────────────────────────────────── */
+    .topnav { height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 50; }
+    .topnav-left { display: flex; align-items: center; gap: 16px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: .95rem; text-decoration: none; color: var(--text-white); }
+    .logo-icon { width: 30px; height: 30px; background: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 20px; height: 20px; }
+    .nav-tabs { display: flex; gap: 2px; }
+    .nav-tab { padding: 5px 12px; border-radius: 6px; font-size: .8rem; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .nav-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-tab.active { background: var(--bg-card); color: var(--text-white); }
+    .topnav-right { display: flex; align-items: center; gap: 10px; }
+    .notif-btn { width: 30px; height: 30px; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .85rem; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; background: var(--blue-bright); border-radius: 50%; border: 1px solid var(--bg-panel); }
+    .user-menu-wrap { position: relative; }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--blue-bright); background: linear-gradient(135deg, #2979ff, #7c4dff); display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-panel); border: 1px solid var(--border-bright); border-radius: 12px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 100; overflow: hidden; animation: dropdownIn .15s cubic-bezier(.22,1,.36,1); }
+    .user-dropdown.open { display: block; }
+    @keyframes dropdownIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .user-dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; color: var(--text-white); }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .user-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .82rem; color: var(--text-light); cursor: pointer; transition: background .12s; }
+    .user-dropdown-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .user-dropdown-item .dd-icon { font-size: .9rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .user-dropdown-item.signout { color: var(--error); }
+    .user-dropdown-item.signout:hover { background: rgba(255,79,106,.08); }
+
+    /* ── UPLOAD CTA BAR ───────────────────────────── */
+    .upload-cta-bar { background: linear-gradient(90deg, rgba(41,121,255,.18), rgba(90,77,255,.12)); border-bottom: 1px solid rgba(41,121,255,.25); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; }
+    .upload-cta-left { display: flex; align-items: center; gap: 12px; }
+    .upload-cta-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(41,121,255,.4); }
+    .upload-cta-text { font-size: .82rem; color: var(--text-light); }
+    .upload-cta-text strong { color: var(--text-white); }
+    .upload-cta-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-cta-ghost { display: flex; align-items: center; gap: 7px; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 20px; padding: 7px 14px; font-size: .78rem; font-weight: 600; color: var(--text-light); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .btn-cta-ghost:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-upload-now { display: flex; align-items: center; gap: 7px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; border-radius: 20px; padding: 8px 16px; font-size: .78rem; font-weight: 700; color: #fff; cursor: pointer; transition: all .15s; font-family: inherit; box-shadow: 0 4px 14px rgba(41,121,255,.35); text-decoration: none; }
+    .btn-upload-now:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(41,121,255,.45); }
+
+    /* ── APP SHELL ────────────────────────────────── */
+    .app-shell { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── LEFT NAV ─────────────────────────────────── */
+    .left-nav { width: 220px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px 0; flex-shrink: 0; overflow-y: auto; }
+    .left-nav::-webkit-scrollbar { width: 0; }
+    .nav-section-label { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); padding: 12px 16px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; transition: all .15s; font-size: .83rem; font-weight: 500; color: var(--text-mid); margin: 1px 8px; border-radius: 8px; text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-item.active { background: var(--bg-card); color: var(--text-white); }
+    .nav-item.active .nav-icon { color: var(--blue-bright); }
+    .nav-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--blue-bright); color: #fff; font-size: .6rem; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+    .nav-badge.gold { background: var(--accent-gold); color: #080f1c; }
+    .nav-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+    .artist-mini { margin: 0 8px 8px; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+    .artist-mini-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .artist-mini-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid)); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 800; border: 2px solid var(--blue-bright); box-shadow: 0 0 10px rgba(41,121,255,.3); flex-shrink: 0; }
+    .artist-mini-name { font-size: .85rem; font-weight: 800; color: var(--text-white); }
+    .artist-mini-role { font-size: .68rem; color: var(--text-dim); }
+    .artist-mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mini-stat { text-align: center; }
+    .mini-stat-val { font-size: .85rem; font-weight: 800; color: var(--text-white); }
+    .mini-stat-val.gold { background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .mini-stat-label { font-size: .6rem; color: var(--text-dim); }
+
+    /* ── MAIN ─────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .content-scroll { flex: 1; overflow-y: auto; padding: 20px; }
+    .content-scroll::-webkit-scrollbar { width: 6px; }
+    .content-scroll::-webkit-scrollbar-track { background: transparent; }
+    .content-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+    /* ── PAGE HEADER ─────────────────────────────── */
+    .page-header { margin-bottom: 20px; }
+    .page-title { font-size: 1.2rem; font-weight: 900; letter-spacing: -.02em; }
+    .page-sub { font-size: .78rem; color: var(--text-dim); margin-top: 3px; }
+
+    /* ── STAT CARDS ──────────────────────────────── */
+    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; transition: border-color .2s; }
+    .stat-card:hover { border-color: var(--border-bright); }
+    .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .stat-card-label { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); }
+    .stat-card-icon { font-size: .9rem; }
+    .stat-card-value { font-size: 1.6rem; font-weight: 900; letter-spacing: -.03em; color: var(--text-white); line-height: 1; margin-bottom: 4px; }
+    .stat-card-value.gold { background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-card-value.blue { background: linear-gradient(135deg, var(--blue-bright), var(--blue-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-card-sub { font-size: .72rem; color: var(--text-dim); }
+    .stat-card-sub.avail { color: var(--success); }
+
+    /* Skeleton */
+    .skel-line { background: var(--bg-hover); border-radius: 4px; animation: shimmer 1.4s ease-in-out infinite; }
+    @keyframes shimmer { 0%,100% { opacity:.4; } 50% { opacity:.9; } }
+    .stat-skeleton { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+    .skel-sm { height: 10px; width: 60%; margin-bottom: 12px; }
+    .skel-lg { height: 28px; width: 50%; margin-bottom: 8px; }
+    .skel-xs { height: 10px; width: 40%; }
+
+    /* ── PANELS ──────────────────────────────────── */
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--bg-card); }
+    .panel-title { font-size: .88rem; font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 8px; }
+    .panel-actions { display: flex; gap: 8px; align-items: center; }
+    .panel-btn { display: flex; align-items: center; gap: 5px; background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 6px; padding: 5px 10px; font-size: .73rem; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: all .15s; font-family: inherit; text-decoration: none; }
+    .panel-btn:hover { color: var(--text-white); border-color: var(--blue-dim); }
+    .panel-btn.primary { background: var(--blue-dim); border-color: var(--blue-bright); color: var(--text-white); }
+    .panel-btn.primary:hover { background: var(--blue-mid); }
+
+    /* ── STRIPE CONNECT PANEL ────────────────────── */
+    #stripeConnectPanel { margin-bottom: 20px; }
+
+    /* Loading state */
+    .connect-loading { padding: 32px 24px; display: flex; align-items: center; gap: 16px; }
+    .connect-loading-skel { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .connect-spinner { width: 40px; height: 40px; border-radius: 10px; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; flex-shrink: 0; }
+
+    /* Not-connected state */
+    .connect-cta { padding: 32px 28px; display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .connect-cta-left { flex: 1; min-width: 260px; }
+    .connect-cta-headline { font-size: 1.05rem; font-weight: 800; color: var(--text-white); margin-bottom: 6px; }
+    .connect-cta-desc { font-size: .82rem; color: var(--text-mid); line-height: 1.55; max-width: 420px; }
+    .connect-cta-points { display: flex; flex-direction: column; gap: 7px; margin-top: 14px; }
+    .connect-cta-point { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--text-light); }
+    .connect-cta-point .cp-icon { font-size: .85rem; }
+    .connect-cta-right { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; flex-shrink: 0; }
+    .btn-stripe { display: flex; align-items: center; gap: 10px; background: var(--stripe-purple); border: none; border-radius: 10px; padding: 13px 22px; font-size: .88rem; font-weight: 700; color: #fff; cursor: pointer; transition: all .18s; font-family: inherit; text-decoration: none; box-shadow: 0 4px 16px rgba(99,91,255,.4); }
+    .btn-stripe:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,91,255,.5); background: #7b73ff; }
+    .btn-stripe:active { transform: translateY(0); }
+    .btn-stripe:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .btn-stripe svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .connect-note { font-size: .7rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+
+    /* Connected/status states */
+    .connect-status { padding: 20px 24px; display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+    .connect-status-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .connect-status-icon.enabled    { background: rgba(63,160,106,.15); }
+    .connect-status-icon.pending    { background: rgba(245,166,35,.12); }
+    .connect-status-icon.restricted { background: rgba(255,79,106,.12); }
+    .connect-status-body { flex: 1; min-width: 200px; }
+    .connect-status-title { font-size: .95rem; font-weight: 800; margin-bottom: 4px; }
+    .connect-status-title.enabled    { color: var(--success); }
+    .connect-status-title.pending    { color: var(--accent-gold); }
+    .connect-status-title.restricted { color: var(--error); }
+    .connect-status-desc { font-size: .8rem; color: var(--text-mid); line-height: 1.5; max-width: 480px; }
+    .connect-status-chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .status-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: .68rem; font-weight: 600; }
+    .status-chip.ok      { background: rgba(63,160,106,.15); color: var(--success); }
+    .status-chip.warn    { background: rgba(245,166,35,.12); color: var(--accent-gold); }
+    .status-chip.fail    { background: rgba(255,79,106,.12); color: var(--error); }
+    .connect-status-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .btn-stripe-sm { display: flex; align-items: center; gap: 7px; background: var(--stripe-purple); border: none; border-radius: 8px; padding: 8px 16px; font-size: .78rem; font-weight: 700; color: #fff; cursor: pointer; transition: all .15s; font-family: inherit; text-decoration: none; }
+    .btn-stripe-sm:hover { background: #7b73ff; }
+    .connect-divider { width: 1px; background: var(--border); align-self: stretch; flex-shrink: 0; margin: 0 8px; }
+    .connect-account-meta { display: flex; flex-direction: column; gap: 6px; padding-left: 10px; flex-shrink: 0; min-width: 160px; }
+    .meta-row { display: flex; flex-direction: column; gap: 1px; }
+    .meta-label { font-size: .63rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); }
+    .meta-value { font-size: .8rem; font-weight: 600; color: var(--text-light); }
+
+    /* ── LOWER GRID ──────────────────────────────── */
+    .lower-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+
+    /* ── PAYOUTS TABLE ───────────────────────────── */
+    .payout-table { width: 100%; border-collapse: collapse; }
+    .payout-table th { padding: 9px 16px; text-align: left; font-size: .68rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); background: var(--bg-card); }
+    .payout-table th.num { text-align: right; }
+    .payout-table td { padding: 12px 16px; font-size: .81rem; vertical-align: middle; border-bottom: 1px solid rgba(26,45,80,.4); }
+    .payout-table tbody tr { transition: background .12s; }
+    .payout-table tbody tr:hover { background: var(--bg-hover); }
+    .payout-table tbody tr:last-child td { border-bottom: none; }
+    .payout-date { color: var(--text-light); font-weight: 500; }
+    .payout-date-sub { font-size: .68rem; color: var(--text-dim); margin-top: 1px; }
+    .payout-amount { font-size: .9rem; font-weight: 800; color: var(--accent-gold); text-align: right; }
+    .payout-dest { display: flex; align-items: center; gap: 7px; }
+    .bank-icon { width: 26px; height: 26px; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .75rem; flex-shrink: 0; }
+    .bank-name { font-size: .78rem; color: var(--text-light); }
+    .bank-last4 { font-size: .68rem; color: var(--text-dim); }
+    .payout-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: .65rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .payout-status.paid       { background: rgba(63,160,106,.15); color: var(--success); }
+    .payout-status.pending    { background: rgba(41,121,255,.15); color: var(--blue-glow); }
+    .payout-status.in_transit { background: rgba(245,166,35,.12); color: var(--accent-gold); }
+    .payout-status.failed     { background: rgba(255,79,106,.12); color: var(--error); }
+    .payout-status.canceled   { background: rgba(61,90,138,.2); color: var(--text-dim); }
+
+    /* Skeleton rows */
+    .skel-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid rgba(26,45,80,.35); }
+    .skel-circle { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; flex-shrink: 0; }
+    .skel-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .skel-line-a { height: 10px; border-radius: 3px; width: 75%; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; }
+    .skel-line-b { height: 8px; border-radius: 3px; width: 40%; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; animation-delay: .1s; }
+
+    /* Empty / error states */
+    .panel-empty { padding: 36px 20px; text-align: center; color: var(--text-dim); font-size: .82rem; }
+    .panel-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+    .panel-error { padding: 28px; text-align: center; color: var(--text-dim); font-size: .82rem; }
+    .panel-error-icon { font-size: 1.6rem; margin-bottom: 8px; }
+
+    /* ── RIGHT SIDEBAR PANELS ────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Payout schedule */
+    .schedule-body { padding: 18px; }
+    .schedule-interval { font-size: 1.4rem; font-weight: 900; color: var(--text-white); letter-spacing: -.02em; text-transform: capitalize; margin-bottom: 2px; }
+    .schedule-detail { font-size: .78rem; color: var(--text-mid); margin-bottom: 14px; }
+    .schedule-next { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .schedule-next-icon { font-size: 1rem; flex-shrink: 0; }
+    .schedule-next-label { font-size: .68rem; color: var(--text-dim); }
+    .schedule-next-val { font-size: .82rem; font-weight: 700; color: var(--text-white); }
+    .schedule-delay { display: flex; align-items: center; gap: 7px; font-size: .73rem; color: var(--text-mid); padding: 8px 0; border-top: 1px solid var(--border); }
+    .schedule-delay strong { color: var(--text-light); }
+
+    /* Bank account */
+    .bank-body { padding: 18px; }
+    .bank-card { background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 10px; padding: 14px; position: relative; overflow: hidden; margin-bottom: 14px; }
+    .bank-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: radial-gradient(circle, rgba(41,121,255,.12), transparent 70%); pointer-events: none; }
+    .bank-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .bank-card-name { font-size: .78rem; font-weight: 700; color: var(--text-white); }
+    .bank-card-type { font-size: .65rem; color: var(--text-dim); margin-top: 2px; text-transform: capitalize; }
+    .bank-logo { width: 32px; height: 22px; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: .6rem; font-weight: 800; color: var(--text-mid); letter-spacing: .03em; }
+    .bank-number { font-size: 1rem; font-weight: 700; letter-spacing: .2em; color: var(--text-light); margin-bottom: 4px; }
+    .bank-routing { font-size: .68rem; color: var(--text-dim); }
+    .bank-update-row { display: flex; align-items: center; justify-content: space-between; }
+    .bank-update-note { font-size: .7rem; color: var(--text-dim); }
+    .bank-no-account { padding: 20px; text-align: center; }
+    .bank-no-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .bank-no-text { font-size: .78rem; color: var(--text-dim); margin-bottom: 12px; }
+
+    /* ── TOAST ────────────────────────────────────── */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 24px; padding: 9px 18px; font-size: .81rem; color: var(--text-white); font-weight: 500; opacity: 0; transition: all .25s; z-index: 400; white-space: nowrap; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--error); }
+
+    /* Page-level loading overlay */
+    .page-loading { position: fixed; inset: 0; background: var(--bg-deepest); display: flex; align-items: center; justify-content: center; z-index: 300; transition: opacity .3s; }
+    .page-loading.hidden { opacity: 0; pointer-events: none; }
+    .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--blue-bright); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
+
+<div class="page-loading" id="pageLoading"><div class="loading-spinner"></div></div>
+
+<!-- ── TOP NAV ──────────────────────────────────── -->
+<div class="topnav">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/><path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/><path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      DropSub
+    </a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="dropsub-mockup_copy.html">Fan View</a>
+      <a class="nav-tab" href="dropsub-artist-dashboard.html">Artist Dashboard</a>
+      <a class="nav-tab active" href="#">Payouts</a>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <div class="notif-btn" onclick="showToast('No new notifications')">🔔<div class="notif-dot"></div></div>
+    <div class="user-menu-wrap">
+      <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">—</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="dropdownName">—</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon">⚙️</span>Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon">🚪</span>Sign out</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── UPLOAD CTA BAR ───────────────────────────── -->
+<div class="upload-cta-bar">
+  <div class="upload-cta-left">
+    <div class="upload-cta-icon">💳</div>
+    <div class="upload-cta-text">
+      <strong>Payouts &amp; Banking.</strong> Connect your Stripe account to receive payments from your fans directly to your bank.
+    </div>
+  </div>
+  <div class="upload-cta-right">
+    <a class="btn-cta-ghost" href="dropsub-artist-analytics.html">📈 View Analytics</a>
+    <a class="btn-upload-now" href="dropsub-artist-dashboard.html">⬆ Upload Content</a>
+  </div>
+</div>
+
+<!-- ── APP SHELL ──────────────────────────────────── -->
+<div class="app-shell">
+
+  <!-- ── LEFT NAV ──────────────────────────────────── -->
+  <div class="left-nav">
+    <div class="artist-mini">
+      <div class="artist-mini-top">
+        <div class="artist-mini-avatar" id="sidebarAvatar">—</div>
+        <div>
+          <div class="artist-mini-name" id="sidebarName">—</div>
+          <div class="artist-mini-role" id="sidebarRole">Artist</div>
+        </div>
+      </div>
+      <div class="artist-mini-stats">
+        <div class="mini-stat">
+          <div class="mini-stat-val gold" id="sidebarBalance">—</div>
+          <div class="mini-stat-label">Available</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-val" id="sidebarPending">—</div>
+          <div class="mini-stat-label">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Manage</div>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon">📁</span>Content Folders</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">⬆️</span>Upload Content</a>
+    <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon">👥</span>Subscribers</a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Revenue</div>
+    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon">📈</span>Analytics</a>
+    <a class="nav-item active"><span class="nav-icon">💳</span>Payouts</a>
+    <a class="nav-item" onclick="showToast('Pricing settings coming soon')"><span class="nav-icon">🏷️</span>Pricing</a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon">🎸</span>Artist Profile</a>
+    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
+
+    <div class="nav-divider"></div>
+    <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
+  </div>
+
+  <!-- ── MAIN ───────────────────────────────────────── -->
+  <div class="main">
+    <div class="content-scroll">
+
+      <div class="page-header">
+        <div class="page-title">💳 Payouts &amp; Banking</div>
+        <div class="page-sub" id="pageSubLabel">Loading your payout settings…</div>
+      </div>
+
+      <!-- Stripe Connect panel -->
+      <div class="panel" id="stripeConnectPanel" style="margin-bottom:20px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg width="16" height="16" viewBox="0 0 32 32" fill="none" style="flex-shrink:0"><rect width="32" height="32" rx="6" fill="#635BFF"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="white"/></svg>
+            Stripe Connect
+          </div>
+          <div id="stripeHeaderBadge"></div>
+        </div>
+        <!-- Loading -->
+        <div id="connectLoading" class="connect-loading">
+          <div class="connect-spinner"></div>
+          <div class="connect-loading-skel">
+            <div class="skel-line skel-lg"></div>
+            <div class="skel-line skel-sm"></div>
+            <div class="skel-line skel-xs"></div>
+          </div>
+        </div>
+        <!-- Not connected -->
+        <div id="connectNotConnected" class="connect-cta" style="display:none;">
+          <div class="connect-cta-left">
+            <div class="connect-cta-headline">Connect your bank account to receive payouts</div>
+            <div class="connect-cta-desc">DropSub uses Stripe Connect to securely transfer your earnings directly to your bank. Set up takes about 5 minutes.</div>
+            <div class="connect-cta-points">
+              <div class="connect-cta-point"><span class="cp-icon">🏦</span> Direct deposits to your bank account</div>
+              <div class="connect-cta-point"><span class="cp-icon">🔒</span> Bank-grade security — we never store your details</div>
+              <div class="connect-cta-point"><span class="cp-icon">💸</span> Automatic payouts on your schedule</div>
+              <div class="connect-cta-point"><span class="cp-icon">📊</span> Full payout history and reporting</div>
+            </div>
+          </div>
+          <div class="connect-cta-right">
+            <button class="btn-stripe" id="btnConnectStripe" onclick="startStripeConnect()">
+              <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="white"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="#635BFF"/></svg>
+              Connect with Stripe
+            </button>
+            <div class="connect-note">🔒 Powered by Stripe — your data is encrypted</div>
+          </div>
+        </div>
+        <!-- Pending -->
+        <div id="connectPending" class="connect-status" style="display:none;">
+          <div class="connect-status-icon pending">⏳</div>
+          <div class="connect-status-body">
+            <div class="connect-status-title pending">Verification in progress</div>
+            <div class="connect-status-desc">Your Stripe account is being reviewed. This usually takes 1–2 business days. You'll receive an email once your account is approved and payouts are enabled.</div>
+            <div class="connect-status-chips">
+              <span class="status-chip warn">⏳ Pending review</span>
+              <span class="status-chip warn" id="chipPayoutsStatus">💳 Payouts pending</span>
+            </div>
+            <div class="connect-status-actions">
+              <a class="btn-stripe-sm" id="pendingDashboardBtn" href="#" target="_blank" rel="noopener">Open Stripe Dashboard ↗</a>
+            </div>
+          </div>
+        </div>
+        <!-- Restricted -->
+        <div id="connectRestricted" class="connect-status" style="display:none;">
+          <div class="connect-status-icon restricted">⚠️</div>
+          <div class="connect-status-body">
+            <div class="connect-status-title restricted">Action required</div>
+            <div class="connect-status-desc" id="restrictedDesc">Your Stripe account has restrictions that are preventing payouts. Please complete the required steps to continue receiving payments.</div>
+            <div class="connect-status-chips">
+              <span class="status-chip fail">⚠️ Restricted</span>
+              <span class="status-chip fail">💳 Payouts disabled</span>
+            </div>
+            <div class="connect-status-actions">
+              <button class="btn-stripe-sm" id="btnCompleteSetup" onclick="continueStripeOnboarding()">Complete setup →</button>
+              <a class="panel-btn" id="restrictedDashboardBtn" href="#" target="_blank" rel="noopener">Open Stripe Dashboard ↗</a>
+            </div>
+          </div>
+        </div>
+        <!-- Enabled -->
+        <div id="connectEnabled" class="connect-status" style="display:none;">
+          <div class="connect-status-icon enabled">✅</div>
+          <div class="connect-status-body">
+            <div class="connect-status-title enabled">Payouts enabled</div>
+            <div class="connect-status-desc">Your Stripe account is fully verified. Earnings are automatically transferred to your bank account on your payout schedule.</div>
+            <div class="connect-status-chips">
+              <span class="status-chip ok">✓ Verified</span>
+              <span class="status-chip ok" id="chipChargesStatus">✓ Charges enabled</span>
+              <span class="status-chip ok" id="chipPayoutsOk">✓ Payouts enabled</span>
+            </div>
+            <div class="connect-status-actions">
+              <a class="btn-stripe-sm" id="enabledDashboardBtn" href="https://dashboard.stripe.com" target="_blank" rel="noopener">Stripe Dashboard ↗</a>
+              <span class="panel-btn" id="enabledAccountId" style="cursor:default;"></span>
+            </div>
+          </div>
+          <div class="connect-divider"></div>
+          <div class="connect-account-meta">
+            <div class="meta-row">
+              <div class="meta-label">Account ID</div>
+              <div class="meta-value" id="metaAccountId">—</div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-label">Country</div>
+              <div class="meta-value" id="metaCountry">—</div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-label">Currency</div>
+              <div class="meta-value" id="metaCurrency">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings stat cards -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>
+        <div class="stat-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>
+        <div class="stat-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>
+      </div>
+
+      <!-- Lower grid -->
+      <div class="lower-grid">
+
+        <!-- Recent payouts table -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Recent Payouts</div>
+            <div class="panel-actions">
+              <button class="panel-btn" onclick="loadPayoutSettings()">↻ Refresh</button>
+            </div>
+          </div>
+          <div id="payoutsTableWrap">
+            <div id="payoutsSkeleton">
+              <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
+              <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
+              <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
+              <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
+            </div>
+            <div id="payoutsContent" style="display:none;">
+              <table class="payout-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Destination</th>
+                    <th>Status</th>
+                    <th class="num">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="payoutsTableBody"></tbody>
+              </table>
+            </div>
+            <div id="payoutsEmpty" style="display:none;">
+              <div class="panel-empty">
+                <div class="panel-empty-icon">📭</div>
+                No payouts yet. Connect your Stripe account and start earning.
+              </div>
+            </div>
+            <div id="payoutsError" style="display:none;">
+              <div class="panel-error"><div class="panel-error-icon">⚠️</div>Could not load payout history.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: schedule + bank account -->
+        <div class="right-col">
+
+          <!-- Payout schedule -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📅 Payout Schedule</div>
+              <div class="panel-actions">
+                <a class="panel-btn" id="editScheduleBtn" href="https://dashboard.stripe.com/settings/payouts" target="_blank" rel="noopener">Edit ↗</a>
+              </div>
+            </div>
+            <div id="scheduleSkeleton" class="schedule-body">
+              <div class="skel-line" style="height:22px;width:40%;margin-bottom:10px;"></div>
+              <div class="skel-line skel-sm" style="margin-bottom:16px;"></div>
+              <div class="skel-line" style="height:52px;border-radius:8px;margin-bottom:10px;"></div>
+              <div class="skel-line skel-xs" style="margin-top:4px;"></div>
+            </div>
+            <div id="scheduleContent" class="schedule-body" style="display:none;">
+              <div class="schedule-interval" id="scheduleInterval">—</div>
+              <div class="schedule-detail" id="scheduleDetail">—</div>
+              <div class="schedule-next">
+                <div class="schedule-next-icon">📆</div>
+                <div>
+                  <div class="schedule-next-label">Next payout estimated</div>
+                  <div class="schedule-next-val" id="scheduleNextDate">—</div>
+                </div>
+              </div>
+              <div class="schedule-delay">
+                ⏱ <span>Funds available after <strong id="scheduleDelay">—</strong> day rolling reserve</span>
+              </div>
+            </div>
+            <div id="scheduleNoAccount" style="display:none;">
+              <div class="panel-empty" style="padding:20px;">
+                <div class="panel-empty-icon" style="font-size:1.4rem;">🔗</div>
+                Connect Stripe to see your payout schedule.
+              </div>
+            </div>
+          </div>
+
+          <!-- Bank account -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">🏦 Bank Account</div>
+              <div class="panel-actions">
+                <a class="panel-btn" id="updateBankBtn" href="https://dashboard.stripe.com/settings/payouts" target="_blank" rel="noopener">Update ↗</a>
+              </div>
+            </div>
+            <div id="bankSkeleton" class="bank-body">
+              <div class="skel-line" style="height:90px;border-radius:10px;margin-bottom:12px;"></div>
+              <div class="skel-line skel-xs"></div>
+            </div>
+            <div id="bankContent" class="bank-body" style="display:none;">
+              <div class="bank-card">
+                <div class="bank-card-top">
+                  <div>
+                    <div class="bank-card-name" id="bankName">—</div>
+                    <div class="bank-card-type" id="bankAccountType">—</div>
+                  </div>
+                  <div class="bank-logo" id="bankLogoText">BANK</div>
+                </div>
+                <div class="bank-number" id="bankNumber">•••• •••• ••••</div>
+                <div class="bank-routing" id="bankRouting"></div>
+              </div>
+              <div class="bank-update-row">
+                <div class="bank-update-note">Last 4 digits shown only. Manage in Stripe.</div>
+              </div>
+            </div>
+            <div id="bankNoAccount" style="display:none;">
+              <div class="bank-no-account">
+                <div class="bank-no-icon">🏦</div>
+                <div class="bank-no-text">No bank account connected yet.</div>
+                <button class="btn-stripe-sm" onclick="startStripeConnect()">
+                  <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="white"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="#635BFF"/></svg>
+                  Connect Stripe
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right-col -->
+      </div><!-- /lower-grid -->
+
+    </div><!-- /content-scroll -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var _onboardingUrl = null;
+
+  // ── Helpers ──────────────────────────────────────────────────
+  var toastTimer;
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2800);
+  }
+
+  function signOut() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('user');
+    window.location.replace('dropsub-login.html');
+  }
+
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function closeUserMenu() {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu-wrap')) closeUserMenu();
+  });
+
+  function token() {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  }
+
+  function handle401() {
+    localStorage.removeItem('access_token'); sessionStorage.removeItem('access_token');
+    window.location.replace('dropsub-login.html');
+  }
+
+  function fmtCurrency(val) {
+    if (val == null || val === '') return '—';
+    var n = parseFloat(val);
+    if (isNaN(n)) return '—';
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtDate(str) {
+    if (!str) return '—';
+    var d = new Date(str);
+    if (isNaN(d)) return str;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fmtDateRelative(str) {
+    if (!str) return '';
+    var d = new Date(str);
+    if (isNaN(d)) return str;
+    var diff = (Date.now() - d.getTime()) / 1000;
+    if (diff < 86400)   return 'Today';
+    if (diff < 172800)  return 'Yesterday';
+    if (diff < 604800)  return Math.floor(diff / 86400) + ' days ago';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  // ── Stripe Connect onboarding ────────────────────────────────
+  function startStripeConnect() {
+    var btn = document.getElementById('btnConnectStripe');
+    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+
+    // If we already have an onboarding URL from the API response, use it directly
+    if (_onboardingUrl) { window.location.href = _onboardingUrl; return; }
+
+    fetch('https://api.dropsub.com/api/artists/stripe-connect/onboard', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json();
+      })
+      .then(function(data) {
+        if (!data) return;
+        var url = data.onboarding_url || data.url || data.redirect_url;
+        if (url) {
+          window.location.href = url;
+        } else {
+          showToast('Could not start Stripe setup — please try again.', 'error');
+          if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 32 32" fill="none" style="width:18px;height:18px;flex-shrink:0"><rect width="32" height="32" rx="6" fill="white"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="#635BFF"/></svg>Connect with Stripe'; }
+        }
+      })
+      .catch(function() {
+        showToast('Network error — could not reach Stripe.', 'error');
+        if (btn) { btn.disabled = false; }
+      });
+  }
+
+  function continueStripeOnboarding() {
+    if (_onboardingUrl) { window.location.href = _onboardingUrl; return; }
+    showToast('Redirecting to Stripe…');
+    startStripeConnect();
+  }
+
+  // ── Render Stripe Connect status ─────────────────────────────
+  function renderStripeConnect(sc) {
+    document.getElementById('connectLoading').style.display = 'none';
+
+    var status = (sc && (sc.status || (sc.connected ? 'enabled' : 'not_connected'))) || 'not_connected';
+    // Normalize common status strings
+    if (!sc || !sc.connected) status = 'not_connected';
+    else if (sc.charges_enabled && sc.payouts_enabled) status = 'enabled';
+    else if (sc.details_submitted) status = 'pending';
+    else status = 'restricted';
+
+    _onboardingUrl = sc && (sc.onboarding_url || sc.account_link || sc.setup_url) || null;
+
+    var badge = document.getElementById('stripeHeaderBadge');
+    if (status === 'enabled') {
+      badge.innerHTML = '<span class="status-chip ok" style="font-size:.7rem;">✓ Connected</span>';
+    } else if (status === 'pending') {
+      badge.innerHTML = '<span class="status-chip warn" style="font-size:.7rem;">⏳ Pending</span>';
+    } else if (status === 'restricted') {
+      badge.innerHTML = '<span class="status-chip fail" style="font-size:.7rem;">⚠ Restricted</span>';
+    } else {
+      badge.innerHTML = '<span class="status-chip fail" style="font-size:.7rem;">✗ Not connected</span>';
+    }
+
+    document.getElementById('connectNotConnected').style.display = status === 'not_connected' ? 'flex' : 'none';
+    document.getElementById('connectPending').style.display      = status === 'pending' ? 'flex' : 'none';
+    document.getElementById('connectRestricted').style.display   = status === 'restricted' ? 'flex' : 'none';
+    document.getElementById('connectEnabled').style.display      = status === 'enabled' ? 'flex' : 'none';
+
+    if (status === 'enabled' && sc) {
+      document.getElementById('metaAccountId').textContent = sc.account_id || '—';
+      document.getElementById('metaCountry').textContent   = (sc.country || '—').toUpperCase();
+      document.getElementById('metaCurrency').textContent  = (sc.default_currency || sc.currency || '—').toUpperCase();
+      if (sc.account_id) {
+        document.getElementById('enabledAccountId').textContent = sc.account_id.slice(0, 18) + '…';
+      }
+    }
+
+    if (status === 'restricted' && sc && sc.requirements_message) {
+      document.getElementById('restrictedDesc').textContent = sc.requirements_message;
+    }
+
+    var dashUrl = (sc && sc.dashboard_url) || 'https://dashboard.stripe.com';
+    var el;
+    el = document.getElementById('pendingDashboardBtn');   if (el) el.href = dashUrl;
+    el = document.getElementById('restrictedDashboardBtn');if (el) el.href = dashUrl;
+    el = document.getElementById('enabledDashboardBtn');   if (el) el.href = dashUrl;
+  }
+
+  // ── Render earnings cards ────────────────────────────────────
+  function renderStats(balance) {
+    var b = balance || {};
+    document.getElementById('statsRow').innerHTML =
+      statCard('Available Balance', '💰', fmtCurrency(b.available), 'gold', b.available > 0 ? 'Ready to pay out' : 'No balance available', b.available > 0 ? 'avail' : '') +
+      statCard('Pending Payouts', '⏳', fmtCurrency(b.pending), 'blue', 'In Stripe\'s rolling reserve', '') +
+      statCard('Total Earned', '📈', fmtCurrency(b.total_earned || b.total), '', 'All time gross revenue', '');
+
+    // Update sidebar
+    document.getElementById('sidebarBalance').textContent = fmtCurrency(b.available);
+    document.getElementById('sidebarPending').textContent = fmtCurrency(b.pending);
+  }
+
+  function statCard(label, icon, value, colorClass, sub, subClass) {
+    return '<div class="stat-card">' +
+      '<div class="stat-card-top">' +
+        '<div class="stat-card-label">' + label + '</div>' +
+        '<div class="stat-card-icon">' + icon + '</div>' +
+      '</div>' +
+      '<div class="stat-card-value ' + (colorClass || '') + '">' + value + '</div>' +
+      '<div class="stat-card-sub ' + (subClass || '') + '">' + sub + '</div>' +
+      '</div>';
+  }
+
+  // ── Render payout schedule ───────────────────────────────────
+  function renderSchedule(sched) {
+    if (!sched) {
+      document.getElementById('scheduleSkeleton').style.display = 'none';
+      document.getElementById('scheduleNoAccount').style.display = 'block';
+      return;
+    }
+    var interval = sched.interval || sched.payout_interval || 'manual';
+    var delay    = sched.delay_days != null ? sched.delay_days : 2;
+    var detail   = '';
+    if (interval === 'daily')   detail = 'Payouts are sent every business day.';
+    else if (interval === 'weekly') {
+      var anchor = sched.weekly_anchor || sched.anchor || 'Monday';
+      detail = 'Payouts are sent every ' + capitalise(anchor) + '.';
+    } else if (interval === 'monthly') {
+      var day = sched.monthly_anchor || sched.anchor || 1;
+      detail = 'Payouts are sent on the ' + ordinal(day) + ' of each month.';
+    } else {
+      detail = 'Payouts are sent manually when you initiate them.';
+    }
+
+    var nextDate = sched.next_payout_date || sched.next_payout || null;
+    document.getElementById('scheduleInterval').textContent = capitalise(interval);
+    document.getElementById('scheduleDetail').textContent   = detail;
+    document.getElementById('scheduleNextDate').textContent = nextDate ? fmtDate(nextDate) : 'Estimated in 1–3 business days';
+    document.getElementById('scheduleDelay').textContent    = delay;
+
+    document.getElementById('scheduleSkeleton').style.display = 'none';
+    document.getElementById('scheduleContent').style.display  = 'block';
+  }
+
+  function capitalise(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : ''; }
+  function ordinal(n) {
+    var s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  // ── Render bank account ──────────────────────────────────────
+  function renderBank(bank) {
+    if (!bank || (!bank.last4 && !bank.bank_name)) {
+      document.getElementById('bankSkeleton').style.display  = 'none';
+      document.getElementById('bankNoAccount').style.display = 'block';
+      return;
+    }
+    var name      = bank.bank_name || bank.bank || 'Bank Account';
+    var last4     = bank.last4 || '????';
+    var acctType  = bank.account_type || bank.type || 'checking';
+    var routing   = bank.routing_last4 ? 'Routing ••••' + bank.routing_last4 : '';
+
+    document.getElementById('bankName').textContent        = name;
+    document.getElementById('bankAccountType').textContent = capitalise(acctType) + ' account';
+    document.getElementById('bankNumber').textContent      = '•••• •••• •••• ' + last4;
+    document.getElementById('bankRouting').textContent     = routing;
+    document.getElementById('bankLogoText').textContent    = name.slice(0,4).toUpperCase();
+
+    document.getElementById('bankSkeleton').style.display = 'none';
+    document.getElementById('bankContent').style.display  = 'block';
+  }
+
+  // ── Render payouts table ─────────────────────────────────────
+  var STATUS_LABELS = { paid: 'Paid', pending: 'Pending', in_transit: 'In Transit', failed: 'Failed', canceled: 'Canceled' };
+
+  function renderPayoutsTable(payouts) {
+    document.getElementById('payoutsSkeleton').style.display = 'none';
+    if (!payouts || payouts.length === 0) {
+      document.getElementById('payoutsEmpty').style.display = 'block';
+      return;
+    }
+    var tbody = document.getElementById('payoutsTableBody');
+    tbody.innerHTML = payouts.map(function(p) {
+      var statusKey = (p.status || 'pending').toLowerCase().replace(' ', '_');
+      var statusLabel = STATUS_LABELS[statusKey] || capitalise(p.status || '');
+      var dest     = p.destination || p.bank_account || '';
+      var bankName = p.bank_name || (dest && dest.bank_name) || 'Bank account';
+      var last4    = p.last4 || (dest && dest.last4) || '????';
+      var arrDate  = p.arrival_date || p.paid_at || p.date || '';
+      var created  = p.created_at || p.created || '';
+      return '<tr>' +
+        '<td><div class="payout-date">' + fmtDate(arrDate || created) + '</div>' +
+             '<div class="payout-date-sub">' + (arrDate && created && arrDate !== created ? 'Initiated ' + fmtDateRelative(created) : '') + '</div></td>' +
+        '<td><div class="payout-dest">' +
+          '<div class="bank-icon">🏦</div>' +
+          '<div><div class="bank-name">' + bankName + '</div>' +
+               '<div class="bank-last4">••••' + last4 + '</div></div>' +
+        '</div></td>' +
+        '<td><span class="payout-status ' + statusKey + '">' + statusLabel + '</span></td>' +
+        '<td class="payout-amount">' + fmtCurrency(p.amount) + '</td>' +
+        '</tr>';
+    }).join('');
+    document.getElementById('payoutsContent').style.display = 'block';
+  }
+
+  // ── Main data fetch ──────────────────────────────────────────
+  function loadPayoutSettings() {
+    // Reset to skeletons
+    document.getElementById('connectLoading').style.display = 'flex';
+    document.getElementById('connectNotConnected').style.display  = 'none';
+    document.getElementById('connectPending').style.display       = 'none';
+    document.getElementById('connectRestricted').style.display    = 'none';
+    document.getElementById('connectEnabled').style.display       = 'none';
+    document.getElementById('statsRow').innerHTML =
+      '<div class="stat-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>'.repeat(3);
+    document.getElementById('payoutsSkeleton').style.display = 'block';
+    document.getElementById('payoutsContent').style.display  = 'none';
+    document.getElementById('payoutsEmpty').style.display    = 'none';
+    document.getElementById('payoutsError').style.display    = 'none';
+    document.getElementById('scheduleSkeleton').style.display = 'block';
+    document.getElementById('scheduleContent').style.display  = 'none';
+    document.getElementById('scheduleNoAccount').style.display = 'none';
+    document.getElementById('bankSkeleton').style.display  = 'block';
+    document.getElementById('bankContent').style.display   = 'none';
+    document.getElementById('bankNoAccount').style.display = 'none';
+
+    fetch('https://api.dropsub.com/api/artists/payout-settings', {
+      headers: { 'Authorization': 'Bearer ' + token() },
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+      })
+      .then(function(result) {
+        if (!result) return;
+
+        var data = result.data || {};
+
+        if (!result.ok) {
+          showToast((data.message || 'Error loading payout settings.'), 'error');
+          document.getElementById('connectLoading').style.display = 'none';
+          document.getElementById('connectNotConnected').style.display = 'flex';
+          renderStats({});
+          document.getElementById('payoutsSkeleton').style.display = 'none';
+          document.getElementById('payoutsError').style.display    = 'block';
+          document.getElementById('scheduleSkeleton').style.display = 'none';
+          document.getElementById('scheduleNoAccount').style.display = 'block';
+          document.getElementById('bankSkeleton').style.display  = 'none';
+          document.getElementById('bankNoAccount').style.display = 'block';
+          return;
+        }
+
+        document.getElementById('pageSubLabel').textContent = 'Updated just now';
+
+        var sc      = data.stripe_connect || data.stripe || null;
+        var balance = data.balance || data.earnings || {};
+        var sched   = data.payout_schedule || data.schedule || null;
+        var bank    = data.bank_account || data.bank || null;
+        var payouts = data.recent_payouts || data.payouts || [];
+
+        renderStripeConnect(sc);
+        renderStats(balance);
+        renderSchedule(sched);
+        renderBank(bank);
+        renderPayoutsTable(payouts);
+      })
+      .catch(function() {
+        document.getElementById('connectLoading').style.display = 'none';
+        document.getElementById('connectNotConnected').style.display = 'flex';
+        renderStats({});
+        document.getElementById('payoutsSkeleton').style.display = 'none';
+        document.getElementById('payoutsError').style.display    = 'block';
+        document.getElementById('scheduleSkeleton').style.display = 'none';
+        document.getElementById('scheduleNoAccount').style.display = 'block';
+        document.getElementById('bankSkeleton').style.display  = 'none';
+        document.getElementById('bankNoAccount').style.display = 'block';
+        showToast('Network error — could not load payout settings.', 'error');
+      });
+  }
+
+  // ── User profile + role guard ────────────────────────────────
+  function fetchUserProfile() {
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token() },
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json();
+      })
+      .then(function(user) {
+        if (!user) return;
+        if (user.role === 'fan') { window.location.replace('dropsub-mockup_copy.html'); return; }
+
+        var name  = user.full_name || user.name || user.username || '';
+        var email = user.email || '';
+        var role  = user.role  || '';
+        var initials = name.split(' ').filter(Boolean)
+          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '?';
+
+        document.getElementById('navAvatar').textContent     = initials;
+        document.getElementById('sidebarAvatar').textContent = initials;
+        if (name)  { document.getElementById('dropdownName').textContent = name; document.getElementById('sidebarName').textContent = name; }
+        if (email) document.getElementById('dropdownEmail').textContent = email;
+        if (role)  document.getElementById('sidebarRole').textContent = capitalise(role);
+
+        document.getElementById('pageLoading').classList.add('hidden');
+      })
+      .catch(function() {
+        document.getElementById('pageLoading').classList.add('hidden');
+      });
+  }
+
+  // ── Init ─────────────────────────────────────────────────────
+  fetchUserProfile();
+  loadPayoutSettings();
+</script>
+</body>
+</html>
