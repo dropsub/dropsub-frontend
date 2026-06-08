@@ -606,12 +606,6 @@
 
     <!-- Toolbar -->
     <div class="toolbar">
-      <div class="toolbar-btn" onclick="openUploadModal()">
-        <span class="icon">⬆️</span> UPLOAD
-      </div>
-      <div class="toolbar-btn" onclick="showToast('Folder created!')">
-        <span class="icon">✏️</span> CREATE
-      </div>
       <div class="toolbar-btn" onclick="showToast('Organize view opened!')">
         <span class="icon">📂</span> ORGANIZE
       </div>
@@ -777,46 +771,6 @@
     <div class="modal-actions">
       <button class="modal-btn primary" onclick="closeModal();showToast('Subscribed! Access granted 🎉')">Subscribe Now</button>
       <button class="modal-btn secondary" onclick="closeModal()">Maybe Later</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ UPLOAD MODAL ══════════════════════════════════════════ -->
-<div class="modal-overlay" id="uploadModal">
-  <div class="upload-modal">
-    <h3>⬆️ Upload Content</h3>
-    <div class="upload-drop" onclick="showToast('File picker would open here…')">
-      <span class="drop-icon">📂</span>
-      <p>Drag & drop files here, or <strong>browse to upload</strong></p>
-      <p style="font-size:.75rem; margin-top:6px; color:var(--text-dim);">Photos, videos, audio, documents supported</p>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Folder Name</label>
-        <input type="text" placeholder="e.g. Tokyo Tour Photos"/>
-      </div>
-      <div class="form-group">
-        <label>Access Tier</label>
-        <select>
-          <option>Free</option>
-          <option selected>Subscription</option>
-          <option>Premium</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Date / Event</label>
-        <input type="text" placeholder="e.g. 2025-06 · Coachella"/>
-      </div>
-      <div class="form-group">
-        <label>Tags</label>
-        <input type="text" placeholder="#tour #backstage"/>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="modal-btn primary" onclick="closeUploadModal();showToast('Upload queued! Files will be archived to blockchain.')">Upload &amp; Archive</button>
-      <button class="modal-btn secondary" onclick="closeUploadModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -1090,14 +1044,9 @@
 
 
   function closeModal() { document.getElementById('subModal').classList.remove('open'); }
-  function openUploadModal() { document.getElementById('uploadModal').classList.add('open'); }
-  function closeUploadModal() { document.getElementById('uploadModal').classList.remove('open'); }
 
   document.getElementById('subModal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
-  });
-  document.getElementById('uploadModal').addEventListener('click', function(e) {
-    if (e.target === this) closeUploadModal();
   });
 
   function toggleAll(cb) {

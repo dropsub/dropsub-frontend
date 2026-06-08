@@ -1203,7 +1203,7 @@
 
 <script>
   // ── Folder data ──────────────────────────────────
-  const folders = [
+  var DEMO_FOLDERS = [
     { name: 'Kiyomizu Temple 2021', icon: '📁', type: 'sub', files: 422, size: '14 GB', revenue: '$1,240', subs: 310, date: '2021-09-15' },
     { name: 'NA Tour 2021', icon: '📁', type: 'sub', files: 640, size: '22 GB', revenue: '$980', subs: 245, date: '2021-10-01' },
     { name: 'Coachella 2022', icon: '📁', type: 'sub', files: 510, size: '18 GB', revenue: '$860', subs: 215, date: '2022-04-17' },
@@ -1212,8 +1212,35 @@
     { name: 'Serbia 2022 Backstage', icon: '📁', type: 'sub', files: 310, size: '9.4 GB', revenue: '$720', subs: 180, date: '2022-03-08' },
   ];
 
-  function renderFolders() {
+  function fetchArtistFolders() {
+    var tbody = document.getElementById('folderTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">Loading folders…</td></tr>';
+    if (!window._currentArtistId) {
+      setTimeout(fetchArtistFolders, 800);
+      return;
+    }
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/artists/' + window._currentArtistId + '/folders', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('API error');
+      return r.json();
+    })
+    .then(function(data) {
+      renderFolders(data.folders || data);
+    })
+    .catch(function() {
+      renderFolders(DEMO_FOLDERS);
+    });
+  }
+
+  function renderFolders(folders) {
     const tbody = document.getElementById('folderTableBody');
+    if (!folders || !folders.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">No folders yet — click New Drop to create your first one.</td></tr>';
+      return;
+    }
     tbody.innerHTML = folders.map(f => {
       const badge = f.type === 'sub'
         ? '<span class="access-badge sub">📋 SUBSCRIPTION</span>'
@@ -1588,7 +1615,7 @@
   }
 
   // ── Init ─────────────────────────────────────────
-  renderFolders();
+  fetchArtistFolders();
   renderChart();
   renderActivity();
   fetchUserProfile();
