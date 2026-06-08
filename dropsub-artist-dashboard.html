@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DropSub — Artist Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -776,7 +777,7 @@
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon">⬆️</span>Upload Content</a>
     <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">📧</span>Subscriptions</a>
     <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon">🔍</span>Discover</a>
-    <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge">1,204</span></a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge">1,204</span></a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
@@ -786,7 +787,7 @@
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Settings</div>
-    <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon">🎸</span>Artist Profile</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">🎸</span>Artist Profile</a>
     <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
     <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
 
@@ -845,13 +846,13 @@
               <span style="font-size:.7rem;font-weight:500;color:var(--text-dim);background:var(--bg-hover);padding:2px 8px;border-radius:10px;">6 folders</span>
             </div>
             <div class="panel-actions">
-              <button class="panel-btn" onclick="showToast('Filter coming soon')">⚙ Manage</button>
-              <button class="panel-btn primary" style="padding:7px 16px;font-size:.8rem;" onclick="openUploadModal()">+ New Drop</button>
+              <a class="panel-btn" href="dropsub-artist-dashboard.html">⚙ Manage</a>
+              <button class="panel-btn primary" style="padding:7px 16px;font-size:.8rem;" onclick="openCreateModal()">+ New Drop</button>
             </div>
           </div>
           <div class="drops-toolbar">
             <button class="dtb-btn" onclick="openUploadModal()"><span>⬆️</span> UPLOAD</button>
-            <button class="dtb-btn" onclick="openUploadModal()"><span>✏️</span> CREATE</button>
+            <button class="dtb-btn" onclick="openCreateModal()"><span>✏️</span> CREATE</button>
             <button class="dtb-btn" onclick="showToast('Organize view coming soon')"><span>📂</span> ORGANIZE</button>
           </div>
           <table class="folder-table">
@@ -878,52 +879,7 @@
             <div class="mu-title">📱 Upload from your phone</div>
             <div class="mu-desc">Scan this QR code on your phone to instantly upload photos and videos from your camera roll directly to your archive.</div>
             <div class="qr-wrap" onclick="openQRModal()">
-              <svg class="qr-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <!-- QR code representation -->
-                <rect width="200" height="200" fill="white"/>
-                <!-- Position detection patterns -->
-                <rect x="10" y="10" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-                <rect x="26" y="26" width="28" height="28" fill="#080f1c"/>
-                <rect x="130" y="10" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-                <rect x="146" y="26" width="28" height="28" fill="#080f1c"/>
-                <rect x="10" y="130" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-                <rect x="26" y="146" width="28" height="28" fill="#080f1c"/>
-                <!-- Data modules -->
-                <rect x="80" y="10" width="10" height="10" fill="#080f1c"/>
-                <rect x="100" y="10" width="10" height="10" fill="#080f1c"/>
-                <rect x="80" y="30" width="10" height="10" fill="#080f1c"/>
-                <rect x="110" y="30" width="10" height="10" fill="#080f1c"/>
-                <rect x="90" y="50" width="10" height="10" fill="#080f1c"/>
-                <rect x="80" y="70" width="10" height="10" fill="#080f1c"/>
-                <rect x="100" y="70" width="10" height="10" fill="#080f1c"/>
-                <rect x="110" y="70" width="10" height="10" fill="#080f1c"/>
-                <rect x="80" y="90" width="10" height="10" fill="#080f1c"/>
-                <rect x="100" y="90" width="10" height="10" fill="#080f1c"/>
-                <rect x="120" y="90" width="10" height="10" fill="#080f1c"/>
-                <rect x="130" y="80" width="10" height="10" fill="#080f1c"/>
-                <rect x="150" y="80" width="10" height="10" fill="#080f1c"/>
-                <rect x="170" y="80" width="10" height="10" fill="#080f1c"/>
-                <rect x="130" y="100" width="10" height="10" fill="#080f1c"/>
-                <rect x="160" y="100" width="10" height="10" fill="#080f1c"/>
-                <rect x="140" y="110" width="10" height="10" fill="#080f1c"/>
-                <rect x="80" y="110" width="10" height="10" fill="#080f1c"/>
-                <rect x="100" y="110" width="10" height="10" fill="#080f1c"/>
-                <rect x="80" y="130" width="10" height="10" fill="#080f1c"/>
-                <rect x="110" y="130" width="10" height="10" fill="#080f1c"/>
-                <rect x="100" y="150" width="10" height="10" fill="#080f1c"/>
-                <rect x="120" y="150" width="10" height="10" fill="#080f1c"/>
-                <rect x="80" y="160" width="10" height="10" fill="#080f1c"/>
-                <rect x="130" y="160" width="10" height="10" fill="#080f1c"/>
-                <rect x="150" y="160" width="10" height="10" fill="#080f1c"/>
-                <rect x="170" y="160" width="10" height="10" fill="#080f1c"/>
-                <rect x="140" y="170" width="10" height="10" fill="#080f1c"/>
-                <rect x="160" y="180" width="10" height="10" fill="#080f1c"/>
-                <rect x="130" y="130" width="10" height="10" fill="#080f1c"/>
-                <rect x="170" y="130" width="10" height="10" fill="#080f1c"/>
-                <!-- DropSub logo hint in center -->
-                <rect x="88" y="88" width="24" height="24" fill="#2979ff" rx="4"/>
-                <text x="100" y="104" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">DS</text>
-              </svg>
+              <canvas id="qrSidebar" style="width:100%;max-width:130px;height:auto;display:block;margin:0 auto;border-radius:6px;"></canvas>
             </div>
             <div class="mu-steps">
               <div class="mu-step"><div class="mu-step-num">1</div>Open your phone camera</div>
@@ -932,7 +888,7 @@
               <div class="mu-step"><div class="mu-step-num">4</div>Choose folder and tier — done</div>
             </div>
             <div class="mu-copy-link">
-              <div class="mu-link-text">dropsub.com/upload/miyavi/a8x2k</div>
+              <div class="mu-link-text">dropsub.com/dropsub-artist-dashboard.html</div>
               <button class="mu-copy-btn" onclick="copyLink()">Copy</button>
             </div>
           </div>
@@ -1053,32 +1009,7 @@
       <div id="phoneUpload" class="phone-upload">
         <div class="phone-upload-inner">
           <div class="phone-qr-large">
-            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <rect width="200" height="200" fill="white"/>
-              <rect x="10" y="10" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-              <rect x="26" y="26" width="28" height="28" fill="#080f1c"/>
-              <rect x="130" y="10" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-              <rect x="146" y="26" width="28" height="28" fill="#080f1c"/>
-              <rect x="10" y="130" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-              <rect x="26" y="146" width="28" height="28" fill="#080f1c"/>
-              <rect x="80" y="10" width="10" height="10" fill="#080f1c"/>
-              <rect x="100" y="10" width="10" height="10" fill="#080f1c"/>
-              <rect x="80" y="30" width="10" height="10" fill="#080f1c"/>
-              <rect x="90" y="50" width="10" height="10" fill="#080f1c"/>
-              <rect x="80" y="70" width="10" height="10" fill="#080f1c"/>
-              <rect x="100" y="70" width="10" height="10" fill="#080f1c"/>
-              <rect x="80" y="90" width="10" height="10" fill="#080f1c"/>
-              <rect x="100" y="90" width="10" height="10" fill="#080f1c"/>
-              <rect x="130" y="80" width="10" height="10" fill="#080f1c"/>
-              <rect x="160" y="80" width="10" height="10" fill="#080f1c"/>
-              <rect x="140" y="110" width="10" height="10" fill="#080f1c"/>
-              <rect x="80" y="130" width="10" height="10" fill="#080f1c"/>
-              <rect x="100" y="150" width="10" height="10" fill="#080f1c"/>
-              <rect x="130" y="160" width="10" height="10" fill="#080f1c"/>
-              <rect x="150" y="160" width="10" height="10" fill="#080f1c"/>
-              <rect x="88" y="88" width="24" height="24" fill="#2979ff" rx="4"/>
-              <text x="100" y="104" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">DS</text>
-            </svg>
+            <canvas id="qrPhone" style="display:block;border-radius:8px;"></canvas>
           </div>
           <div class="phone-ul-title">Scan to upload from your phone</div>
           <div class="phone-ul-desc">Open your camera app, point at this QR code, and you'll be taken to a mobile-optimized upload page. Select photos or videos from your camera roll to add them directly to your archive.</div>
@@ -1171,51 +1102,82 @@
     <div class="qr-modal-title">📱 Upload from Your Phone</div>
     <div class="qr-modal-sub">Scan this code with your phone camera to access the mobile upload page for your MIYAVI archive.</div>
     <div class="qr-modal-code" onclick="showToast('QR code enlarged')">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="200" height="200" fill="white"/>
-        <rect x="10" y="10" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-        <rect x="26" y="26" width="28" height="28" fill="#080f1c"/>
-        <rect x="130" y="10" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-        <rect x="146" y="26" width="28" height="28" fill="#080f1c"/>
-        <rect x="10" y="130" width="60" height="60" fill="none" stroke="#080f1c" stroke-width="8"/>
-        <rect x="26" y="146" width="28" height="28" fill="#080f1c"/>
-        <rect x="80" y="10" width="10" height="10" fill="#080f1c"/>
-        <rect x="100" y="10" width="10" height="10" fill="#080f1c"/>
-        <rect x="80" y="30" width="10" height="10" fill="#080f1c"/>
-        <rect x="110" y="30" width="10" height="10" fill="#080f1c"/>
-        <rect x="90" y="50" width="10" height="10" fill="#080f1c"/>
-        <rect x="80" y="70" width="10" height="10" fill="#080f1c"/>
-        <rect x="100" y="70" width="10" height="10" fill="#080f1c"/>
-        <rect x="110" y="70" width="10" height="10" fill="#080f1c"/>
-        <rect x="80" y="90" width="10" height="10" fill="#080f1c"/>
-        <rect x="100" y="90" width="10" height="10" fill="#080f1c"/>
-        <rect x="120" y="90" width="10" height="10" fill="#080f1c"/>
-        <rect x="130" y="80" width="10" height="10" fill="#080f1c"/>
-        <rect x="150" y="80" width="10" height="10" fill="#080f1c"/>
-        <rect x="170" y="80" width="10" height="10" fill="#080f1c"/>
-        <rect x="130" y="100" width="10" height="10" fill="#080f1c"/>
-        <rect x="160" y="100" width="10" height="10" fill="#080f1c"/>
-        <rect x="140" y="110" width="10" height="10" fill="#080f1c"/>
-        <rect x="80" y="110" width="10" height="10" fill="#080f1c"/>
-        <rect x="100" y="110" width="10" height="10" fill="#080f1c"/>
-        <rect x="80" y="130" width="10" height="10" fill="#080f1c"/>
-        <rect x="110" y="130" width="10" height="10" fill="#080f1c"/>
-        <rect x="100" y="150" width="10" height="10" fill="#080f1c"/>
-        <rect x="120" y="150" width="10" height="10" fill="#080f1c"/>
-        <rect x="80" y="160" width="10" height="10" fill="#080f1c"/>
-        <rect x="130" y="160" width="10" height="10" fill="#080f1c"/>
-        <rect x="150" y="160" width="10" height="10" fill="#080f1c"/>
-        <rect x="170" y="160" width="10" height="10" fill="#080f1c"/>
-        <rect x="140" y="170" width="10" height="10" fill="#080f1c"/>
-        <rect x="130" y="130" width="10" height="10" fill="#080f1c"/>
-        <rect x="88" y="88" width="24" height="24" fill="#2979ff" rx="4"/>
-        <text x="100" y="104" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">DS</text>
-      </svg>
+      <canvas id="qrLarge" style="display:block;border-radius:8px;"></canvas>
     </div>
-    <div class="qr-modal-url">dropsub.com/upload/miyavi/a8x2k</div>
+    <div class="qr-modal-url">dropsub.com/dropsub-artist-dashboard.html</div>
     <div class="qr-modal-actions">
       <button class="qr-modal-btn ghost" onclick="closeQRModal()">Close</button>
       <button class="qr-modal-btn blue" onclick="copyLink(); closeQRModal()">Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CREATE FOLDER MODAL ──────────────────────── -->
+<div class="modal-overlay" id="createModal">
+  <div class="upload-modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Create New Drop</div>
+      <div class="modal-close" onclick="closeCreateModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="mform">
+        <div class="mform-row">
+          <div class="mfield">
+            <label>Folder name</label>
+            <input type="text" placeholder="e.g. Tokyo Tour 2025 · Backstage"/>
+          </div>
+          <div class="mfield">
+            <label>Date / Event</label>
+            <input type="text" placeholder="e.g. 2025-06 · Coachella"/>
+          </div>
+        </div>
+        <div class="mfield">
+          <label>Access tier</label>
+          <div class="tier-selector">
+            <div class="tier-opt" id="ctierFree" onclick="selectCreateTier('free')">
+              <span class="tier-opt-icon">📣</span>
+              <div class="tier-opt-name">Free</div>
+            </div>
+            <div class="tier-opt sel-sub" id="ctierSub" onclick="selectCreateTier('sub')">
+              <span class="tier-opt-icon">📋</span>
+              <div class="tier-opt-name">Subscription</div>
+            </div>
+            <div class="tier-opt" id="ctierPremium" onclick="selectCreateTier('premium')">
+              <span class="tier-opt-icon">⭐</span>
+              <div class="tier-opt-name">Premium</div>
+            </div>
+          </div>
+        </div>
+        <div class="mform-row" id="cpriceRow" style="display:none;">
+          <div class="mfield">
+            <label>Price</label>
+            <div class="price-input-wrap">
+              <span class="price-symbol">$</span>
+              <input type="number" placeholder="9.99" min="0.99" step="0.01"/>
+            </div>
+          </div>
+          <div class="mfield">
+            <label>Billing</label>
+            <select>
+              <option>Monthly subscription</option>
+              <option>One-time purchase</option>
+              <option>Annual subscription</option>
+            </select>
+          </div>
+        </div>
+        <div class="mfield">
+          <label>Tags</label>
+          <input type="text" placeholder="#tour #backstage #2025 (comma separated)"/>
+        </div>
+        <div class="mfield">
+          <label>Description <span style="font-size:.68rem;color:var(--text-dim);font-weight:400;">(optional)</span></label>
+          <textarea placeholder="Tell fans what's in this folder…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mfooter-btn cancel" onclick="closeCreateModal()">Cancel</button>
+      <button class="mfooter-btn submit" onclick="closeCreateModal();showToast('✓ Drop created successfully!')">✓ Create Drop</button>
     </div>
   </div>
 </div>
@@ -1390,11 +1352,6 @@
 
   // ── Upload modal ─────────────────────────────────
   function openUploadModal() {
-    // Only allow creating folders for the logged-in artist's own account
-    if (!window._currentArtistId) {
-      showToast('Please wait — loading your account…');
-      return;
-    }
     document.getElementById('uploadModal').classList.add('open');
   }
   function closeUploadModal() {
@@ -1485,7 +1442,7 @@
 
   // ── Copy link ────────────────────────────────────
   function copyLink() {
-    navigator.clipboard?.writeText('https://dropsub.com/upload/miyavi/a8x2k')
+    navigator.clipboard?.writeText('https://dropsub.com/dropsub-artist-dashboard.html')
       .catch(() => {});
     showToast('✓ Upload link copied to clipboard!');
   }
@@ -1668,12 +1625,53 @@
       .catch(function() {});
   }
 
+  // ── Create folder modal ──────────────────────────
+  function openCreateModal() {
+    document.getElementById('createModal').classList.add('open');
+  }
+  function closeCreateModal() {
+    document.getElementById('createModal').classList.remove('open');
+  }
+  document.getElementById('createModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCreateModal();
+  });
+
+  var _selectedCreateTier = 'sub';
+  function selectCreateTier(tier) {
+    _selectedCreateTier = tier;
+    ['ctierFree','ctierSub','ctierPremium'].forEach(function(t) {
+      document.getElementById(t).className = 'tier-opt';
+    });
+    document.getElementById('ctierFree').classList.toggle('sel-free', tier === 'free');
+    document.getElementById('ctierSub').classList.toggle('sel-sub', tier === 'sub');
+    document.getElementById('ctierPremium').classList.toggle('sel-premium', tier === 'premium');
+    document.getElementById('cpriceRow').style.display = tier === 'free' ? 'none' : 'grid';
+  }
+
+  // ── QR code generation ───────────────────────────
+  function generateQRCodes() {
+    if (typeof QRCode === 'undefined') { setTimeout(generateQRCodes, 200); return; }
+    var url = 'https://dropsub.com/dropsub-artist-dashboard.html';
+    var targets = [
+      { id: 'qrSidebar', size: 130 },
+      { id: 'qrPhone',   size: 160 },
+      { id: 'qrLarge',   size: 180 },
+    ];
+    targets.forEach(function(t) {
+      var el = document.getElementById(t.id);
+      if (!el) return;
+      QRCode.toCanvas(el, url, { width: t.size, margin: 1, color: { dark: '#080f1c', light: '#ffffff' } },
+        function(err) { if (err) console.error(err); });
+    });
+  }
+
   // ── Init ─────────────────────────────────────────
   fetchArtistFolders();
   renderChart();
   renderActivity();
   fetchUserProfile();
   fetchTaxStatus();
+  generateQRCodes();
 </script>
 </body>
 </html>
