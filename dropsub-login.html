@@ -447,6 +447,49 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── FORGOT PASSWORD MODAL ─────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(8,15,28,.75); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 16px; padding: 36px 32px; width: 100%; max-width: 400px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+      transform: translateY(12px); transition: transform .2s;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
+    .modal-sub { font-size: .82rem; color: var(--text-mid); margin-bottom: 22px; line-height: 1.5; }
+    .modal-success {
+      display: none; text-align: center; padding: 12px 0 4px;
+    }
+    .modal-success-icon { font-size: 2rem; margin-bottom: 10px; }
+    .modal-success-msg { font-size: .88rem; color: #3fa06a; font-weight: 600; margin-bottom: 6px; }
+    .modal-success-sub { font-size: .78rem; color: var(--text-mid); line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-modal-cancel {
+      padding: 9px 18px; border-radius: var(--radius); background: none;
+      border: 1px solid var(--border-bright); color: var(--text-mid);
+      font-family: inherit; font-size: .82rem; font-weight: 500; cursor: pointer; transition: all .15s;
+    }
+    .btn-modal-cancel:hover { border-color: var(--blue-dim); color: var(--text-white); }
+    .btn-modal-send {
+      padding: 9px 20px; border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--blue-bright), #5a4dff);
+      border: none; color: #fff; font-family: inherit;
+      font-size: .82rem; font-weight: 700; cursor: pointer; transition: all .15s;
+    }
+    .btn-modal-send:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(41,121,255,.4); }
+    .btn-modal-send:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .modal-error {
+      display: none; font-size: .75rem; color: var(--error); margin-top: 6px;
+    }
+    .modal-error.show { display: block; }
+
     /* ── RESPONSIVE ─────────────────────────────────── */
     @media (max-width: 1100px) {
       .page { grid-template-columns: 0 1fr 0; padding: 24px; }
@@ -470,14 +513,16 @@
   <!-- ── LEFT PANEL ───────────────────────────────── -->
   <div class="left-panel">
     <div class="brand-lockup">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
-          <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
-          <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <span class="brand-name">DropSub</span>
+      <a href="dropsub-landing.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#080f1c"/>
+            <path d="M2 17l10 5 10-5" stroke="#2979ff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M2 12l10 5 10-5" stroke="#080f1c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="brand-name">DropSub</span>
+      </a>
     </div>
 
     <div>
@@ -614,7 +659,7 @@
         <label class="remember">
           <input type="checkbox" id="rememberMe"/> Keep me signed in
         </label>
-        <a href="#" class="forgot-link" onclick="showToast('Password reset coming soon!'); return false;">Forgot password?</a>
+        <a href="#" class="forgot-link" onclick="openForgotModal(); return false;">Forgot password?</a>
       </div>
 
       <button type="submit" class="btn-signin" id="signinBtn">
@@ -626,8 +671,7 @@
 
     <div class="card-footer">
       By signing in you agree to our
-      <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.<br>
-      © 2025 DropSub — Confidential by Richard Frias
+      <a href="dropsub-terms.html">Terms of Service</a> and <a href="dropsub-privacy.html">Privacy Policy</a>.
     </div>
   </div>
 
@@ -691,6 +735,41 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal" onclick="handleModalBackdrop(event)">
+  <div class="modal-box">
+    <div id="forgotForm">
+      <div class="modal-title">Reset your password</div>
+      <div class="modal-sub">Enter your email and we'll send you a link to reset your password.</div>
+      <div class="field">
+        <label class="field-label">Email address</label>
+        <div class="field-wrap">
+          <span class="field-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+          <input class="field-input" id="forgotEmailInput" type="email" placeholder="you@email.com" autocomplete="email"/>
+        </div>
+        <span class="modal-error" id="forgotEmailError">Please enter a valid email address.</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" type="button" onclick="closeForgotModal()">Cancel</button>
+        <button class="btn-modal-send" type="button" id="forgotSendBtn" onclick="submitForgotPassword()">Send reset link</button>
+      </div>
+    </div>
+    <div class="modal-success" id="forgotSuccess">
+      <div class="modal-success-icon">✉️</div>
+      <div class="modal-success-msg">Check your email for a reset link</div>
+      <div class="modal-success-sub">If an account exists for that address, you'll receive a password reset email within a few minutes.</div>
+      <div class="modal-actions" style="justify-content:center;margin-top:16px;">
+        <button class="btn-modal-cancel" type="button" onclick="closeForgotModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   // ── Password toggle ──────────────────────────────
@@ -785,9 +864,69 @@
       });
   }
 
+  // ── Forgot password modal ────────────────────────
+  function openForgotModal() {
+    document.getElementById('forgotEmailInput').value = '';
+    document.getElementById('forgotEmailError').classList.remove('show');
+    document.getElementById('forgotEmailInput').classList.remove('error');
+    document.getElementById('forgotForm').style.display = '';
+    document.getElementById('forgotSuccess').style.display = 'none';
+    document.getElementById('forgotSendBtn').disabled = false;
+    document.getElementById('forgotSendBtn').textContent = 'Send reset link';
+    document.getElementById('forgotModal').classList.add('open');
+    setTimeout(function(){ document.getElementById('forgotEmailInput').focus(); }, 50);
+  }
+
+  function closeForgotModal() {
+    document.getElementById('forgotModal').classList.remove('open');
+  }
+
+  function handleModalBackdrop(e) {
+    if (e.target === document.getElementById('forgotModal')) closeForgotModal();
+  }
+
+  function submitForgotPassword() {
+    var email = document.getElementById('forgotEmailInput').value.trim();
+    var errEl = document.getElementById('forgotEmailError');
+    var inputEl = document.getElementById('forgotEmailInput');
+    var btn = document.getElementById('forgotSendBtn');
+
+    errEl.classList.remove('show');
+    inputEl.classList.remove('error');
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.classList.add('show');
+      inputEl.classList.add('error');
+      inputEl.focus();
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    fetch('https://api.dropsub.com/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    })
+      .then(function() {
+        document.getElementById('forgotForm').style.display = 'none';
+        document.getElementById('forgotSuccess').style.display = 'block';
+      })
+      .catch(function() {
+        // Show success regardless — never reveal whether an email exists
+        document.getElementById('forgotForm').style.display = 'none';
+        document.getElementById('forgotSuccess').style.display = 'block';
+      });
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeForgotModal();
+  });
+
   // ── Social login handler ─────────────────────────
   function handleSocial(provider) {
-    showToast(`${provider} sign-in coming soon!`);
+    showToast(`${provider} sign-in is coming soon — use email to sign in for now.`);
   }
 
   // ── Toast ────────────────────────────────────────
