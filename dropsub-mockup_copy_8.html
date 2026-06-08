@@ -55,6 +55,7 @@
     .logo {
       display: flex; align-items: center; gap: 8px;
       font-weight: 800; font-size: .95rem; letter-spacing: .02em;
+      text-decoration: none; color: var(--text-white);
     }
     .logo-icon {
       width: 30px; height: 30px;
@@ -66,6 +67,7 @@
     .nav-link {
       padding: 5px 12px; border-radius: 6px; font-size: .82rem;
       font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s;
+      text-decoration: none;
     }
     .nav-link:hover, .nav-link.active { background: var(--bg-hover); color: var(--text-white); }
     .topnav-right { display: flex; align-items: center; gap: 12px; }
@@ -511,7 +513,7 @@
 <!-- ══ TOP NAV ══════════════════════════════════════════════ -->
 <nav class="topnav">
   <div class="topnav-left">
-    <div class="logo">
+    <a class="logo" href="dropsub-landing.html">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M3 7C3 5.89543 3.89543 5 5 5H10L12 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" fill="#111" stroke="#111" stroke-width="1.5"/>
@@ -519,12 +521,13 @@
         </svg>
       </div>
       <span>DropSub</span>
-    </div>
+    </a>
     <nav class="nav-links">
       <div class="nav-link active">My Artists</div>
       <div class="nav-link">Discover</div>
-      <div class="nav-link">Subscriptions</div>
+      <a class="nav-link" href="dropsub-subscriptions.html">Subscriptions</a>
       <div class="nav-link">Drops</div>
+      <a class="nav-link" href="dropsub-account-settings.html">Settings</a>
     </nav>
   </div>
   <div class="topnav-right">
