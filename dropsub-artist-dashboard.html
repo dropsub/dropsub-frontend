@@ -684,7 +684,11 @@
 <script>
   (function() {
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    if (!token) { window.location.replace('dropsub-login.html'); }
+    if (!token) { window.location.replace('dropsub-login.html'); return; }
+    try {
+      var p = JSON.parse(sessionStorage.getItem('ds_profile') || '{}');
+      if (p.role === 'fan') { window.location.replace('dropsub-fan-dashboard.html'); }
+    } catch(e) {}
   })();
 </script>
 
@@ -698,7 +702,7 @@
       DropSub
     </a>
     <div class="nav-tabs">
-      <a class="nav-tab" href="dropsub-mockup_copy.html">Fan View</a>
+      <a class="nav-tab" href="dropsub-fan-dashboard.html">Fan View</a>
       <a class="nav-tab active" href="#">Artist Dashboard</a>
     </div>
   </div>
@@ -1559,7 +1563,7 @@
         var user = data.user || data;
 
         if (user.role === 'fan') {
-          window.location.replace('dropsub-mockup_copy.html');
+          window.location.replace('dropsub-fan-dashboard.html');
           return;
         }
 

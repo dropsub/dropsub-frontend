@@ -381,7 +381,7 @@
 <!-- ══ TOP NAV ══════════════════════════════════════════════ -->
 <nav class="topnav">
   <div class="topnav-left">
-    <a class="logo" href="dropsub-mockup_copy.html">
+    <a class="logo" href="dropsub-fan-dashboard.html">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M3 7C3 5.89543 3.89543 5 5 5H10L12 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" fill="#111" stroke="#111" stroke-width="1.5"/>
@@ -391,7 +391,7 @@
       <span>DropSub</span>
     </a>
     <nav class="nav-links">
-      <a class="nav-link" href="dropsub-mockup_copy.html">My Artists</a>
+      <a class="nav-link" href="dropsub-fan-dashboard.html">My Artists</a>
       <a class="nav-link" href="#">Discover</a>
       <a class="nav-link active" href="dropsub-subscriptions.html">Subscriptions</a>
       <a class="nav-link" href="#">Drops</a>
@@ -447,7 +447,7 @@
         <div class="empty-icon">📋</div>
         <div class="empty-title">No active subscriptions</div>
         <div class="empty-desc">You haven't subscribed to any artist content yet. Browse artists to find exclusive folders and archives to unlock.</div>
-        <a class="btn-browse" href="dropsub-mockup_copy.html">Browse Artists</a>
+        <a class="btn-browse" href="dropsub-fan-dashboard.html">Browse Artists</a>
       </div>
 
       <!-- Grid -->
@@ -621,15 +621,15 @@
             JSON.stringify(price) + ',' +
             JSON.stringify(interval) +
           ')">Cancel</button>' +
-          '<a class="btn-view" href="dropsub-mockup_copy.html">View content</a>';
+          '<a class="btn-view" href="dropsub-fan-dashboard.html">View content</a>';
       } else if (isCanceled) {
         footerHTML =
           '<button class="btn-reactivate" onclick="showToast(\'Reactivate coming soon!\')">Reactivate</button>' +
-          '<a class="btn-view" href="dropsub-mockup_copy.html">View content</a>';
+          '<a class="btn-view" href="dropsub-fan-dashboard.html">View content</a>';
       } else {
         footerHTML =
           '<button class="btn-cancel" onclick="showToast(\'Please update your payment method.\')">Update billing</button>' +
-          '<a class="btn-view" href="dropsub-mockup_copy.html">View content</a>';
+          '<a class="btn-view" href="dropsub-fan-dashboard.html">View content</a>';
       }
 
       var card = document.createElement('div');

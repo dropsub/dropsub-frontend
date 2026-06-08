@@ -253,7 +253,7 @@
       DropSub
     </a>
     <div class="nav-tabs">
-      <a class="nav-tab" href="dropsub-mockup_copy.html">Fan View</a>
+      <a class="nav-tab" href="dropsub-fan-dashboard.html">Fan View</a>
       <a class="nav-tab" href="dropsub-artist-dashboard.html">Artist Dashboard</a>
       <a class="nav-tab active" href="#">Analytics</a>
     </div>
@@ -915,7 +915,7 @@
       })
       .then(function(user) {
         if (!user) return;
-        if (user.role === 'fan') { window.location.replace('dropsub-mockup_copy.html'); return; }
+        if (user.role === 'fan') { window.location.replace('dropsub-fan-dashboard.html'); return; }
 
         var name  = user.full_name || user.name || user.username || '';
         var email = user.email || '';
