@@ -246,6 +246,22 @@
     }
     .panel-btn.primary:hover { transform: translateY(-1px); }
 
+    /* Drops toolbar inside panel */
+    .drops-toolbar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: var(--bg-dark);
+    }
+    .dtb-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 7px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      color: var(--text-light); font-size: .78rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all .15s;
+      letter-spacing: .04em;
+    }
+    .dtb-btn:hover { background: var(--bg-hover); border-color: var(--blue-bright); color: #fff; }
+
     /* Folder table */
     .folder-table { width: 100%; border-collapse: collapse; }
     .folder-table th {
@@ -602,16 +618,21 @@
     }
     .panel-highlight { animation: panelFlash .9s ease-out; }
 
-    /* ── COLLAB BUTTON ───────────────────────── */
-    .collab-btn {
+    /* ── COLLAB TOGGLE ───────────────────────── */
+    .collab-toggle {
       display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 8px; border-radius: 5px; border: 1px solid rgba(245,166,35,.4);
-      background: rgba(245,166,35,.08); color: var(--accent-gold);
+      padding: 2px 9px; border-radius: 20px; border: 1px solid rgba(61,90,138,.5);
+      background: rgba(61,90,138,.1); color: var(--text-dim);
       font-size: .62rem; font-weight: 800; letter-spacing: .06em;
-      cursor: pointer; transition: all .15s; flex-shrink: 0;
+      cursor: pointer; transition: all .2s; flex-shrink: 0;
       font-family: inherit;
     }
-    .collab-btn:hover { background: rgba(245,166,35,.18); border-color: var(--accent-gold); }
+    .collab-toggle:hover { border-color: rgba(245,166,35,.5); color: var(--accent-gold); }
+    .collab-toggle.on {
+      background: rgba(245,166,35,.14); border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+    .collab-toggle.on:hover { background: rgba(245,166,35,.22); }
 
     /* ── COLLAB MODAL ────────────────────────── */
     .collab-modal-overlay {
@@ -749,6 +770,8 @@
     <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
     <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon">📁</span>Drops<span class="nav-badge">12</span></a>
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon">⬆️</span>Upload Content</a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">📧</span>Subscriptions</a>
+    <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon">🔍</span>Discover</a>
     <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge">1,204</span></a>
 
     <div class="nav-divider"></div>
@@ -821,6 +844,11 @@
               <button class="panel-btn" onclick="showToast('Filter coming soon')">⚙ Manage</button>
               <button class="panel-btn primary" style="padding:7px 16px;font-size:.8rem;" onclick="openUploadModal()">+ New Drop</button>
             </div>
+          </div>
+          <div class="drops-toolbar">
+            <button class="dtb-btn" onclick="openUploadModal()"><span>⬆️</span> UPLOAD</button>
+            <button class="dtb-btn" onclick="openUploadModal()"><span>✏️</span> CREATE</button>
+            <button class="dtb-btn" onclick="showToast('Organize view coming soon')"><span>📂</span> ORGANIZE</button>
           </div>
           <table class="folder-table">
             <thead>
@@ -1212,13 +1240,15 @@
 <script>
   // ── Folder data ──────────────────────────────────
   var DEMO_FOLDERS = [
-    { name: 'Kiyomizu Temple 2021', icon: '📁', type: 'sub', files: 422, size: '14 GB', revenue: '$1,240', subs: 310, date: '2021-09-15' },
-    { name: 'NA Tour 2021', icon: '📁', type: 'sub', files: 640, size: '22 GB', revenue: '$980', subs: 245, date: '2021-10-01' },
-    { name: 'Coachella 2022', icon: '📁', type: 'sub', files: 510, size: '18 GB', revenue: '$860', subs: 215, date: '2022-04-17' },
-    { name: 'Birthday Event 2022', icon: '📂', type: 'free', files: 145, size: '3.2 GB', revenue: '—', subs: '—', date: '2022-09-14' },
-    { name: '20th Anniversary Futurism', icon: '⭐', type: 'premium', files: 1200, size: '42 GB', revenue: '$1,200', subs: 60, date: '2022-10-21' },
-    { name: 'Serbia 2022 Backstage', icon: '📁', type: 'sub', files: 310, size: '9.4 GB', revenue: '$720', subs: 180, date: '2022-03-08' },
+    { name: 'Kiyomizu Temple 2021', icon: '📁', type: 'sub', files: 422, size: '14 GB', revenue: '$1,240', subs: 310, date: '2021-09-15', collab: false },
+    { name: 'NA Tour 2021', icon: '📁', type: 'sub', files: 640, size: '22 GB', revenue: '$980', subs: 245, date: '2021-10-01', collab: true },
+    { name: 'Coachella 2022', icon: '📁', type: 'sub', files: 510, size: '18 GB', revenue: '$860', subs: 215, date: '2022-04-17', collab: false },
+    { name: 'Birthday Event 2022', icon: '📂', type: 'free', files: 145, size: '3.2 GB', revenue: '—', subs: '—', date: '2022-09-14', collab: true },
+    { name: '20th Anniversary Futurism', icon: '⭐', type: 'premium', files: 1200, size: '42 GB', revenue: '$1,200', subs: 60, date: '2022-10-21', collab: false },
+    { name: 'Serbia 2022 Backstage', icon: '📁', type: 'sub', files: 310, size: '9.4 GB', revenue: '$720', subs: 180, date: '2022-03-08', collab: false },
   ];
+
+  var _currentFolders = [];
 
   function fetchArtistFolders() {
     var tbody = document.getElementById('folderTableBody');
@@ -1244,12 +1274,13 @@
   }
 
   function renderFolders(folders) {
+    _currentFolders = folders;
     const tbody = document.getElementById('folderTableBody');
     if (!folders || !folders.length) {
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">No folders yet — click New Drop to create your first one.</td></tr>';
       return;
     }
-    tbody.innerHTML = folders.map(f => {
+    tbody.innerHTML = folders.map((f, idx) => {
       const badge = f.type === 'sub'
         ? '<span class="access-badge sub">📋 SUBSCRIPTION</span>'
         : f.type === 'free'
@@ -1257,6 +1288,7 @@
         : '<span class="access-badge premium">⭐ PREMIUM</span>';
       const d = new Date(f.date);
       const date = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      const collabOn = f.collab === true;
       return `
         <tr onclick="showToast('Opening ${f.name}…')">
           <td>
@@ -1266,7 +1298,7 @@
                 <div class="folder-name">${f.name}</div>
                 <div class="folder-meta">${f.files.toLocaleString()} files · ${f.size}</div>
               </div>
-              <button class="collab-btn" onclick="event.stopPropagation();openCollabModal()" title="Collaboration folders">COLLAB</button>
+              <button class="collab-toggle${collabOn ? ' on' : ''}" onclick="event.stopPropagation();toggleCollab(${idx})" title="${collabOn ? 'Disable fan collaboration uploads' : 'Enable fan collaboration uploads'}">${collabOn ? '🤝 COLLAB ON' : 'COLLAB'}</button>
             </div>
           </td>
           <td>${badge}</td>
@@ -1282,6 +1314,16 @@
           </td>
         </tr>`;
     }).join('');
+  }
+
+  function toggleCollab(idx) {
+    _currentFolders[idx].collab = !_currentFolders[idx].collab;
+    var name = _currentFolders[idx].name;
+    renderFolders(_currentFolders);
+    showToast(_currentFolders[idx].collab
+      ? '🤝 Fan uploads enabled for "' + name + '"'
+      : 'Fan uploads disabled for "' + name + '"'
+    );
   }
 
   // ── Earnings chart ───────────────────────────────

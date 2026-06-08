@@ -477,6 +477,20 @@
     .form-group select:focus, .form-group input:focus { border-color: var(--blue-bright); }
     option { background: var(--bg-card); }
 
+    /* ── COLLAB BADGE (fan view) ─────────────────────── */
+    .fan-collab-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 20px;
+      background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.3);
+      color: var(--accent-gold); font-size: .6rem; font-weight: 800;
+      letter-spacing: .06em; white-space: nowrap; flex-shrink: 0; margin-left: 8px;
+      cursor: default;
+    }
+
+    /* ── FILE AREA HIGHLIGHT ─────────────────────────── */
+    @keyframes dropsFlash { 0%,100% { background: transparent; } 50% { background: rgba(41,121,255,.06); } }
+    #fanDropsArea.drops-flash { animation: dropsFlash .7s ease-out; }
+
     /* ── STATUS BAR ──────────────────────────────────── */
     .status-bar {
       height: 28px; background: var(--bg-panel);
@@ -524,9 +538,9 @@
     </a>
     <nav class="nav-links">
       <div class="nav-link active">My Artists</div>
-      <div class="nav-link">Discover</div>
+      <a class="nav-link" href="dropsub-discover.html">Discover</a>
       <a class="nav-link" href="dropsub-subscriptions.html">Subscriptions</a>
-      <div class="nav-link">Drops</div>
+      <div class="nav-link" onclick="var a=document.getElementById('fanDropsArea');a.classList.add('drops-flash');setTimeout(function(){a.classList.remove('drops-flash');},700)">Drops</div>
       <a class="nav-link" href="dropsub-account-settings.html">Settings</a>
     </nav>
   </div>
@@ -618,7 +632,7 @@
     </div>
 
     <!-- File Table -->
-    <div class="file-area">
+    <div class="file-area" id="fanDropsArea">
       <table class="file-table">
         <thead>
           <tr>
@@ -775,6 +789,24 @@
   </div>
 </div>
 
+<!-- ══ FAN UPLOAD MODAL ══════════════════════════════════════ -->
+<div class="modal-overlay" id="fanUploadModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-icon">📸</div>
+    <h3>Contribute to <span id="fanUploadFolderName" style="color:var(--accent-gold);"></span></h3>
+    <p>Upload your photos and videos from this event. The artist reviews and approves all fan submissions before they go live in the archive.</p>
+    <div class="upload-drop" onclick="showToast('File picker coming soon…')">
+      <span class="drop-icon">⬆️</span>
+      <p>Drop files here or <strong>browse to upload</strong></p>
+      <p style="font-size:.72rem;margin-top:5px;">Photos and videos — max 500 MB per file</p>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="closeFanUploadModal();showToast('✓ Submitted! The artist will review your contribution.')">Submit for Review</button>
+      <button class="modal-btn secondary" onclick="closeFanUploadModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ TOAST ═════════════════════════════════════════════════ -->
 <div id="toast"></div>
 
@@ -786,12 +818,12 @@
       subtitle: 'K-Pop · Stray Kids · 847 files · 12.4 GB',
       tags: ['#BANGCHAN','#WOLFBOY','#SKZ','#KPOP','#TOUR2023'],
       folders: [
-        { name: 'Chicago Tour Photos', type: 'subscription', date: '2023-06-29', size: '3.2 GB', files: 142, color:'blue' },
-        { name: 'Bang Chan on Adventures', type: 'free', date: '2023-07-12', size: '890 MB', files: 67, color:'gold' },
-        { name: 'Backstage Seoul Concert', type: 'subscription', date: '2023-09-03', size: '2.1 GB', files: 214, color:'blue' },
-        { name: 'Vacation Selfies', type: 'subscription', date: '2023-08-20', size: '1.4 GB', files: 88, color:'blue' },
-        { name: 'Atlant Tour Photos', type: 'subscription', date: '2023-10-15', size: '2.8 GB', files: 193, color:'blue' },
-        { name: 'Early Access New Music', type: 'premium', date: '2024-01-05', size: '540 MB', files: 12, price:'$7.99', color:'blue', purchased: false, teaser: 'Get early access to unreleased tracks and studio demos from the upcoming Stray Kids album. 12 audio files in lossless quality.' },
+        { name: 'Chicago Tour Photos', type: 'subscription', date: '2023-06-29', size: '3.2 GB', files: 142, color:'blue', collab: true },
+        { name: 'Bang Chan on Adventures', type: 'free', date: '2023-07-12', size: '890 MB', files: 67, color:'gold', collab: false },
+        { name: 'Backstage Seoul Concert', type: 'subscription', date: '2023-09-03', size: '2.1 GB', files: 214, color:'blue', collab: false },
+        { name: 'Vacation Selfies', type: 'subscription', date: '2023-08-20', size: '1.4 GB', files: 88, color:'blue', collab: true },
+        { name: 'Atlant Tour Photos', type: 'subscription', date: '2023-10-15', size: '2.8 GB', files: 193, color:'blue', collab: false },
+        { name: 'Early Access New Music', type: 'premium', date: '2024-01-05', size: '540 MB', files: 12, price:'$7.99', color:'blue', purchased: false, collab: false, teaser: 'Get early access to unreleased tracks and studio demos from the upcoming Stray Kids album. 12 audio files in lossless quality.' },
       ],
       folderCount: '6 folders · 847 files',
     },
@@ -843,12 +875,12 @@
       subtitle: 'Rock · J-Glam · 5,000+ files · 180 GB',
       tags: ['#MIYAVI','#JROCK','#GUITAR','#JGLAM','#ARCHIVE'],
       folders: [
-        { name: 'Kiyomizu Temple 2021', type: 'subscription', date: '2021-09-15', size: '14 GB', files: 422, color:'blue' },
-        { name: 'NA Tour 2021', type: 'subscription', date: '2021-10-01', size: '22 GB', files: 640, color:'blue' },
-        { name: 'Coachella 2022', type: 'subscription', date: '2022-04-17', size: '18 GB', files: 510, color:'blue' },
-        { name: 'Birthday Event 2022', type: 'free', date: '2022-09-14', size: '3.2 GB', files: 145, color:'gold' },
-        { name: '20th Anniversary Futurism', type: 'premium', date: '2022-10-21', size: '42 GB', files: 1200, price:'$19.99', color:'blue', purchased: true, teaser: '1,200 photos and videos spanning MIYAVI\'s entire 20-year career — rare backstage archives, personal photos, and unreleased tour footage.' },
-        { name: 'Serbia 2022 Backstage', type: 'subscription', date: '2022-03-08', size: '9.4 GB', files: 310, color:'blue' },
+        { name: 'Kiyomizu Temple 2021', type: 'subscription', date: '2021-09-15', size: '14 GB', files: 422, color:'blue', collab: false },
+        { name: 'NA Tour 2021', type: 'subscription', date: '2021-10-01', size: '22 GB', files: 640, color:'blue', collab: true },
+        { name: 'Coachella 2022', type: 'subscription', date: '2022-04-17', size: '18 GB', files: 510, color:'blue', collab: false },
+        { name: 'Birthday Event 2022', type: 'free', date: '2022-09-14', size: '3.2 GB', files: 145, color:'gold', collab: true },
+        { name: '20th Anniversary Futurism', type: 'premium', date: '2022-10-21', size: '42 GB', files: 1200, price:'$19.99', color:'blue', purchased: true, collab: false, teaser: '1,200 photos and videos spanning MIYAVI\'s entire 20-year career — rare backstage archives, personal photos, and unreleased tour footage.' },
+        { name: 'Serbia 2022 Backstage', type: 'subscription', date: '2022-03-08', size: '9.4 GB', files: 310, color:'blue', collab: false },
       ],
       folderCount: '6 folders · 5,000+ files',
     },
@@ -936,6 +968,14 @@
       }
       cell.appendChild(icon);
       cell.appendChild(info);
+      if (f.collab) {
+        var collabBadge = document.createElement('span');
+        collabBadge.className = 'fan-collab-badge';
+        collabBadge.textContent = '🤝 COLLAB';
+        collabBadge.title = 'Fan collaboration folder — you can upload here!';
+        collabBadge.onclick = function(e) { e.stopPropagation(); showToast('🤝 Upload your photos & videos to contribute to this folder!'); };
+        cell.appendChild(collabBadge);
+      }
       tdName.appendChild(cell);
       tr.appendChild(tdName);
 
@@ -978,18 +1018,27 @@
 
       // Actions
       var tdAct = document.createElement('td');
-      if (isFree || isSub) {
+      if (isFree || isSub || isPremOwned) {
         var w = document.createElement('div'); w.className = 'row-actions';
-        var b = document.createElement('div'); b.className = 'row-action-btn'; b.title = 'Share';
-        b.textContent = '🔗';
-        b.onclick = function(e) { e.stopPropagation(); showToast('Link copied!'); };
-        w.appendChild(b); tdAct.appendChild(w);
-      } else if (isPremOwned) {
-        var w = document.createElement('div'); w.className = 'row-actions';
-        var b = document.createElement('div'); b.className = 'row-action-btn'; b.title = 'Download';
-        b.textContent = '⬇️';
-        b.onclick = function(e) { e.stopPropagation(); showToast('Download starting…'); };
-        w.appendChild(b); tdAct.appendChild(w);
+        if (isFree || isSub) {
+          var shareBtn = document.createElement('div'); shareBtn.className = 'row-action-btn'; shareBtn.title = 'Share';
+          shareBtn.textContent = '🔗';
+          shareBtn.onclick = function(e) { e.stopPropagation(); showToast('Link copied!'); };
+          w.appendChild(shareBtn);
+        } else if (isPremOwned) {
+          var dlBtn = document.createElement('div'); dlBtn.className = 'row-action-btn'; dlBtn.title = 'Download';
+          dlBtn.textContent = '⬇️';
+          dlBtn.onclick = function(e) { e.stopPropagation(); showToast('Download starting…'); };
+          w.appendChild(dlBtn);
+        }
+        if (f.collab) {
+          var upBtn = document.createElement('div'); upBtn.className = 'row-action-btn'; upBtn.title = 'Upload to this collab folder';
+          upBtn.textContent = '⬆️';
+          upBtn.style.cssText = 'background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.35);';
+          (function(n) { upBtn.onclick = function(e) { e.stopPropagation(); openFanUploadModal(n); }; })(f.name);
+          w.appendChild(upBtn);
+        }
+        tdAct.appendChild(w);
       }
       tr.appendChild(tdAct);
 
@@ -1091,6 +1140,18 @@
       })
       .catch(function() { /* network error — stay on page, keep default initials */ });
   }
+
+  // ── Fan upload modal ─────────────────────────────────────────
+  function openFanUploadModal(folderName) {
+    document.getElementById('fanUploadFolderName').textContent = folderName;
+    document.getElementById('fanUploadModal').classList.add('open');
+  }
+  function closeFanUploadModal() {
+    document.getElementById('fanUploadModal').classList.remove('open');
+  }
+  document.getElementById('fanUploadModal').addEventListener('click', function(e) {
+    if (e.target === this) closeFanUploadModal();
+  });
 
   // ── Init ────────────────────────────────────────────────────
   renderTable(artists['BANGCHAN'].folders);
