@@ -556,6 +556,51 @@
     .qr-modal-btn.ghost:hover { color: var(--text-white); }
     .qr-modal-btn.blue { background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; color: #fff; }
 
+    /* ── COLLAB BUTTON ───────────────────────── */
+    .collab-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 5px; border: 1px solid rgba(245,166,35,.4);
+      background: rgba(245,166,35,.08); color: var(--accent-gold);
+      font-size: .62rem; font-weight: 800; letter-spacing: .06em;
+      cursor: pointer; transition: all .15s; flex-shrink: 0;
+      font-family: inherit;
+    }
+    .collab-btn:hover { background: rgba(245,166,35,.18); border-color: var(--accent-gold); }
+
+    /* ── COLLAB MODAL ────────────────────────── */
+    .collab-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(4,8,20,.88); backdrop-filter: blur(10px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .collab-modal-overlay.open { display: flex; }
+    .collab-modal {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 18px; padding: 36px 32px; max-width: 480px; width: 100%;
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+      animation: modalIn .3s cubic-bezier(.22,1,.36,1);
+    }
+    .collab-modal-icon { font-size: 2.4rem; margin-bottom: 16px; }
+    .collab-modal-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.3);
+      border-radius: 20px; padding: 4px 12px; font-size: .68rem; font-weight: 700;
+      color: var(--accent-gold); letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .collab-modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -.02em; }
+    .collab-modal-desc { font-size: .85rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 22px; }
+    .collab-modal-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .collab-feature { display: flex; align-items: flex-start; gap: 10px; font-size: .82rem; color: var(--text-light); line-height: 1.5; }
+    .collab-feature-icon { font-size: .85rem; flex-shrink: 0; margin-top: 1px; }
+    .collab-modal-close {
+      width: 100%; padding: 11px; border-radius: var(--radius);
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      color: var(--text-light); font-family: inherit; font-size: .85rem;
+      font-weight: 600; cursor: pointer; transition: all .15s;
+    }
+    .collab-modal-close:hover { color: var(--text-white); border-color: var(--blue-dim); }
+
     /* ── TOAST ────────────────────────────────── */
     .toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
@@ -655,7 +700,7 @@
     </div>
 
     <div class="nav-section-label">Manage</div>
-    <a class="nav-item active"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
     <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon">📁</span>Content Folders<span class="nav-badge">12</span></a>
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon">⬆️</span>Upload Content</a>
     <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge">1,204</span></a>
@@ -1062,6 +1107,25 @@
   </div>
 </div>
 
+<!-- ── COLLAB MODAL ──────────────────────────────── -->
+<div class="collab-modal-overlay" id="collabModal" onclick="if(event.target===this)closeCollabModal()">
+  <div class="collab-modal">
+    <div class="collab-modal-icon">🤝</div>
+    <div class="collab-modal-badge">Coming Soon</div>
+    <div class="collab-modal-title">Collaboration Folders</div>
+    <div class="collab-modal-desc">
+      Artists will be able to designate folders as collaboration spaces — where fans can contribute their own content directly to your archive.
+    </div>
+    <div class="collab-modal-features">
+      <div class="collab-feature"><span class="collab-feature-icon">📸</span>Fans upload photos, videos, and recordings from your shows directly to your archive</div>
+      <div class="collab-feature"><span class="collab-feature-icon">✅</span>You review and approve submissions before they go live</div>
+      <div class="collab-feature"><span class="collab-feature-icon">💰</span>Set a revenue share with contributors or keep it as a fan community feature</div>
+      <div class="collab-feature"><span class="collab-feature-icon">🔒</span>Full moderation controls — approve, reject, or flag content instantly</div>
+    </div>
+    <button class="collab-modal-close" onclick="closeCollabModal()">Got it, notify me when it launches</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1094,6 +1158,7 @@
                 <div class="folder-name">${f.name}</div>
                 <div class="folder-meta">${f.files.toLocaleString()} files · ${f.size}</div>
               </div>
+              <button class="collab-btn" onclick="event.stopPropagation();openCollabModal()" title="Collaboration folders">COLLAB</button>
             </div>
           </td>
           <td>${badge}</td>
@@ -1161,8 +1226,21 @@
     `).join('');
   }
 
+  // ── Collab modal ─────────────────────────────────
+  function openCollabModal() {
+    document.getElementById('collabModal').classList.add('open');
+  }
+  function closeCollabModal() {
+    document.getElementById('collabModal').classList.remove('open');
+  }
+
   // ── Upload modal ─────────────────────────────────
   function openUploadModal() {
+    // Only allow creating folders for the logged-in artist's own account
+    if (!window._currentArtistId) {
+      showToast('Please wait — loading your account…');
+      return;
+    }
     document.getElementById('uploadModal').classList.add('open');
   }
   function closeUploadModal() {
@@ -1281,8 +1359,38 @@
   });
 
   // ── Auth / user profile ──────────────────────────
+  function applyProfile(user) {
+    var name     = user.full_name || user.name || user.username || '';
+    var email    = user.email || '';
+    var role     = user.role || '';
+    var artistId = user.artist ? user.artist.id : (user.artist_id || null);
+    var initials = name.split(' ').filter(Boolean)
+      .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+
+    if (initials) {
+      document.getElementById('navAvatar').textContent     = initials;
+      document.getElementById('sidebarAvatar').textContent = initials;
+    }
+    if (name) {
+      document.getElementById('dropdownName').textContent = name;
+      document.getElementById('sidebarName').textContent  = name;
+    }
+    if (email) document.getElementById('dropdownEmail').textContent = email;
+    if (role)  document.getElementById('sidebarRole').textContent   = role.charAt(0).toUpperCase() + role.slice(1);
+
+    // Store artist ID so folder creation is scoped to this account
+    window._currentArtistId = artistId;
+  }
+
   function fetchUserProfile() {
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+
+    // Apply cached profile immediately so the display never shows stale defaults
+    var cached = sessionStorage.getItem('ds_profile');
+    if (cached) {
+      try { applyProfile(JSON.parse(cached)); } catch (e) {}
+    }
+
     fetch('https://api.dropsub.com/api/auth/me', {
       headers: { 'Authorization': 'Bearer ' + token },
     })
@@ -1290,38 +1398,52 @@
         if (res.status === 401) {
           localStorage.removeItem('access_token');
           sessionStorage.removeItem('access_token');
+          sessionStorage.removeItem('ds_profile');
           window.location.replace('dropsub-login.html');
           return null;
         }
         return res.json();
       })
-      .then(function(user) {
-        if (!user) return;
+      .then(function(data) {
+        if (!data) return;
+        var user = data.user || data;
 
-        // Role check — fans belong on the fan view
         if (user.role === 'fan') {
           window.location.replace('dropsub-mockup_copy.html');
           return;
         }
 
-        var name  = user.full_name || user.name || user.username || '';
-        var email = user.email || '';
-        var role  = user.role || '';
-        var initials = name.split(' ').filter(Boolean)
-          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
-
-        if (initials) {
-          document.getElementById('navAvatar').textContent     = initials;
-          document.getElementById('sidebarAvatar').textContent = initials;
-        }
-        if (name)  {
-          document.getElementById('dropdownName').textContent = name;
-          document.getElementById('sidebarName').textContent  = name;
-        }
-        if (email) document.getElementById('dropdownEmail').textContent = email;
-        if (role)  document.getElementById('sidebarRole').textContent   = role.charAt(0).toUpperCase() + role.slice(1);
+        // Cache for instant display on next page load
+        sessionStorage.setItem('ds_profile', JSON.stringify(user));
+        applyProfile(user);
       })
-      .catch(function() { /* network error — keep defaults */ });
+      .catch(function() { /* network error — cached profile already applied */ });
+  }
+
+  function saveProfile(updates) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    return fetch('https://api.dropsub.com/api/auth/me', {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    })
+      .then(function(res) {
+        if (!res.ok) throw new Error('Save failed');
+        return res.json();
+      })
+      .then(function(data) {
+        var updated = data.profile || data.user || data;
+        // Update cache and display with fresh data
+        var cached = {};
+        try { cached = JSON.parse(sessionStorage.getItem('ds_profile') || '{}'); } catch (e) {}
+        var merged = Object.assign({}, cached, updated);
+        sessionStorage.setItem('ds_profile', JSON.stringify(merged));
+        applyProfile(merged);
+        return merged;
+      });
   }
 
   // ── Init ─────────────────────────────────────────
