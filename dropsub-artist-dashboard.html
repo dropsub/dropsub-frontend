@@ -449,6 +449,27 @@
     .drop-title { font-size: .9rem; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
     .drop-sub { font-size: .78rem; color: var(--text-mid); }
     .drop-sub span { color: var(--blue-glow); font-weight: 600; }
+    .browse-btn {
+      margin-top: 12px; padding: 7px 18px;
+      background: var(--blue-bright); color: #fff;
+      border: none; border-radius: 6px; font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .browse-btn:hover { opacity: .85; }
+    .file-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 6px; background: var(--bg-card);
+      margin-bottom: 6px; font-size: .8rem;
+    }
+    .file-item-icon { font-size: 1rem; flex-shrink: 0; }
+    .file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-white); }
+    .file-item-size { color: var(--text-dim); font-size: .75rem; flex-shrink: 0; }
+    .file-item-remove {
+      background: none; border: none; color: var(--text-dim); cursor: pointer;
+      font-size: .85rem; padding: 0 2px; flex-shrink: 0; line-height: 1;
+    }
+    .file-item-remove:hover { color: #ff4f6a; }
+    .file-summary { font-size: .75rem; color: var(--text-mid); padding: 4px 2px; }
 
     /* Phone upload panel */
     .phone-upload { display: none; }
@@ -981,26 +1002,29 @@
 
       <!-- Desktop drop zone -->
       <div id="desktopUpload">
+        <input type="file" id="fileInput" accept="image/*,video/*,audio/*" multiple style="display:none;" onchange="processFiles(this.files)"/>
         <div class="drop-zone" id="dropZone"
-          onclick="showToast('File picker would open — backend required')"
+          onclick="document.getElementById('fileInput').click()"
           ondragover="event.preventDefault(); this.classList.add('dragover')"
+          ondragenter="event.preventDefault()"
           ondragleave="this.classList.remove('dragover')"
           ondrop="handleDrop(event)">
           <span class="drop-icon">📂</span>
-          <div class="drop-title">Drop files here or <span>browse to upload</span></div>
-          <div class="drop-sub">Photos, videos, audio, documents · Up to 5GB per file</div>
+          <div class="drop-title">Drop files here or <span>click to browse</span></div>
+          <div class="drop-sub">Photos, videos, audio · Up to 5GB per file</div>
+          <button class="browse-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Browse Files</button>
         </div>
-        <!-- Simulated upload progress -->
+        <!-- Selected file list -->
+        <div id="fileList" style="display:none;margin-bottom:14px;">
+          <div id="fileItems"></div>
+          <div id="fileSummary" class="file-summary"></div>
+        </div>
+        <!-- Upload progress -->
         <div class="upload-progress" id="uploadProgress">
           <div class="progress-item">
-            <span class="progress-name">📸 MIYAVI_Tokyo_001.jpg</span>
-            <div class="progress-bar-wrap"><div class="progress-bar" id="pb1" style="width:0%"></div></div>
-            <span class="progress-pct" id="pp1">0%</span>
-          </div>
-          <div class="progress-item">
-            <span class="progress-name">🎬 Backstage_4K.mp4</span>
-            <div class="progress-bar-wrap"><div class="progress-bar" id="pb2" style="width:0%"></div></div>
-            <span class="progress-pct" id="pp2">0%</span>
+            <span class="progress-name" id="uploadProgressLabel">Uploading…</span>
+            <div class="progress-bar-wrap"><div class="progress-bar" id="uploadProgressBar" style="width:0%"></div></div>
+            <span class="progress-pct" id="uploadProgressPct">0%</span>
           </div>
         </div>
       </div>
@@ -1098,7 +1122,7 @@
     </div>
     <div class="modal-footer">
       <button class="mfooter-btn cancel" onclick="closeUploadModal()">Cancel</button>
-      <button class="mfooter-btn submit" id="submitUploadBtn" onclick="simulateUpload()" disabled style="opacity:.45;cursor:not-allowed;">⬆ Upload & Archive</button>
+      <button class="mfooter-btn submit" id="submitUploadBtn" onclick="doUpload()" disabled style="opacity:.45;cursor:not-allowed;">⬆ Upload & Archive</button>
     </div>
   </div>
 </div>
@@ -1364,10 +1388,16 @@
   function closeUploadModal() {
     document.getElementById('uploadModal').classList.remove('open');
     document.getElementById('uploadProgress').classList.remove('show');
-    document.getElementById('pb1').style.width = '0%';
-    document.getElementById('pb2').style.width = '0%';
-    document.getElementById('pp1').textContent = '0%';
-    document.getElementById('pp2').textContent = '0%';
+    document.getElementById('uploadProgressBar').style.width = '0%';
+    document.getElementById('uploadProgressPct').textContent = '0%';
+    var lbl = document.getElementById('uploadProgressLabel');
+    lbl.textContent = 'Uploading…'; lbl.style.color = '';
+    _selectedFiles = [];
+    document.getElementById('fileList').style.display = 'none';
+    document.getElementById('fileItems').innerHTML = '';
+    document.getElementById('fileSummary').textContent = '';
+    var fi = document.getElementById('fileInput');
+    if (fi) fi.value = '';
     var cb = document.getElementById('contentPolicyCheck');
     if (cb) cb.checked = false;
     var btn = document.getElementById('submitUploadBtn');
@@ -1410,6 +1440,68 @@
     document.getElementById('priceRow').style.display = tier === 'free' ? 'none' : 'grid';
   }
 
+  // ── File selection & list ────────────────────────
+  var _selectedFiles = [];
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+    return (bytes / 1073741824).toFixed(2) + ' GB';
+  }
+
+  function fileIcon(type) {
+    if (type.startsWith('image/')) return '🖼️';
+    if (type.startsWith('video/')) return '🎬';
+    if (type.startsWith('audio/')) return '🎵';
+    return '📄';
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function processFiles(files) {
+    var allowed = Array.from(files).filter(function(f) {
+      return f.type.startsWith('image/') || f.type.startsWith('video/') || f.type.startsWith('audio/');
+    });
+    if (!allowed.length) {
+      showToast('No supported files — select images, video, or audio');
+      return;
+    }
+    _selectedFiles = _selectedFiles.concat(allowed);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    var list = document.getElementById('fileList');
+    var items = document.getElementById('fileItems');
+    var summary = document.getElementById('fileSummary');
+    if (!_selectedFiles.length) { list.style.display = 'none'; return; }
+    list.style.display = 'block';
+    var totalSize = _selectedFiles.reduce(function(s, f) { return s + f.size; }, 0);
+    items.innerHTML = _selectedFiles.map(function(f, i) {
+      return '<div class="file-item">' +
+        '<span class="file-item-icon">' + fileIcon(f.type) + '</span>' +
+        '<span class="file-item-name">' + escapeHtml(f.name) + '</span>' +
+        '<span class="file-item-size">' + formatFileSize(f.size) + '</span>' +
+        '<button class="file-item-remove" onclick="removeFile(' + i + ')" title="Remove">✕</button>' +
+        '</div>';
+    }).join('');
+    summary.textContent = _selectedFiles.length + ' file' + (_selectedFiles.length !== 1 ? 's' : '') + ' · ' + formatFileSize(totalSize) + ' total';
+  }
+
+  function removeFile(idx) {
+    _selectedFiles.splice(idx, 1);
+    renderFileList();
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('dragover');
+    processFiles(e.dataTransfer.files);
+  }
+
   // ── Content policy checkbox ──────────────────────
   function onPolicyCheck() {
     var checked = document.getElementById('contentPolicyCheck').checked;
@@ -1420,40 +1512,70 @@
     if (checked) document.getElementById('policyError').style.display = 'none';
   }
 
-  // ── Simulate upload progress ─────────────────────
-  function simulateUpload() {
+  // ── Upload ───────────────────────────────────────
+  function doUpload() {
     if (!document.getElementById('contentPolicyCheck').checked) {
       document.getElementById('policyError').style.display = 'block';
       return;
     }
-    closeUploadModal();
-    showToast('⬆ Uploading files to your archive…');
-  }
-
-  // ── Drag and drop ────────────────────────────────
-  function handleDrop(e) {
-    e.preventDefault();
-    document.getElementById('dropZone').classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if (files.length) {
-      document.getElementById('uploadProgress').classList.add('show');
-      animateProgress('pb1', 'pp1', 100, 1800);
-      animateProgress('pb2', 'pp2', 100, 2800);
-      showToast(`${files.length} file(s) queued for upload`);
+    if (!_selectedFiles.length) {
+      showToast('Please select files to upload');
+      return;
     }
-  }
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var formData = new FormData();
+    _selectedFiles.forEach(function(f) { formData.append('files', f); });
 
-  function animateProgress(barId, pctId, target, duration) {
-    const bar = document.getElementById(barId);
-    const pct = document.getElementById(pctId);
-    let current = 0;
-    const step = target / (duration / 50);
-    const interval = setInterval(() => {
-      current = Math.min(current + step + Math.random() * 2, target);
-      bar.style.width = current + '%';
-      pct.textContent = Math.round(current) + '%';
-      if (current >= target) clearInterval(interval);
-    }, 50);
+    var progressWrap = document.getElementById('uploadProgress');
+    var progressBar  = document.getElementById('uploadProgressBar');
+    var progressPct  = document.getElementById('uploadProgressPct');
+    var progressLbl  = document.getElementById('uploadProgressLabel');
+    progressWrap.classList.add('show');
+    progressLbl.textContent = 'Uploading ' + _selectedFiles.length + ' file' + (_selectedFiles.length !== 1 ? 's' : '') + '…';
+    progressLbl.style.color = '';
+    progressBar.style.width = '0%';
+    progressPct.textContent = '0%';
+
+    var btn = document.getElementById('submitUploadBtn');
+    btn.disabled = true; btn.style.opacity = '.45'; btn.style.cursor = 'not-allowed';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.dropsub.com/api/upload');
+    if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        var pct = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = pct + '%';
+        progressPct.textContent = pct + '%';
+      }
+    };
+
+    xhr.onload = function() {
+      progressBar.style.width = '100%';
+      progressPct.textContent = '100%';
+      if (xhr.status >= 200 && xhr.status < 300) {
+        var count = _selectedFiles.length;
+        setTimeout(function() {
+          closeUploadModal();
+          showToast('✓ ' + count + ' file' + (count !== 1 ? 's' : '') + ' uploaded successfully!');
+        }, 400);
+      } else {
+        progressLbl.style.color = '#ff4f6a';
+        progressLbl.textContent = 'Upload failed (HTTP ' + xhr.status + ')';
+        showToast('Upload failed — please try again');
+        btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+      }
+    };
+
+    xhr.onerror = function() {
+      progressLbl.style.color = '#ff4f6a';
+      progressLbl.textContent = 'Upload failed — network error';
+      showToast('Upload failed — check your connection');
+      btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+    };
+
+    xhr.send(formData);
   }
 
   // ── QR Modal ─────────────────────────────────────
