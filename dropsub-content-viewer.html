@@ -878,13 +878,13 @@
 
   // ── Populate folder header ───────────────────────────────────
   function populateHeader(folder) {
-    var artist  = folder.artist_name  || folder.artist  || '—';
+    var artist  = folder.artist_name  || folder.artist  || (folder.artists && folder.artists.name) || '—';
     var name    = folder.name         || folder.title   || 'Untitled Folder';
     var desc    = folder.description  || '';
     var count   = folder.file_count   != null ? folder.file_count : (allFiles.length);
-    var size    = formatBytes(folder.total_size || folder.size);
+    var size    = formatBytes(folder.total_size || folder.size || folder.total_bytes);
     var updated = formatDate(folder.updated_at  || folder.created_at);
-    var tier    = (folder.tier || '').toLowerCase();
+    var tier    = (folder.tier || folder.access_type || '').toLowerCase();
 
     document.getElementById('folderArtist').textContent    = artist;
     document.getElementById('folderName').textContent      = name;
@@ -897,7 +897,7 @@
     document.title = 'DropSub — ' + name;
 
     var badge = document.getElementById('tierBadge');
-    if (tier === 'subscription') { badge.className = 'tier-badge sub'; badge.textContent = 'Subscription'; }
+    if (tier === 'subscription' || tier === 'sub') { badge.className = 'tier-badge sub'; badge.textContent = 'Subscription'; }
     else if (tier === 'premium') { badge.className = 'tier-badge premium'; badge.textContent = 'Premium Drop'; }
     else if (tier === 'free')    { badge.className = 'tier-badge free'; badge.textContent = 'Free'; }
     else { badge.style.display = 'none'; }
@@ -988,7 +988,7 @@
 
         var data   = result.data;
         var folder = data.folder || data;
-        var files  = data.files  || data.items || data.contents || [];
+        var files  = data.files  || folder.files || data.items || data.contents || [];
 
         if (!Array.isArray(files)) files = [];
 

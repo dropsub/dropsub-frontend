@@ -1341,7 +1341,7 @@
       const collabOn = f.collab === true;
       const isPublic = f.is_public !== false;
       return `
-        <tr onclick="showToast('Opening ${f.name}…')">
+        <tr style="cursor:pointer" onclick="window.location.href='dropsub-content-viewer.html?folder_id=${f.id}&artist_id=${f.artist_id}'">
           <td>
             <div class="folder-name-cell">
               <span class="folder-icon">${icon}</span>
