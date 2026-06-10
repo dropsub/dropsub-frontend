@@ -1120,7 +1120,7 @@
 
       <!-- Desktop drop zone -->
       <div id="desktopUpload">
-        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.gif,.heic,.mp4,.mov,.avi,.mkv,.webm,.wmv,.mp3,.wav,.aac,.flac,.m4a,.ogg,image/*,video/*,audio/*" multiple style="display:none;" onchange="processFiles(this.files)"/>
+        <input type="file" id="fileInput" multiple style="display:none;" onchange="processFiles(this.files)"/>
         <div class="drop-zone" id="dropZone"
           onclick="document.getElementById('fileInput').click()"
           ondragover="event.preventDefault(); this.classList.add('dragover')"
