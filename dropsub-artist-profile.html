@@ -156,6 +156,9 @@
     .social-input { flex: 1; padding: 10px 10px; background: none; border: none; outline: none; color: var(--text-white); font-family: inherit; font-size: .84rem; min-width: 0; }
     .social-input::placeholder { color: var(--text-dim); }
 
+    select.field-input { appearance: none; -webkit-appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233d5a8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+    select.field-input option { background: #132040; color: #fff; }
+
     /* ── INLINE BANNER ───────────────────────────── */
     .inline-banner { display: none; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: .8rem; font-weight: 600; }
     .inline-banner.show { display: flex; }
@@ -322,6 +325,35 @@
               <input class="field-input" type="text" id="fieldName" placeholder="Your artist or band name" maxlength="120"/>
             </div>
             <div class="field-group">
+              <label class="field-label">Genre</label>
+              <select class="field-input" id="fieldGenre">
+                <option value="">— Select a genre —</option>
+                <option value="Alternative">Alternative</option>
+                <option value="Ambient">Ambient</option>
+                <option value="Blues">Blues</option>
+                <option value="Classical">Classical</option>
+                <option value="Country">Country</option>
+                <option value="Dance/Electronic">Dance/Electronic</option>
+                <option value="Folk">Folk</option>
+                <option value="Funk">Funk</option>
+                <option value="Gospel">Gospel</option>
+                <option value="Hip Hop/Rap">Hip Hop/Rap</option>
+                <option value="House">House</option>
+                <option value="Indie">Indie</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Latin">Latin</option>
+                <option value="Metal">Metal</option>
+                <option value="Pop">Pop</option>
+                <option value="Punk">Punk</option>
+                <option value="R&amp;B/Soul">R&amp;B/Soul</option>
+                <option value="Reggae">Reggae</option>
+                <option value="Rock">Rock</option>
+                <option value="Singer-Songwriter">Singer-Songwriter</option>
+                <option value="Trap">Trap</option>
+                <option value="World">World</option>
+              </select>
+            </div>
+            <div class="field-group">
               <label class="field-label">Bio</label>
               <textarea class="field-input" id="fieldBio" placeholder="Tell your fans who you are — your story, your sound, your vibe…" maxlength="1000"></textarea>
               <span class="field-hint">Up to 1000 characters.</span>
@@ -462,6 +494,9 @@
       // Artist name field
       if (a.name) document.getElementById('fieldName').value = a.name;
 
+      // Genre
+      if (a.genre) document.getElementById('fieldGenre').value = a.genre;
+
       // Bio
       if (a.bio) document.getElementById('fieldBio').value = a.bio;
 
@@ -575,8 +610,9 @@
       method: 'PATCH',
       headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: name,
-        bio:  (document.getElementById('fieldBio').value || '').trim() || null
+        name:  name,
+        genre: document.getElementById('fieldGenre').value || null,
+        bio:   (document.getElementById('fieldBio').value || '').trim() || null
       })
     })
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })

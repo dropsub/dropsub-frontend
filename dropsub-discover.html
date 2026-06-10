@@ -563,7 +563,7 @@
     var bannerStyle = a.bannerUrl
       ? 'background:url(\'' + a.bannerUrl + '\') center/cover no-repeat;'
       : 'background:linear-gradient(135deg,#132040,#0d1a30);';
-    var bio = a.bio ? (a.bio.length > 55 ? a.bio.slice(0, 55) + '…' : a.bio) : (a.genre || '—');
+    var bio = a.genre || '—';
     return '<div class="artist-card" onclick="viewArtist(\'' + a.slug + '\')">' +
       '<div class="ac-banner" style="' + bannerStyle + '">' +
         '<span class="ac-new-badge" style="background:rgba(41,121,255,.85);">LIVE</span>' +
