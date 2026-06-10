@@ -887,12 +887,12 @@
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon">⬆️</span>Upload Content</a>
     <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">📧</span>Subscriptions</a>
     <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon">🔍</span>Discover</a>
-    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge">1,204</span></a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge" id="navSubsBadge">0</span></a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
     <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon">📈</span>Analytics</a>
-    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon">💳</span>Payouts<span class="nav-badge gold">$4.2K</span></a>
+    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon">💳</span>Payouts<span class="nav-badge gold" id="navPayoutsBadge">$0</span></a>
     <a class="nav-item" onclick="showToast('Pricing settings coming soon')"><span class="nav-icon">🏷️</span>Pricing</a>
 
     <div class="nav-divider"></div>
@@ -2159,11 +2159,20 @@
       document.getElementById('statRevValue').textContent = rev;
       var sideRev = document.getElementById('sidebarRevVal');
       if (sideRev) sideRev.textContent = rev;
+      // Payouts nav badge — compact format
+      var revCents = s.revenue_cents || 0;
+      var payoutBadge = revCents >= 100000
+        ? '$' + (revCents / 100000).toFixed(1) + 'K'
+        : '$' + (revCents / 100).toFixed(0);
+      var navPayout = document.getElementById('navPayoutsBadge');
+      if (navPayout) navPayout.textContent = payoutBadge;
 
       var subsCount = (s.subscribers || 0).toLocaleString();
       document.getElementById('statSubsValue').textContent = subsCount;
       var sideSubs = document.getElementById('sidebarSubsVal');
       if (sideSubs) sideSubs.textContent = subsCount;
+      var navSubs = document.getElementById('navSubsBadge');
+      if (navSubs) navSubs.textContent = subsCount;
 
       document.getElementById('statFilesValue').textContent = (s.file_count || 0).toLocaleString();
       var fc = data.folders ? data.folders.length : 0;
@@ -2182,21 +2191,31 @@
 
   function initQRCodes() {
     if (!window._currentArtistId) return;
-    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    _qrUrl = 'https://www.dropsub.com/dropsub-upload.html'
-           + '?artist_id=' + encodeURIComponent(window._currentArtistId)
-           + '&token='     + encodeURIComponent(token || '');
-    var displayUrl = 'dropsub.com/dropsub-upload.html?artist_id=' + window._currentArtistId.slice(0, 8) + '…';
-    var muLinkText = document.getElementById('muLinkText');
-    if (muLinkText) muLinkText.textContent = displayUrl;
-    var qrModalUrl = document.getElementById('qrModalUrl');
-    if (qrModalUrl) qrModalUrl.textContent = displayUrl;
-    _qrDefs.forEach(function(q) {
-      var el = document.getElementById(q.id);
-      if (!el) return;
-      el.innerHTML = '';
-      new QRCode(el, { text: _qrUrl, width: q.size, height: q.size, colorDark: '#000000', colorLight: '#ffffff' });
-    });
+    var accessToken = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!accessToken) return;
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(window._currentArtistId) + '/upload-token', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + accessToken }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.upload_token) return;
+      _qrUrl = 'https://www.dropsub.com/dropsub-upload.html'
+             + '?artist_id='   + encodeURIComponent(window._currentArtistId)
+             + '&upload_token=' + encodeURIComponent(data.upload_token);
+      var displayUrl = 'dropsub.com/dropsub-upload.html';
+      var muLinkText = document.getElementById('muLinkText');
+      if (muLinkText) muLinkText.textContent = displayUrl;
+      var qrModalUrl = document.getElementById('qrModalUrl');
+      if (qrModalUrl) qrModalUrl.textContent = displayUrl;
+      _qrDefs.forEach(function(q) {
+        var el = document.getElementById(q.id);
+        if (!el) return;
+        el.innerHTML = '';
+        new QRCode(el, { text: _qrUrl, width: q.size, height: q.size, colorDark: '#000000', colorLight: '#ffffff' });
+      });
+    })
+    .catch(function() {});
   }
 
   // ── Organize mode ────────────────────────────────

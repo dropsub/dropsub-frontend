@@ -307,59 +307,43 @@
 
 </div>
 <script>
-  var _artistId = null;
-  var _token    = null;
-  var _files    = [];
+  var _uploadToken = null;
+  var _files       = [];
 
   function init() {
     var params = new URLSearchParams(window.location.search);
-    _artistId = params.get('artist_id');
-    _token    = params.get('token');
+    _uploadToken = params.get('upload_token');
 
-    if (!_token || !_artistId) {
+    if (!_uploadToken) {
       document.getElementById('invalidCard').style.display = '';
       return;
     }
 
     document.getElementById('uploadSection').style.display = '';
-    fetchArtistInfo();
-    fetchFolders();
+    validateToken();
   }
 
-  function fetchArtistInfo() {
-    fetch('https://api.dropsub.com/api/auth/me', {
-      headers: { 'Authorization': 'Bearer ' + _token }
-    })
+  function validateToken() {
+    fetch('https://api.dropsub.com/api/upload/token-info/' + encodeURIComponent(_uploadToken))
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(data) {
       if (!data) { showInvalid(); return; }
-      var user = data.user || data;
-      var artistName = (user.artist && user.artist.name) ? user.artist.name : '';
-      if (artistName) {
-        document.getElementById('artistNameEl').textContent = artistName;
+      if (data.artist_name) {
+        document.getElementById('artistNameEl').textContent = data.artist_name;
         document.getElementById('artistBadge').style.display = 'flex';
       }
+      if (data.folders && data.folders.length) {
+        var sel = document.getElementById('folderSelect');
+        data.folders.forEach(function(f) {
+          var opt = document.createElement('option');
+          opt.value = f.id;
+          opt.textContent = f.name;
+          sel.appendChild(opt);
+        });
+        document.getElementById('folderField').style.display = '';
+      }
     })
-    .catch(function() {});
-  }
-
-  function fetchFolders() {
-    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(_artistId) + '/folders', {
-      headers: { 'Authorization': 'Bearer ' + _token }
-    })
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(data) {
-      if (!data || !data.folders || !data.folders.length) return;
-      var sel = document.getElementById('folderSelect');
-      data.folders.forEach(function(f) {
-        var opt = document.createElement('option');
-        opt.value = f.id;
-        opt.textContent = f.name;
-        sel.appendChild(opt);
-      });
-      document.getElementById('folderField').style.display = '';
-    })
-    .catch(function() {});
+    .catch(function() { showInvalid(); });
   }
 
   function showInvalid() {
@@ -453,13 +437,10 @@
     var folderId = document.getElementById('folderSelect').value;
     var form = new FormData();
     _files.forEach(function(f) { form.append('files', f); });
-    form.append('artist_id', _artistId);
-    form.append('source', 'mobile');
     if (folderId) form.append('folder_id', folderId);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://api.dropsub.com/api/upload');
-    xhr.setRequestHeader('Authorization', 'Bearer ' + _token);
+    xhr.open('POST', 'https://api.dropsub.com/api/upload/mobile/' + encodeURIComponent(_uploadToken));
 
     xhr.upload.onprogress = function(e) {
       if (e.lengthComputable) setProgress(Math.round(e.loaded / e.total * 90), 'Uploading…');
