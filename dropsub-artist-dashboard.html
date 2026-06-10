@@ -1809,7 +1809,7 @@
         name: name,
         description: document.getElementById('editFolderDesc').value.trim(),
         access_type: _editTier,
-        is_published: document.getElementById('editFolderVisibility').value === 'true'
+        is_public: document.getElementById('editFolderVisibility').value === 'true'
       })
     })
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })

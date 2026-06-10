@@ -478,10 +478,8 @@
 </head>
 <body>
 <script>
-  (function() {
-    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    if (!token) { window.location.replace('dropsub-login.html'); }
-  })();
+  // Auth guard deferred — free/public folders must be accessible without a token.
+  // loadFolder() handles 401/403 and redirects to login only when the content requires it.
 </script>
 
 <!-- ══ TOP NAV ══════════════════════════════════════════════ -->
@@ -947,10 +945,18 @@
         if (!result) return;
 
         if (result.status === 403) {
+          // If the user has no token, send them to login so they can authenticate first
+          var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+          if (!token) {
+            var returnUrl = encodeURIComponent(window.location.href);
+            window.location.replace('dropsub-login.html?return=' + returnUrl);
+            return;
+          }
+
           var folder = (result.data && result.data.folder) || result.data || {};
           var price  = folder.price != null ? folder.price : result.data.price;
           var interval = folder.interval || result.data.interval || 'month';
-          var tier   = (folder.tier || result.data.tier || 'subscription').toLowerCase();
+          var tier   = (folder.tier || folder.access_type || result.data.tier || 'subscription').toLowerCase();
           var fname  = folder.name  || result.data.folder_name || 'This folder';
           var artist = folder.artist_name || result.data.artist_name || '';
 
@@ -1143,6 +1149,7 @@
   // ── User profile ─────────────────────────────────────────────
   function fetchUserProfile() {
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return; // no token — page may still load for free/public folders
     fetch('https://api.dropsub.com/api/auth/me', {
       headers: { 'Authorization': 'Bearer ' + token },
     })
@@ -1150,7 +1157,6 @@
         if (res.status === 401) {
           localStorage.removeItem('access_token');
           sessionStorage.removeItem('access_token');
-          window.location.replace('dropsub-login.html');
           return null;
         }
         return res.json();
