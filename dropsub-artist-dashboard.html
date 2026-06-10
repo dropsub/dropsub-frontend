@@ -871,11 +871,11 @@
       </div>
       <div class="artist-mini-stats">
         <div class="mini-stat">
-          <div class="mini-stat-val gold">$4,280</div>
+          <div class="mini-stat-val gold" id="sidebarRevVal">—</div>
           <div class="mini-stat-label">This month</div>
         </div>
         <div class="mini-stat">
-          <div class="mini-stat-val">1,204</div>
+          <div class="mini-stat-val" id="sidebarSubsVal">—</div>
           <div class="mini-stat-label">Subscribers</div>
         </div>
       </div>
@@ -1261,7 +1261,7 @@
         <div class="mform-row">
           <div class="mfield">
             <label>Folder name</label>
-            <input type="text" placeholder="e.g. Tokyo Tour 2025 · Backstage"/>
+            <input type="text" id="cFolderName" placeholder="e.g. Tokyo Tour 2025 · Backstage"/>
           </div>
           <div class="mfield">
             <label>Date / Event</label>
@@ -1290,7 +1290,7 @@
             <label>Price</label>
             <div class="price-input-wrap">
               <span class="price-symbol">$</span>
-              <input type="number" placeholder="9.99" min="0.99" step="0.01"/>
+              <input type="number" id="cFolderPrice" placeholder="9.99" min="0.99" step="0.01"/>
             </div>
           </div>
           <div class="mfield">
@@ -1304,17 +1304,17 @@
         </div>
         <div class="mfield">
           <label>Tags</label>
-          <input type="text" placeholder="#tour #backstage #2025 (comma separated)"/>
+          <input type="text" id="cFolderTags" placeholder="#tour #backstage #2025 (comma separated)"/>
         </div>
         <div class="mfield">
           <label>Description <span style="font-size:.68rem;color:var(--text-dim);font-weight:400;">(optional)</span></label>
-          <textarea placeholder="Tell fans what's in this folder…"></textarea>
+          <textarea id="cFolderDesc" placeholder="Tell fans what's in this folder…"></textarea>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="mfooter-btn cancel" onclick="closeCreateModal()">Cancel</button>
-      <button class="mfooter-btn submit" onclick="closeCreateModal();showToast('✓ Drop created successfully!')">✓ Create Drop</button>
+      <button class="mfooter-btn submit" id="cSubmitBtn" onclick="submitCreateFolder()">✓ Create Drop</button>
     </div>
   </div>
 </div>
@@ -2157,8 +2157,13 @@
         ? '$' + (s.revenue_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         : '$0.00';
       document.getElementById('statRevValue').textContent = rev;
+      var sideRev = document.getElementById('sidebarRevVal');
+      if (sideRev) sideRev.textContent = rev;
 
-      document.getElementById('statSubsValue').textContent = (s.subscribers || 0).toLocaleString();
+      var subsCount = (s.subscribers || 0).toLocaleString();
+      document.getElementById('statSubsValue').textContent = subsCount;
+      var sideSubs = document.getElementById('sidebarSubsVal');
+      if (sideSubs) sideSubs.textContent = subsCount;
 
       document.getElementById('statFilesValue').textContent = (s.file_count || 0).toLocaleString();
       var fc = data.folders ? data.folders.length : 0;
@@ -2374,6 +2379,61 @@
   function openCreateModal() {
     document.getElementById('createModal').classList.add('open');
   }
+  function submitCreateFolder() {
+    var name = (document.getElementById('cFolderName').value || '').trim();
+    if (!name) {
+      showToast('Please enter a folder name');
+      document.getElementById('cFolderName').focus();
+      return;
+    }
+    var btn = document.getElementById('cSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating…';
+
+    var price = parseFloat(document.getElementById('cFolderPrice').value || '');
+    var payload = {
+      name: name,
+      type: _selectedCreateTier,
+      is_published: true,
+      description: (document.getElementById('cFolderDesc').value || '').trim(),
+      tags: (document.getElementById('cFolderTags').value || '')
+              .split(',').map(function(t) { return t.trim().replace(/^#/, ''); }).filter(Boolean)
+    };
+    if (window._currentArtistId) payload.artist_id = window._currentArtistId;
+    if (_selectedCreateTier !== 'free' && price) {
+      if (_selectedCreateTier === 'sub') payload.sub_price_cents = Math.round(price * 100);
+      else payload.premium_price_cents = Math.round(price * 100);
+    }
+
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/folders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      btn.disabled = false;
+      btn.textContent = '✓ Create Drop';
+      if (!res.ok) {
+        showToast('Error: ' + (res.data.error || 'Could not create folder'));
+        return;
+      }
+      closeCreateModal();
+      showToast('✓ Drop created!');
+      document.getElementById('cFolderName').value  = '';
+      document.getElementById('cFolderDesc').value  = '';
+      document.getElementById('cFolderTags').value  = '';
+      document.getElementById('cFolderPrice').value = '';
+      selectCreateTier('sub');
+      setDropsView('active');
+    })
+    .catch(function() {
+      btn.disabled = false;
+      btn.textContent = '✓ Create Drop';
+      showToast('Network error — please try again');
+    });
+  }
   function closeCreateModal() {
     document.getElementById('createModal').classList.remove('open');
   }
@@ -2393,21 +2453,20 @@
     document.getElementById('cpriceRow').style.display = tier === 'free' ? 'none' : 'grid';
   }
 
-  // ── Init ─────────────────────────────────────────
-  fetchArtistFolders();
-  renderChart();
-  renderActivity();
-  fetchUserProfile();
-  fetchTaxStatus();
-
-  // ── QR codes ─────────────────────────────────────
+  // ── QR codes (declared before init so initQRCodes() can reference them on first applyProfile call)
   var _qrUrl = 'https://www.dropsub.com/dropsub-upload.html';
   var _qrDefs = [
     { id: 'qrcode-sidebar', size: 130 },
     { id: 'qrcode-phone',   size: 160 },
     { id: 'qrcode-modal',   size: 180 },
   ];
-  // QR codes are initialized in initQRCodes(), called from applyProfile() once the artist ID is known
+
+  // ── Init ─────────────────────────────────────────
+  fetchArtistFolders();
+  renderChart();
+  renderActivity();
+  fetchUserProfile();
+  fetchTaxStatus();
 </script>
 </body>
 </html>
