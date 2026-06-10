@@ -263,6 +263,16 @@
     }
     .dtb-btn:hover { background: var(--bg-hover); border-color: var(--blue-bright); color: #fff; }
 
+    /* Drops view tabs */
+    .drops-view-tabs { display: flex; gap: 2px; }
+    .dvt-tab {
+      padding: 3px 12px; border-radius: 6px; font-size: .78rem; font-weight: 600;
+      color: var(--text-dim); cursor: pointer; transition: all .15s;
+      border: none; background: none; font-family: inherit;
+    }
+    .dvt-tab:hover { color: var(--text-white); background: var(--bg-hover); }
+    .dvt-tab.active { background: var(--bg-card); color: var(--text-white); border: 1px solid var(--border-bright); }
+
     /* Folder table */
     .folder-table { width: 100%; border-collapse: collapse; }
     .folder-table th {
@@ -941,13 +951,18 @@
         <!-- Folders panel -->
         <div class="panel" id="dropsSection">
           <div class="panel-header">
-            <div class="panel-title">
-              📁 Drops
-              <span style="font-size:.7rem;font-weight:500;color:var(--text-dim);background:var(--bg-hover);padding:2px 8px;border-radius:10px;">6 folders</span>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <div class="panel-title">
+                📁 Drops
+                <span id="dropsFolderCount" style="font-size:.7rem;font-weight:500;color:var(--text-dim);background:var(--bg-hover);padding:2px 8px;border-radius:10px;">0 folders</span>
+              </div>
+              <div class="drops-view-tabs">
+                <button class="dvt-tab active" id="dvtActive" onclick="setDropsView('active')">Active</button>
+                <button class="dvt-tab" id="dvtArchived" onclick="setDropsView('archived')">Archived</button>
+              </div>
             </div>
             <div class="panel-actions">
-              <a class="panel-btn" href="dropsub-artist-dashboard.html">⚙ Manage</a>
-              <button class="panel-btn primary" style="padding:7px 16px;font-size:.8rem;" onclick="openCreateModal()">+ New Drop</button>
+              <button class="panel-btn primary" id="newDropBtn" style="padding:7px 16px;font-size:.8rem;" onclick="openCreateModal()">+ New Drop</button>
             </div>
           </div>
           <div class="drops-toolbar">
@@ -1369,7 +1384,8 @@
 
 <!-- ══ MORE MENU ════════════════════════════════════════════════ -->
 <div class="more-menu" id="moreMenu">
-  <div class="more-menu-item" onclick="archiveFolder()">📦 Archive</div>
+  <div class="more-menu-item" id="moreMenuArchive" onclick="archiveFolder()">📦 Archive</div>
+  <div class="more-menu-item" id="moreMenuRestore" onclick="restoreFolder()" style="display:none">♻️ Restore to Drops</div>
   <div class="more-menu-sep"></div>
   <div class="more-menu-item" onclick="showToast('Coming soon'); closeMoreMenu()">🔑 Manage permissions</div>
   <div class="more-menu-sep"></div>
@@ -1399,9 +1415,18 @@
 <script>
   // ── Folder data ──────────────────────────────────
   var _currentFolders = [];
+  var _dropsView = 'active'; // 'active' | 'archived'
+
+  function setDropsView(view) {
+    _dropsView = view;
+    document.getElementById('dvtActive').classList.toggle('active', view === 'active');
+    document.getElementById('dvtArchived').classList.toggle('active', view === 'archived');
+    document.getElementById('newDropBtn').style.display = view === 'active' ? '' : 'none';
+    fetchArtistFolders();
+  }
 
   function fetchArtistFolders() {
-    console.log('[fetchArtistFolders] called, _currentArtistId:', window._currentArtistId);
+    console.log('[fetchArtistFolders] called, _currentArtistId:', window._currentArtistId, 'view:', _dropsView);
     var tbody = document.getElementById('folderTableBody');
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">Loading folders…</td></tr>';
     if (!window._currentArtistId) {
@@ -1410,7 +1435,8 @@
       return;
     }
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    var url = 'https://api.dropsub.com/api/artists/' + window._currentArtistId + '/folders';
+    var url = 'https://api.dropsub.com/api/artists/' + window._currentArtistId + '/folders'
+            + (_dropsView === 'archived' ? '?archived=true' : '');
     console.log('[fetchArtistFolders] fetching:', url, '| token present:', !!token);
     fetch(url, {
       headers: { 'Authorization': 'Bearer ' + token }
@@ -1422,7 +1448,6 @@
     })
     .then(function(data) {
       console.log('[fetchArtistFolders] raw response:', data);
-      console.log('[fetchArtistFolders] data.folders:', data.folders);
       var folders = data.folders || [];
       renderFolders(folders);
     })
@@ -1434,9 +1459,14 @@
 
   function renderFolders(folders) {
     _currentFolders = folders;
+    var countEl = document.getElementById('dropsFolderCount');
+    if (countEl) countEl.textContent = folders.length + ' folder' + (folders.length !== 1 ? 's' : '');
     const tbody = document.getElementById('folderTableBody');
     if (!folders || !folders.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">No drops yet — click + New Drop to get started.</td></tr>';
+      var emptyMsg = _dropsView === 'archived'
+        ? 'No archived folders.'
+        : 'No active drops — click + New Drop to get started.';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-dim);">' + emptyMsg + '</td></tr>';
       return;
     }
     tbody.innerHTML = folders.map((f, idx) => {
@@ -1833,6 +1863,8 @@
   function openMoreMenu(idx, el) {
     _moreMenuIdx = idx;
     var menu = document.getElementById('moreMenu');
+    document.getElementById('moreMenuArchive').style.display = _dropsView === 'active'   ? '' : 'none';
+    document.getElementById('moreMenuRestore').style.display = _dropsView === 'archived' ? '' : 'none';
     var rect = el.getBoundingClientRect();
     menu.style.top  = (rect.bottom + 6) + 'px';
     menu.style.left = Math.max(4, rect.right - 192) + 'px';
@@ -1894,11 +1926,32 @@
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
     .then(function(result) {
       if (!result.ok) { showToast('Archive failed: ' + (result.data.error || 'unknown error')); return; }
-      _currentFolders[idx].is_published = false;
+      _currentFolders.splice(idx, 1);
       renderFolders(_currentFolders);
       showToast('"' + f.name + '" archived');
     })
     .catch(function() { showToast('Archive failed — check your connection'); });
+  }
+
+  function restoreFolder() {
+    var idx = _moreMenuIdx;
+    closeMoreMenu();
+    if (idx < 0) return;
+    var f = _currentFolders[idx];
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/folders/' + f.id, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_published: true })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      if (!result.ok) { showToast('Restore failed: ' + (result.data.error || 'unknown error')); return; }
+      _currentFolders.splice(idx, 1);
+      renderFolders(_currentFolders);
+      showToast('"' + f.name + '" restored to Drops');
+    })
+    .catch(function() { showToast('Restore failed — check your connection'); });
   }
 
   // ── Upload ───────────────────────────────────────

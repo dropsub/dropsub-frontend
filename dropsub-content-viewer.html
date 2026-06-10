@@ -929,8 +929,11 @@
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     showState('stateLoading');
 
+    var reqHeaders = {};
+    if (token) reqHeaders['Authorization'] = 'Bearer ' + token;
+
     fetch('https://api.dropsub.com/api/folders/' + encodeURIComponent(folderId) + '/files', {
-      headers: { 'Authorization': 'Bearer ' + token },
+      headers: reqHeaders,
     })
       .then(function(res) {
         if (res.status === 401) {
