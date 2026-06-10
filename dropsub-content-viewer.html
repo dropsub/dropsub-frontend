@@ -647,7 +647,7 @@
     <div class="lightbox-filename" id="lbFilename">—</div>
     <div class="lb-topbar-right">
       <span class="lightbox-counter" id="lbCounter"></span>
-      <a class="lb-icon-btn" id="lbDownloadBtn" title="Download" download>⬇</a>
+      <div class="lb-icon-btn" id="lbDownloadBtn" title="Download" onclick="lbDownload()" style="display:none">⬇</div>
       <div class="lb-icon-btn" title="Close (Esc)" onclick="closeLightbox()">✕</div>
     </div>
   </div>
@@ -1070,9 +1070,7 @@
     document.getElementById('lbCounter').textContent  =
       (lbIndex + 1) + ' / ' + filteredFiles.length;
 
-    var dlBtn = document.getElementById('lbDownloadBtn');
-    if (url) { dlBtn.href = url; dlBtn.download = name; dlBtn.style.display = 'flex'; }
-    else     { dlBtn.style.display = 'none'; }
+    document.getElementById('lbDownloadBtn').style.display = url ? 'flex' : 'none';
 
     // Pause previous media
     document.querySelectorAll('#lbContent video, #lbContent audio').forEach(function(m) { m.pause(); });
@@ -1149,6 +1147,29 @@
     );
   }
 
+  // ── Download (fetch → blob for cross-origin S3 URLs) ─────────
+  function lbDownload() {
+    var file = filteredFiles[lbIndex];
+    if (!file) return;
+    var url  = fileUrl(file);
+    var name = fileName(file);
+    if (!url) return;
+    var btn = document.getElementById('lbDownloadBtn');
+    btn.textContent = '…';
+    fetch(url)
+      .then(function(r) { return r.blob(); })
+      .then(function(blob) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() { URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 1000);
+        btn.textContent = '⬇';
+      })
+      .catch(function() { window.open(url, '_blank'); btn.textContent = '⬇'; });
+  }
+
   // ── Keyboard nav ─────────────────────────────────────────────
   document.addEventListener('keydown', function(e) {
     if (!document.getElementById('lightbox').classList.contains('open')) return;
@@ -1156,6 +1177,21 @@
     if (e.key === 'ArrowLeft')  lbNav(-1);
     if (e.key === 'ArrowRight') lbNav(1);
   });
+
+  // ── Swipe gestures ────────────────────────────────────────────
+  var lbTouchX = 0, lbTouchY = 0;
+  var lbStageEl = document.getElementById('lbStage');
+  lbStageEl.addEventListener('touchstart', function(e) {
+    lbTouchX = e.changedTouches[0].clientX;
+    lbTouchY = e.changedTouches[0].clientY;
+  }, { passive: true });
+  lbStageEl.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - lbTouchX;
+    var dy = e.changedTouches[0].clientY - lbTouchY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 44) {
+      lbNav(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
 
   // Close lightbox on background click
   document.getElementById('lightbox').addEventListener('click', function(e) {
