@@ -298,6 +298,52 @@
     }
     .fol-btn:hover { background: var(--blue-dim); border-color: var(--blue-bright); }
 
+    /* ── MORE MENU ───────────────────────────────── */
+    .more-menu {
+      position: fixed; z-index: 220;
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 10px; padding: 4px; min-width: 190px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.45);
+      display: none;
+    }
+    .more-menu.open { display: block; animation: modalIn .15s cubic-bezier(.22,1,.36,1); }
+    .more-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 7px;
+      font-size: .82rem; color: var(--text-light);
+      cursor: pointer; transition: background .1s;
+    }
+    .more-menu-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .more-menu-item.danger { color: #f87171; }
+    .more-menu-item.danger:hover { background: rgba(239,68,68,.1); color: #ef4444; }
+    .more-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ── CONFIRM DIALOG ──────────────────────────── */
+    .confirm-overlay {
+      display: none; position: fixed; inset: 0; z-index: 250;
+      background: rgba(4,8,20,.85); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-dialog {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 16px; padding: 28px 28px 22px; max-width: 400px; width: 100%;
+      box-shadow: 0 32px 80px rgba(0,0,0,.5);
+      animation: modalIn .3s cubic-bezier(.22,1,.36,1);
+    }
+    .confirm-icon { font-size: 2rem; margin-bottom: 12px; }
+    .confirm-title { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+    .confirm-desc { font-size: .83rem; color: var(--text-mid); margin-bottom: 22px; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .confirm-btn {
+      padding: 8px 18px; border-radius: 8px; font-family: inherit;
+      font-size: .83rem; font-weight: 600; cursor: pointer; transition: all .15s; border: none;
+    }
+    .confirm-btn.cancel { background: var(--bg-card); border: 1px solid var(--border-bright); color: var(--text-mid); }
+    .confirm-btn.cancel:hover { color: var(--text-white); }
+    .confirm-btn.danger { background: #ef4444; color: #fff; }
+    .confirm-btn.danger:hover { background: #dc2626; }
+
     /* ── RIGHT SIDEBAR ────────────────────────── */
     .right-col { display: flex; flex-direction: column; gap: 14px; }
 
@@ -1258,6 +1304,78 @@
 </div>
 
 <!-- ── COLLAB MODAL ──────────────────────────────── -->
+<!-- ══ EDIT FOLDER MODAL ═══════════════════════════════════════ -->
+<div class="modal-overlay" id="editFolderModal" onclick="if(event.target===this)closeEditModal()">
+  <div class="upload-modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Edit Folder</div>
+      <div class="modal-close" onclick="closeEditModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="mform">
+        <div class="mfield">
+          <label>FOLDER NAME</label>
+          <input type="text" id="editFolderName" placeholder="Folder name"/>
+        </div>
+        <div class="mfield">
+          <label>DESCRIPTION</label>
+          <textarea id="editFolderDesc" placeholder="Optional description"></textarea>
+        </div>
+        <div class="mfield">
+          <label>ACCESS TIER</label>
+          <div class="tier-selector">
+            <div class="tier-opt" id="etierFree" onclick="selectEditTier('free')">
+              <span class="tier-opt-icon">📣</span>
+              <div class="tier-opt-name">Free</div>
+            </div>
+            <div class="tier-opt" id="etierSub" onclick="selectEditTier('subscription')">
+              <span class="tier-opt-icon">📋</span>
+              <div class="tier-opt-name">Subscription</div>
+            </div>
+            <div class="tier-opt" id="etierPremium" onclick="selectEditTier('premium')">
+              <span class="tier-opt-icon">⭐</span>
+              <div class="tier-opt-name">Premium</div>
+            </div>
+          </div>
+        </div>
+        <div class="mfield">
+          <label>VISIBILITY</label>
+          <select id="editFolderVisibility">
+            <option value="true">🌐 Public</option>
+            <option value="false">🔒 Private</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mfooter-btn cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="mfooter-btn submit" id="editFolderSaveBtn" onclick="saveEditFolder()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONFIRM DIALOG ══════════════════════════════════════════ -->
+<div class="confirm-overlay" id="confirmDialog" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-dialog">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-desc" id="confirmDesc"></div>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="confirm-btn danger" id="confirmActionBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MORE MENU ════════════════════════════════════════════════ -->
+<div class="more-menu" id="moreMenu">
+  <div class="more-menu-item" onclick="archiveFolder()">📦 Archive</div>
+  <div class="more-menu-sep"></div>
+  <div class="more-menu-item" onclick="showToast('Coming soon'); closeMoreMenu()">🔑 Manage permissions</div>
+  <div class="more-menu-sep"></div>
+  <div class="more-menu-item danger" onclick="openDeleteConfirm(); closeMoreMenu()">🗑 Delete folder</div>
+</div>
+
 <div class="collab-modal-overlay" id="collabModal" onclick="if(event.target===this)closeCollabModal()">
   <div class="collab-modal">
     <div class="collab-modal-icon">🤝</div>
@@ -1360,9 +1478,9 @@
             <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
               <button class="privacy-toggle-btn ${isPublic ? 'pub' : 'priv'}" onclick="event.stopPropagation();toggleFolderPrivacy(${idx})" title="${isPublic ? 'Public — click to make private' : 'Private — click to make public'}">${isPublic ? '🌐 Public' : '🔒 Private'}</button>
               <div class="folder-actions">
-                <div class="fol-btn" onclick="event.stopPropagation();showToast('Share link copied!')" title="Share">🔗</div>
-                <div class="fol-btn" onclick="event.stopPropagation();showToast('Edit folder coming soon')" title="Edit">✏️</div>
-                <div class="fol-btn" onclick="event.stopPropagation();showToast('More options coming soon')" title="More">⋯</div>
+                <div class="fol-btn" onclick="event.stopPropagation();shareFolderLink('${f.id}')" title="Copy share link">🔗</div>
+                <div class="fol-btn" onclick="event.stopPropagation();openEditModal(${idx})" title="Edit folder">✏️</div>
+                <div class="fol-btn" onclick="event.stopPropagation();openMoreMenu(${idx},this)" title="More options">⋯</div>
               </div>
             </div>
           </td>
@@ -1625,6 +1743,162 @@
     var isPublic = _currentFolders[idx].is_public;
     renderFolders(_currentFolders);
     showToast(isPublic ? '🌐 "' + name + '" is now Public' : '🔒 "' + name + '" is now Private');
+  }
+
+  // ── Share ────────────────────────────────────────
+  function shareFolderLink(folderId) {
+    var url = 'https://www.dropsub.com/dropsub-content-viewer.html?folder_id=' + folderId;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function() {
+        showToast('Link copied!');
+      }).catch(function() { _fallbackCopy(url); });
+    } else {
+      _fallbackCopy(url);
+    }
+  }
+  function _fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Link copied!'); }
+    catch(e) { showToast('Could not copy — copy the URL manually'); }
+    document.body.removeChild(ta);
+  }
+
+  // ── Edit folder modal ────────────────────────────
+  var _editFolderIdx = -1;
+  var _editTier = 'subscription';
+  function openEditModal(idx) {
+    _editFolderIdx = idx;
+    var f = _currentFolders[idx];
+    _editTier = f.access_type || f.type || 'subscription';
+    if (_editTier === 'sub') _editTier = 'subscription';
+    document.getElementById('editFolderName').value = f.name || '';
+    document.getElementById('editFolderDesc').value = f.description || '';
+    document.getElementById('editFolderVisibility').value = f.is_public !== false ? 'true' : 'false';
+    selectEditTier(_editTier);
+    document.getElementById('editFolderModal').classList.add('open');
+  }
+  function closeEditModal() {
+    document.getElementById('editFolderModal').classList.remove('open');
+    _editFolderIdx = -1;
+  }
+  function selectEditTier(tier) {
+    _editTier = tier;
+    var map = { free: 'etierFree', subscription: 'etierSub', premium: 'etierPremium' };
+    var clsMap = { free: 'sel-free', subscription: 'sel-sub', premium: 'sel-premium' };
+    ['etierFree','etierSub','etierPremium'].forEach(function(id) {
+      document.getElementById(id).className = 'tier-opt';
+    });
+    if (map[tier]) document.getElementById(map[tier]).className = 'tier-opt ' + clsMap[tier];
+  }
+  function saveEditFolder() {
+    if (_editFolderIdx < 0) return;
+    var name = document.getElementById('editFolderName').value.trim();
+    if (!name) { showToast('Folder name is required'); return; }
+    var f = _currentFolders[_editFolderIdx];
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var btn = document.getElementById('editFolderSaveBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    fetch('https://api.dropsub.com/api/folders/' + f.id, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        description: document.getElementById('editFolderDesc').value.trim(),
+        access_type: _editTier,
+        is_published: document.getElementById('editFolderVisibility').value === 'true'
+      })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      btn.disabled = false; btn.textContent = 'Save changes';
+      if (!result.ok) { showToast('Save failed: ' + (result.data.error || 'unknown error')); return; }
+      var updated = result.data.folder || result.data;
+      _currentFolders[_editFolderIdx] = Object.assign({}, _currentFolders[_editFolderIdx], updated);
+      renderFolders(_currentFolders);
+      closeEditModal();
+      showToast('Folder updated');
+    })
+    .catch(function() {
+      btn.disabled = false; btn.textContent = 'Save changes';
+      showToast('Save failed — check your connection');
+    });
+  }
+
+  // ── More menu ────────────────────────────────────
+  var _moreMenuIdx = -1;
+  function openMoreMenu(idx, el) {
+    _moreMenuIdx = idx;
+    var menu = document.getElementById('moreMenu');
+    var rect = el.getBoundingClientRect();
+    menu.style.top  = (rect.bottom + 6) + 'px';
+    menu.style.left = Math.max(4, rect.right - 192) + 'px';
+    menu.classList.add('open');
+  }
+  function closeMoreMenu() {
+    document.getElementById('moreMenu').classList.remove('open');
+    _moreMenuIdx = -1;
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('moreMenu').contains(e.target)) closeMoreMenu();
+  });
+
+  // ── Confirm dialog ───────────────────────────────
+  function openDeleteConfirm() {
+    var idx = _moreMenuIdx;
+    if (idx < 0) return;
+    var f = _currentFolders[idx];
+    document.getElementById('confirmIcon').textContent  = '🗑';
+    document.getElementById('confirmTitle').textContent = 'Delete "' + f.name + '"?';
+    document.getElementById('confirmDesc').textContent  = 'This will permanently remove the folder and all its files. This cannot be undone.';
+    document.getElementById('confirmActionBtn').textContent = 'Delete';
+    document.getElementById('confirmActionBtn').onclick = function() { doDeleteFolder(idx); };
+    document.getElementById('confirmDialog').classList.add('open');
+  }
+  function closeConfirm() {
+    document.getElementById('confirmDialog').classList.remove('open');
+  }
+  function doDeleteFolder(idx) {
+    var f = _currentFolders[idx];
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    closeConfirm();
+    fetch('https://api.dropsub.com/api/folders/' + f.id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      if (!result.ok) { showToast('Delete failed: ' + (result.data.error || 'unknown error')); return; }
+      _currentFolders.splice(idx, 1);
+      renderFolders(_currentFolders);
+      showToast('Folder deleted');
+    })
+    .catch(function() { showToast('Delete failed — check your connection'); });
+  }
+
+  // ── Archive folder ───────────────────────────────
+  function archiveFolder() {
+    var idx = _moreMenuIdx;
+    closeMoreMenu();
+    if (idx < 0) return;
+    var f = _currentFolders[idx];
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/folders/' + f.id, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_published: false })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      if (!result.ok) { showToast('Archive failed: ' + (result.data.error || 'unknown error')); return; }
+      _currentFolders[idx].is_published = false;
+      renderFolders(_currentFolders);
+      showToast('"' + f.name + '" archived');
+    })
+    .catch(function() { showToast('Archive failed — check your connection'); });
   }
 
   // ── Upload ───────────────────────────────────────
