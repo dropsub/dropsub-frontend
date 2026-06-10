@@ -147,12 +147,13 @@
     .field-hint { font-size: .7rem; color: var(--text-dim); line-height: 1.4; }
 
     /* Social link fields with platform prefix icon */
-    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .social-field { display: flex; flex-direction: column; gap: 6px; }
-    .social-input-wrap { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 8px; overflow: hidden; transition: border-color .15s; }
+    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+    .social-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .social-field.full-width { grid-column: 1 / -1; }
+    .social-input-wrap { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 8px; overflow: hidden; transition: border-color .15s; min-width: 0; }
     .social-input-wrap:focus-within { border-color: var(--blue-bright); }
-    .social-prefix { padding: 0 10px 0 12px; font-size: .85rem; white-space: nowrap; color: var(--text-mid); flex-shrink: 0; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; }
-    .social-input { flex: 1; padding: 10px 12px; background: none; border: none; outline: none; color: var(--text-white); font-family: inherit; font-size: .84rem; }
+    .social-prefix { padding: 0 8px 0 10px; font-size: .72rem; white-space: nowrap; color: var(--text-mid); flex-shrink: 0; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; }
+    .social-input { flex: 1; padding: 10px 10px; background: none; border: none; outline: none; color: var(--text-white); font-family: inherit; font-size: .84rem; min-width: 0; }
     .social-input::placeholder { color: var(--text-dim); }
 
     /* ── INLINE BANNER ───────────────────────────── */
@@ -371,14 +372,14 @@
                   <input class="social-input" type="text" id="fieldYouTube" placeholder="@yourchannel"/>
                 </div>
               </div>
-              <div class="social-field">
+              <div class="social-field full-width">
                 <label class="field-label">Spotify</label>
                 <div class="social-input-wrap">
                   <span class="social-prefix">open.spotify.com/artist/</span>
                   <input class="social-input" type="text" id="fieldSpotify" placeholder="artistid"/>
                 </div>
               </div>
-              <div class="social-field">
+              <div class="social-field full-width">
                 <label class="field-label">Apple Music</label>
                 <div class="social-input-wrap">
                   <span class="social-prefix">music.apple.com/artist/</span>
