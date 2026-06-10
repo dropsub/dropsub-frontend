@@ -505,6 +505,10 @@
     .drop-title { font-size: .9rem; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
     .drop-sub { font-size: .78rem; color: var(--text-mid); }
     .drop-sub span { color: var(--blue-glow); font-weight: 600; }
+    .drop-types { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
+    .drop-type-tag { display: flex; align-items: center; gap: 5px; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: .67rem; color: var(--text-mid); white-space: nowrap; }
+    .drop-type-tag .dt-icon { font-size: .85rem; }
+    .drop-type-tag .dt-limit { color: var(--text-dim); }
     .browse-btn {
       margin-top: 12px; padding: 7px 18px;
       background: var(--blue-bright); color: #fff;
@@ -1116,7 +1120,7 @@
 
       <!-- Desktop drop zone -->
       <div id="desktopUpload">
-        <input type="file" id="fileInput" accept="image/*,video/*,audio/*" multiple style="display:none;" onchange="processFiles(this.files)"/>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.gif,.heic,.mp4,.mov,.avi,.mkv,.webm,.wmv,.mp3,.wav,.aac,.flac,.m4a,.ogg,image/*,video/*,audio/*" multiple style="display:none;" onchange="processFiles(this.files)"/>
         <div class="drop-zone" id="dropZone"
           onclick="document.getElementById('fileInput').click()"
           ondragover="event.preventDefault(); this.classList.add('dragover')"
@@ -1125,7 +1129,12 @@
           ondrop="handleDrop(event)">
           <span class="drop-icon">📂</span>
           <div class="drop-title">Drop files here or <span>click to browse</span></div>
-          <div class="drop-sub">Photos, videos, audio · Up to 5GB per file</div>
+          <div class="drop-sub">Images, video, and audio</div>
+          <div class="drop-types">
+            <span class="drop-type-tag"><span class="dt-icon">🖼</span> JPG, PNG, WebP, GIF <span class="dt-limit">· 10 MB</span></span>
+            <span class="drop-type-tag"><span class="dt-icon">🎬</span> MP4, MOV, AVI, MKV, WebM <span class="dt-limit">· 500 MB</span></span>
+            <span class="drop-type-tag"><span class="dt-icon">🎵</span> MP3, WAV, AAC, FLAC, M4A <span class="dt-limit">· 50 MB</span></span>
+          </div>
           <button class="browse-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Browse Files</button>
         </div>
         <!-- Selected file list -->
@@ -1717,6 +1726,24 @@
   // ── File selection & list ────────────────────────
   var _selectedFiles = [];
 
+  var _ACCEPTED_EXTS = {
+    image: ['jpg','jpeg','png','gif','webp','heic','avif','bmp'],
+    video: ['mp4','mov','avi','mkv','webm','wmv','flv'],
+    audio: ['mp3','wav','flac','aac','m4a','ogg','opus']
+  };
+  var _FILE_LIMITS = { image: 10, audio: 50, video: 500 }; // MB
+
+  function detectUploadCategory(file) {
+    if (file.type.startsWith('image/')) return 'image';
+    if (file.type.startsWith('video/')) return 'video';
+    if (file.type.startsWith('audio/')) return 'audio';
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (_ACCEPTED_EXTS.image.indexOf(ext) !== -1) return 'image';
+    if (_ACCEPTED_EXTS.video.indexOf(ext) !== -1) return 'video';
+    if (_ACCEPTED_EXTS.audio.indexOf(ext) !== -1) return 'audio';
+    return null;
+  }
+
   function formatFileSize(bytes) {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -1736,14 +1763,31 @@
   }
 
   function processFiles(files) {
-    var allowed = Array.from(files).filter(function(f) {
-      return f.type.startsWith('image/') || f.type.startsWith('video/') || f.type.startsWith('audio/');
+    var accepted = [], rejectedMsgs = [];
+
+    Array.from(files).forEach(function(f) {
+      var cat = detectUploadCategory(f);
+      if (!cat) {
+        rejectedMsgs.push('"' + f.name + '" — unsupported file type');
+        return;
+      }
+      var limitMB = _FILE_LIMITS[cat];
+      var limitBytes = limitMB * 1024 * 1024;
+      if (f.size > limitBytes) {
+        rejectedMsgs.push('"' + f.name + '" — too large (max ' + limitMB + ' MB for ' + cat + ')');
+        return;
+      }
+      accepted.push(f);
     });
-    if (!allowed.length) {
-      showToast('No supported files — select images, video, or audio');
-      return;
+
+    if (rejectedMsgs.length) {
+      var msg = rejectedMsgs.length === 1
+        ? 'Skipped: ' + rejectedMsgs[0]
+        : rejectedMsgs.length + ' files skipped — unsupported type or over size limit';
+      showToast(msg);
     }
-    _selectedFiles = _selectedFiles.concat(allowed);
+    if (!accepted.length) return;
+    _selectedFiles = _selectedFiles.concat(accepted);
     renderFileList();
   }
 
