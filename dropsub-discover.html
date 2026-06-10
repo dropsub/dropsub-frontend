@@ -507,14 +507,97 @@
   ];
 
   // ── State ─────────────────────────────────────────────────────
-  var _filter  = 'all';
-  var _sort    = 'featured';
-  var _query   = '';
-  var _followed = {};
+  var _filter      = 'all';
+  var _sort        = 'featured';
+  var _query       = '';
+  var _followed    = {};
+  var _realArtists = [];
+
+  // ── Fetch real artists from API ───────────────────────────────
+  function fetchRealArtists() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    fetch('https://api.dropsub.com/api/artists', { headers: headers })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.artists || !data.artists.length) return;
+      _realArtists = data.artists.map(function(a) {
+        var n = a.subscriber_count || 0;
+        var subsTxt = n >= 1000000 ? (n / 1000000).toFixed(1) + 'M'
+                    : n >= 1000    ? (n / 1000).toFixed(1)    + 'K'
+                    : n.toString();
+        return {
+          id:          a.id,
+          slug:        a.slug,
+          displayName: a.name || '—',
+          name:        (a.name || '').toUpperCase(),
+          genre:       a.genre || '',
+          bio:         a.bio   || '',
+          cat:         'music',
+          followers:   subsTxt,
+          fNum:        n,
+          drops:       0,
+          featured:    false,
+          sub:         true,
+          avatarUrl:   a.avatar_url  || null,
+          bannerUrl:   a.banner_url  || null,
+          verified:    a.is_verified || false,
+          isNew:       false,
+          real:        true
+        };
+      });
+      renderFeatured();
+      renderPage();
+    })
+    .catch(function() {});
+  }
+
+  // ── Render a single real-artist card ──────────────────────────
+  function renderRealCard(a) {
+    var initials = a.displayName.split(' ').filter(Boolean)
+      .map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase() || '?';
+    var avatarHtml = a.avatarUrl
+      ? '<img src="' + a.avatarUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>'
+      : initials;
+    var bannerStyle = a.bannerUrl
+      ? 'background:url(\'' + a.bannerUrl + '\') center/cover no-repeat;'
+      : 'background:linear-gradient(135deg,#132040,#0d1a30);';
+    var bio = a.bio ? (a.bio.length > 55 ? a.bio.slice(0, 55) + '…' : a.bio) : (a.genre || '—');
+    return '<div class="artist-card" onclick="viewArtist(\'' + a.slug + '\')">' +
+      '<div class="ac-banner" style="' + bannerStyle + '">' +
+        '<span class="ac-new-badge" style="background:rgba(41,121,255,.85);">LIVE</span>' +
+        (a.verified ? '<span class="ac-category">✓ VERIFIED</span>' : '') +
+      '</div>' +
+      '<div class="ac-body">' +
+        '<div class="ac-avatar-wrap"><div class="ac-avatar" style="background:var(--bg-card);overflow:hidden;">' + avatarHtml + '</div></div>' +
+        '<div class="ac-name">' + a.displayName + '</div>' +
+        '<div class="ac-genre">' + bio + '</div>' +
+        '<div class="ac-stats">' +
+          '<div class="ac-stat">👥 <span class="ac-stat-val">' + a.followers + '</span></div>' +
+        '</div>' +
+        '<button class="ac-btn subscribe" onclick="event.stopPropagation();viewArtist(\'' + a.slug + '\')">View</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function viewArtist(slug) {
+    window.location.href = 'dropsub-artist.html?slug=' + encodeURIComponent(slug);
+  }
 
   // ── Filter + sort helpers ─────────────────────────────────────
   function getFiltered() {
-    return ARTISTS.filter(function(a) {
+    var realFiltered = _realArtists.filter(function(a) {
+      if (_filter !== 'all' && _filter !== 'music') return false;
+      if (_query) {
+        var q = _query.toLowerCase();
+        return a.displayName.toLowerCase().indexOf(q) !== -1 ||
+               a.bio.toLowerCase().indexOf(q) !== -1;
+      }
+      return true;
+    });
+
+    var staticFiltered = ARTISTS.filter(function(a) {
       if (_filter !== 'all' && a.cat !== _filter) return false;
       if (_query) {
         var q = _query.toLowerCase();
@@ -525,10 +608,11 @@
       if (_sort === 'popular')  return b.fNum - a.fNum;
       if (_sort === 'new')      return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || b.fNum - a.fNum;
       if (_sort === 'alpha')    return a.name.localeCompare(b.name);
-      // featured: featured first, then by followers
       if (a.featured !== b.featured) return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
       return b.fNum - a.fNum;
     });
+
+    return realFiltered.concat(staticFiltered);
   }
 
   // ── Render featured ───────────────────────────────────────────
@@ -565,6 +649,7 @@
       return;
     }
     grid.innerHTML = list.map(function(a) {
+      if (a.real) return renderRealCard(a);
       var following = !!_followed[a.id];
       var btnCls  = following ? 'following' : (a.sub ? 'subscribe' : 'follow');
       var btnText = following ? '✓ Following' : (a.sub ? 'Subscribe' : 'Follow');
@@ -606,7 +691,7 @@
       titleEl.textContent = '🔥 Trending Now';
     }
 
-    var total = _query || _filter !== 'all' ? filtered.length : ARTISTS.length;
+    var total = filtered.length;
     document.getElementById('resultCount').textContent = total + ' artist' + (total !== 1 ? 's' : '');
 
     renderGrid(gridList);
@@ -709,6 +794,7 @@
   // ── Init ─────────────────────────────────────────────────────
   renderFeatured();
   renderPage();
+  fetchRealArtists();
 </script>
 </body>
 </html>
