@@ -883,7 +883,7 @@
 
     <div class="nav-section-label">Manage</div>
     <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
-    <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon">📁</span>Drops<span class="nav-badge">12</span></a>
+    <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon">📁</span>Drops<span class="nav-badge" id="dropsBadge">0</span></a>
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon">⬆️</span>Upload Content</a>
     <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">📧</span>Subscriptions</a>
     <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon">🔍</span>Discover</a>
@@ -911,37 +911,37 @@
 
       <!-- Stats row -->
       <div class="stats-row">
-        <div class="stat-card" onclick="showToast('Revenue details coming soon')">
+        <div class="stat-card" onclick="window.location.href='dropsub-artist-analytics.html'" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Revenue MTD</div>
             <div class="stat-card-icon">💰</div>
           </div>
-          <div class="stat-card-value gold">$4,280</div>
-          <div class="stat-card-delta">↑ +18% vs last month</div>
+          <div class="stat-card-value gold" id="statRevValue">—</div>
+          <div class="stat-card-delta neutral" id="statRevDelta">This month</div>
         </div>
-        <div class="stat-card" onclick="showToast('Subscriber details coming soon')">
+        <div class="stat-card" onclick="window.location.href='dropsub-subscriptions.html'" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Subscribers</div>
             <div class="stat-card-icon">👥</div>
           </div>
-          <div class="stat-card-value blue">1,204</div>
-          <div class="stat-card-delta">↑ +43 this week</div>
+          <div class="stat-card-value blue" id="statSubsValue">—</div>
+          <div class="stat-card-delta neutral" id="statSubsDelta">Total active</div>
         </div>
-        <div class="stat-card" onclick="showToast('Content details coming soon')">
+        <div class="stat-card" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'})" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Total Files</div>
             <div class="stat-card-icon">📂</div>
           </div>
-          <div class="stat-card-value">5,000+</div>
-          <div class="stat-card-delta neutral">Across 6 folders</div>
+          <div class="stat-card-value" id="statFilesValue">—</div>
+          <div class="stat-card-delta neutral" id="statFilesDelta">Across folders</div>
         </div>
-        <div class="stat-card" onclick="showToast('Storage details coming soon')">
+        <div class="stat-card" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'})" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Storage Used</div>
             <div class="stat-card-icon">☁️</div>
           </div>
-          <div class="stat-card-value">180 GB</div>
-          <div class="stat-card-delta neutral">of 500 GB</div>
+          <div class="stat-card-value" id="statStorageValue">—</div>
+          <div class="stat-card-delta neutral" id="statStorageDelta">Total used</div>
         </div>
       </div>
 
@@ -968,7 +968,8 @@
           <div class="drops-toolbar">
             <button class="dtb-btn" onclick="openUploadModal()"><span>⬆️</span> UPLOAD</button>
             <button class="dtb-btn" onclick="openCreateModal()"><span>✏️</span> CREATE</button>
-            <button class="dtb-btn" onclick="showToast('Organize view coming soon')"><span>📂</span> ORGANIZE</button>
+            <button class="dtb-btn" id="organizeBtn" onclick="toggleOrganizeMode()"><span>📂</span> ORGANIZE</button>
+            <button class="dtb-btn" id="organizeDoneBtn" style="display:none;background:var(--blue-bright);color:#fff;border-color:var(--blue-bright);" onclick="toggleOrganizeMode()"><span>✓</span> DONE</button>
           </div>
           <table class="folder-table">
             <thead>
@@ -1003,7 +1004,7 @@
               <div class="mu-step"><div class="mu-step-num">4</div>Choose folder and tier — done</div>
             </div>
             <div class="mu-copy-link">
-              <div class="mu-link-text">dropsub.com/dropsub-artist-dashboard.html</div>
+              <div class="mu-link-text" id="muLinkText">dropsub.com/dropsub-upload.html</div>
               <button class="mu-copy-btn" onclick="copyLink()">Copy</button>
             </div>
           </div>
@@ -1240,7 +1241,7 @@
     <div class="qr-modal-code" onclick="showToast('QR code enlarged')">
       <div id="qrcode-modal" style="width:180px;height:180px;border-radius:8px;overflow:hidden;"></div>
     </div>
-    <div class="qr-modal-url">dropsub.com/dropsub-artist-dashboard.html</div>
+    <div class="qr-modal-url" id="qrModalUrl">dropsub.com/dropsub-upload.html</div>
     <div class="qr-modal-actions">
       <button class="qr-modal-btn ghost" onclick="closeQRModal()">Close</button>
       <button class="qr-modal-btn blue" onclick="copyLink(); closeQRModal()">Copy Link</button>
@@ -1416,6 +1417,8 @@
   // ── Folder data ──────────────────────────────────
   var _currentFolders = [];
   var _dropsView = 'active'; // 'active' | 'archived'
+  var _organizeMode = false;
+  var _dragSrcIdx = null;
 
   function setDropsView(view) {
     _dropsView = view;
@@ -1461,6 +1464,10 @@
     _currentFolders = folders;
     var countEl = document.getElementById('dropsFolderCount');
     if (countEl) countEl.textContent = folders.length + ' folder' + (folders.length !== 1 ? 's' : '');
+    if (_dropsView === 'active') {
+      var badge = document.getElementById('dropsBadge');
+      if (badge) badge.textContent = folders.length;
+    }
     const tbody = document.getElementById('folderTableBody');
     if (!folders || !folders.length) {
       var emptyMsg = _dropsView === 'archived'
@@ -1488,8 +1495,11 @@
       const date = d && !isNaN(d) ? d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—';
       const collabOn = f.collab === true;
       const isPublic = f.is_public !== false;
+      const trDragAttrs = _organizeMode
+        ? `draggable="true" ondragstart="startFolderDrag(${idx},this)" ondragover="overFolderDrag(${idx},event,this)" ondragleave="leaveFolderDrag(this)" ondrop="dropFolderDrag(${idx},event)" ondragend="endFolderDrag()"`
+        : `onclick="console.log('folder clicked, id:', '${f.id}', 'artist_id:', '${f.artist_id}'); window.location.href='dropsub-content-viewer.html?folder_id=${f.id}&artist_id=${f.artist_id}'"`;
       return `
-        <tr style="cursor:pointer" onclick="console.log('folder clicked, id:', '${f.id}', 'artist_id:', '${f.artist_id}'); window.location.href='dropsub-content-viewer.html?folder_id=${f.id}&artist_id=${f.artist_id}'">
+        <tr style="cursor:${_organizeMode ? 'grab' : 'pointer'}" ${trDragAttrs}>
           <td>
             <div class="folder-name-cell">
               <span class="folder-icon">${icon}</span>
@@ -2078,8 +2088,7 @@
 
   // ── Copy link ────────────────────────────────────
   function copyLink() {
-    navigator.clipboard?.writeText('https://dropsub.com/dropsub-artist-dashboard.html')
-      .catch(() => {});
+    navigator.clipboard?.writeText(_qrUrl).catch(() => {});
     showToast('✓ Upload link copied to clipboard!');
   }
 
@@ -2127,6 +2136,106 @@
 
     // Store artist ID so folder creation is scoped to this account
     window._currentArtistId = artistId;
+    if (artistId) {
+      fetchDashboardStats();
+      initQRCodes();
+    }
+  }
+
+  function fetchDashboardStats() {
+    if (!window._currentArtistId) return;
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/artists/' + window._currentArtistId + '/dashboard', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.stats) return;
+      var s = data.stats;
+
+      var rev = s.revenue_cents
+        ? '$' + (s.revenue_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : '$0.00';
+      document.getElementById('statRevValue').textContent = rev;
+
+      document.getElementById('statSubsValue').textContent = (s.subscribers || 0).toLocaleString();
+
+      document.getElementById('statFilesValue').textContent = (s.file_count || 0).toLocaleString();
+      var fc = data.folders ? data.folders.length : 0;
+      document.getElementById('statFilesDelta').textContent = 'Across ' + fc + ' folder' + (fc !== 1 ? 's' : '');
+
+      var bytes = s.total_bytes || 0;
+      var storage;
+      if      (bytes >= 1073741824) storage = (bytes / 1073741824).toFixed(1) + ' GB';
+      else if (bytes >= 1048576)    storage = (bytes / 1048576).toFixed(1)    + ' MB';
+      else if (bytes >= 1024)       storage = (bytes / 1024).toFixed(1)       + ' KB';
+      else                          storage = bytes + ' B';
+      document.getElementById('statStorageValue').textContent = storage;
+    })
+    .catch(function() {});
+  }
+
+  function initQRCodes() {
+    if (!window._currentArtistId) return;
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    _qrUrl = 'https://www.dropsub.com/dropsub-upload.html'
+           + '?artist_id=' + encodeURIComponent(window._currentArtistId)
+           + '&token='     + encodeURIComponent(token || '');
+    var displayUrl = 'dropsub.com/dropsub-upload.html?artist_id=' + window._currentArtistId.slice(0, 8) + '…';
+    var muLinkText = document.getElementById('muLinkText');
+    if (muLinkText) muLinkText.textContent = displayUrl;
+    var qrModalUrl = document.getElementById('qrModalUrl');
+    if (qrModalUrl) qrModalUrl.textContent = displayUrl;
+    _qrDefs.forEach(function(q) {
+      var el = document.getElementById(q.id);
+      if (!el) return;
+      el.innerHTML = '';
+      new QRCode(el, { text: _qrUrl, width: q.size, height: q.size, colorDark: '#000000', colorLight: '#ffffff' });
+    });
+  }
+
+  // ── Organize mode ────────────────────────────────
+  function toggleOrganizeMode() {
+    _organizeMode = !_organizeMode;
+    var orgBtn  = document.getElementById('organizeBtn');
+    var doneBtn = document.getElementById('organizeDoneBtn');
+    if (orgBtn)  orgBtn.style.display  = _organizeMode ? 'none' : '';
+    if (doneBtn) doneBtn.style.display = _organizeMode ? ''     : 'none';
+    renderFolders(_currentFolders);
+    if (_organizeMode) showToast('Drag rows to reorder, then tap Done');
+  }
+
+  function startFolderDrag(idx, el) {
+    _dragSrcIdx = idx;
+    el.style.opacity = '0.45';
+  }
+  function overFolderDrag(idx, e, el) {
+    e.preventDefault();
+    if (_dragSrcIdx === idx) return;
+    el.style.outline = '2px solid var(--blue-bright)';
+  }
+  function leaveFolderDrag(el) {
+    el.style.outline = '';
+  }
+  function endFolderDrag() {
+    _dragSrcIdx = null;
+    renderFolders(_currentFolders);
+  }
+  function dropFolderDrag(toIdx, e) {
+    e.preventDefault();
+    if (_dragSrcIdx === null || _dragSrcIdx === toIdx) { endFolderDrag(); return; }
+    var moved = _currentFolders.splice(_dragSrcIdx, 1)[0];
+    _currentFolders.splice(toIdx, 0, moved);
+    _dragSrcIdx = null;
+    renderFolders(_currentFolders);
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    _currentFolders.forEach(function(f, i) {
+      fetch('https://api.dropsub.com/api/folders/' + f.id, {
+        method: 'PATCH',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sort_order: i })
+      }).catch(function() {});
+    });
   }
 
   function fetchUserProfile() {
@@ -2292,21 +2401,13 @@
   fetchTaxStatus();
 
   // ── QR codes ─────────────────────────────────────
-  var _qrUrl = 'https://dropsub.com/dropsub-artist-dashboard.html';
+  var _qrUrl = 'https://www.dropsub.com/dropsub-upload.html';
   var _qrDefs = [
     { id: 'qrcode-sidebar', size: 130 },
     { id: 'qrcode-phone',   size: 160 },
     { id: 'qrcode-modal',   size: 180 },
   ];
-  _qrDefs.forEach(function(q) {
-    new QRCode(document.getElementById(q.id), {
-      text: _qrUrl,
-      width: q.size,
-      height: q.size,
-      colorDark: '#000000',
-      colorLight: '#ffffff'
-    });
-  });
+  // QR codes are initialized in initQRCodes(), called from applyProfile() once the artist ID is known
 </script>
 </body>
 </html>

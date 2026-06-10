@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DropSub — Mobile Upload</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deepest: #080f1c;
+      --bg-dark:    #0c1527;
+      --bg-panel:   #0f1d35;
+      --bg-card:    #132040;
+      --bg-hover:   #1a2d50;
+      --blue-bright:#2979ff;
+      --accent-gold:#f5a623;
+      --text-main:  #c8d8f0;
+      --text-dim:   #4a6a9a;
+      --border:     #1a2d50;
+    }
+    html, body {
+      height: 100%;
+      background: var(--bg-deepest);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+      gap: 20px;
+    }
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      color: #fff;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--blue-bright);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .card-sub {
+      font-size: .8rem;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .drop-zone.drag-over {
+      border-color: var(--blue-bright);
+      background: rgba(41,121,255,.08);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .drop-text { font-size: .85rem; color: var(--text-dim); line-height: 1.5; }
+    .drop-text strong { color: var(--blue-bright); }
+    .file-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: .8rem;
+    }
+    .file-item-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fff; }
+    .file-item-size { color: var(--text-dim); flex-shrink: 0; }
+    .file-item-remove {
+      flex-shrink: 0;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim); font-size: 1rem; line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .file-item-remove:hover { color: #f44; background: rgba(255,68,68,.1); }
+    label.field-label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    select {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: .88rem;
+      padding: 10px 12px;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus { border-color: var(--blue-bright); }
+    .folder-field { margin-top: 16px; }
+    .progress-wrap {
+      margin-top: 16px;
+      display: none;
+    }
+    .progress-wrap.show { display: block; }
+    .progress-label {
+      font-size: .78rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-bar-track {
+      height: 6px;
+      background: var(--bg-hover);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--blue-bright);
+      border-radius: 3px;
+      width: 0%;
+      transition: width .2s;
+    }
+    .upload-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 14px;
+      background: var(--blue-bright);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      letter-spacing: .02em;
+    }
+    .upload-btn:active { transform: scale(.98); }
+    .upload-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .success-card {
+      text-align: center;
+      padding: 32px 20px;
+    }
+    .success-icon { font-size: 3rem; margin-bottom: 12px; }
+    .success-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .success-sub { font-size: .83rem; color: var(--text-dim); line-height: 1.6; }
+    .upload-more-btn {
+      margin-top: 20px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 11px 24px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .error-card {
+      text-align: center;
+      padding: 32px 20px;
+    }
+    .error-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .error-title { font-size: 1rem; font-weight: 700; color: #ff6b6b; margin-bottom: 6px; }
+    .error-sub { font-size: .82rem; color: var(--text-dim); line-height: 1.6; }
+    .artist-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 6px 14px 6px 8px;
+      font-size: .8rem;
+      color: var(--text-dim);
+    }
+    .artist-badge-dot {
+      width: 8px; height: 8px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+    }
+    .artist-name { color: #fff; font-weight: 600; }
+    #errorMsg {
+      background: rgba(255,80,80,.12);
+      border: 1px solid rgba(255,80,80,.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .8rem;
+      color: #ff8080;
+      margin-top: 12px;
+      display: none;
+    }
+    #errorMsg.show { display: block; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="logo-bar">
+    <div class="logo-icon">🎵</div>
+    DropSub
+  </div>
+
+  <!-- Error state (invalid/missing token) -->
+  <div class="card error-card" id="invalidCard" style="display:none">
+    <div class="error-icon">🔒</div>
+    <div class="error-title">Link invalid or expired</div>
+    <div class="error-sub">This upload link is no longer valid. Ask the artist to generate a new one from their dashboard.</div>
+  </div>
+
+  <!-- Upload form -->
+  <div id="uploadSection" style="display:none;width:100%;max-width:420px;display:none;">
+
+    <div class="artist-badge" id="artistBadge" style="display:none;margin:0 auto 4px;width:fit-content">
+      <div class="artist-badge-dot"></div>
+      Uploading for <span class="artist-name" id="artistNameEl">&nbsp;</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📱 Upload files</div>
+      <div class="card-sub">Select photos or videos from your camera roll to upload directly to your artist archive.</div>
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,.pdf" capture>
+        <div class="drop-icon">📷</div>
+        <div class="drop-text">
+          <strong>Tap to select files</strong><br>
+          Photos, videos, audio, or PDF
+        </div>
+      </div>
+
+      <div class="file-list" id="fileList"></div>
+
+      <div class="folder-field" id="folderField" style="display:none">
+        <label class="field-label" for="folderSelect">Add to folder (optional)</label>
+        <select id="folderSelect">
+          <option value="">— No folder (unsorted) —</option>
+        </select>
+      </div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-label">
+          <span id="progressText">Uploading…</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div id="errorMsg"></div>
+
+      <button class="upload-btn" id="uploadBtn" disabled onclick="startUpload()">
+        Upload Files
+      </button>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="card success-card" id="successCard" style="display:none">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Upload complete!</div>
+    <div class="success-sub" id="successSub">Your files have been sent to the artist archive and are pending review.</div>
+    <button class="upload-more-btn" onclick="resetUpload()">Upload more files</button>
+  </div>
+
+</div>
+<script>
+  var _artistId = null;
+  var _token    = null;
+  var _files    = [];
+
+  function init() {
+    var params = new URLSearchParams(window.location.search);
+    _artistId = params.get('artist_id');
+    _token    = params.get('token');
+
+    if (!_token || !_artistId) {
+      document.getElementById('invalidCard').style.display = '';
+      return;
+    }
+
+    document.getElementById('uploadSection').style.display = '';
+    fetchArtistInfo();
+    fetchFolders();
+  }
+
+  function fetchArtistInfo() {
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + _token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data) { showInvalid(); return; }
+      var user = data.user || data;
+      var artistName = (user.artist && user.artist.name) ? user.artist.name : '';
+      if (artistName) {
+        document.getElementById('artistNameEl').textContent = artistName;
+        document.getElementById('artistBadge').style.display = 'flex';
+      }
+    })
+    .catch(function() {});
+  }
+
+  function fetchFolders() {
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(_artistId) + '/folders', {
+      headers: { 'Authorization': 'Bearer ' + _token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.folders || !data.folders.length) return;
+      var sel = document.getElementById('folderSelect');
+      data.folders.forEach(function(f) {
+        var opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.name;
+        sel.appendChild(opt);
+      });
+      document.getElementById('folderField').style.display = '';
+    })
+    .catch(function() {});
+  }
+
+  function showInvalid() {
+    document.getElementById('uploadSection').style.display = 'none';
+    document.getElementById('invalidCard').style.display = '';
+  }
+
+  var dropZone = document.getElementById('dropZone');
+  var fileInput = document.getElementById('fileInput');
+
+  dropZone.addEventListener('dragover',  function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', function()  { dropZone.classList.remove('drag-over'); });
+  dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    addFiles(Array.from(e.dataTransfer.files));
+  });
+  fileInput.addEventListener('change', function() {
+    addFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
+  function fileIcon(mime) {
+    if (!mime) return '📄';
+    if (mime.startsWith('image/')) return '🖼️';
+    if (mime.startsWith('video/')) return '🎬';
+    if (mime.startsWith('audio/')) return '🎵';
+    return '📄';
+  }
+  function formatBytes(b) {
+    if (b >= 1073741824) return (b / 1073741824).toFixed(1) + ' GB';
+    if (b >= 1048576)    return (b / 1048576).toFixed(1)    + ' MB';
+    if (b >= 1024)       return (b / 1024).toFixed(1)       + ' KB';
+    return b + ' B';
+  }
+
+  function addFiles(newFiles) {
+    newFiles.forEach(function(f) { _files.push(f); });
+    renderFileList();
+  }
+
+  function removeFile(idx) {
+    _files.splice(idx, 1);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    var list = document.getElementById('fileList');
+    if (!_files.length) { list.innerHTML = ''; document.getElementById('uploadBtn').disabled = true; return; }
+    list.innerHTML = _files.map(function(f, i) {
+      return '<div class="file-item">'
+        + '<span class="file-item-icon">' + fileIcon(f.type) + '</span>'
+        + '<span class="file-item-name">' + escHtml(f.name) + '</span>'
+        + '<span class="file-item-size">' + formatBytes(f.size) + '</span>'
+        + '<button class="file-item-remove" onclick="removeFile(' + i + ')" title="Remove">✕</button>'
+        + '</div>';
+    }).join('');
+    document.getElementById('uploadBtn').disabled = false;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function setProgress(pct, label) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent  = pct + '%';
+    if (label) document.getElementById('progressText').textContent = label;
+  }
+
+  function showError(msg) {
+    var el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function clearError() {
+    document.getElementById('errorMsg').classList.remove('show');
+  }
+
+  function startUpload() {
+    if (!_files.length) return;
+    clearError();
+
+    var btn = document.getElementById('uploadBtn');
+    btn.disabled = true;
+
+    var progressWrap = document.getElementById('progressWrap');
+    progressWrap.classList.add('show');
+    setProgress(0, 'Uploading…');
+
+    var folderId = document.getElementById('folderSelect').value;
+    var form = new FormData();
+    _files.forEach(function(f) { form.append('files', f); });
+    form.append('artist_id', _artistId);
+    form.append('source', 'mobile');
+    if (folderId) form.append('folder_id', folderId);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.dropsub.com/api/upload');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + _token);
+
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) setProgress(Math.round(e.loaded / e.total * 90), 'Uploading…');
+    };
+
+    xhr.onload = function() {
+      setProgress(100, 'Done!');
+      var resp;
+      try { resp = JSON.parse(xhr.responseText); } catch(e) { resp = {}; }
+      if (xhr.status >= 200 && xhr.status < 300 && resp.uploaded && resp.uploaded.length) {
+        var sub = resp.uploaded.length + ' file' + (resp.uploaded.length !== 1 ? 's' : '') + ' uploaded successfully.';
+        if (resp.errors && resp.errors.length) sub += ' ' + resp.errors.length + ' file(s) failed.';
+        document.getElementById('successSub').textContent = sub + ' Your artist will review and publish them.';
+        document.getElementById('uploadSection').style.display  = 'none';
+        document.getElementById('successCard').style.display = '';
+      } else {
+        progressWrap.classList.remove('show');
+        btn.disabled = false;
+        showError(resp.error || 'Upload failed. Please try again.');
+      }
+    };
+
+    xhr.onerror = function() {
+      progressWrap.classList.remove('show');
+      btn.disabled = false;
+      showError('Network error — check your connection and try again.');
+    };
+
+    xhr.send(form);
+  }
+
+  function resetUpload() {
+    _files = [];
+    renderFileList();
+    document.getElementById('progressWrap').classList.remove('show');
+    document.getElementById('successCard').style.display   = 'none';
+    document.getElementById('uploadSection').style.display = '';
+    clearError();
+  }
+
+  init();
+</script>
+</body>
+</html>
