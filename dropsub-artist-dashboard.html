@@ -618,6 +618,28 @@
     }
     .mfooter-btn.submit:hover { transform: translateY(-1px); }
 
+    /* ── COVER IMAGE PICKER ───────────────────── */
+    .cover-preview { width: 100%; height: 90px; border-radius: 8px; background: var(--bg-card); margin-bottom: 10px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); transition: background .2s; }
+    .cover-preview-placeholder { font-size: .75rem; color: var(--text-dim); }
+    .cover-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+    .cover-tab { flex: 1; padding: 6px 4px; border: 1px solid var(--border); border-radius: 6px; font-size: .7rem; font-weight: 700; letter-spacing: .03em; cursor: pointer; background: none; color: var(--text-mid); font-family: inherit; transition: all .15s; text-align: center; white-space: nowrap; }
+    .cover-tab.active { border-color: var(--blue-bright); color: var(--blue-bright); background: rgba(41,121,255,.1); }
+    .cover-pane { display: none; }
+    .cover-pane.active { display: block; }
+    .cover-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-height: 160px; overflow-y: auto; padding-right: 2px; }
+    .cover-grid-item { aspect-ratio: 1; border-radius: 5px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color .12s; background: var(--bg-card); }
+    .cover-grid-item:hover { border-color: var(--border-bright); }
+    .cover-grid-item.selected { border-color: var(--blue-bright); }
+    .cover-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover-empty-msg { font-size: .75rem; color: var(--text-dim); text-align: center; padding: 20px 0; }
+    .cover-upload-area { border: 2px dashed var(--border); border-radius: 8px; padding: 20px 16px; text-align: center; cursor: pointer; transition: border-color .15s; }
+    .cover-upload-area:hover { border-color: var(--border-bright); }
+    .cover-upload-label { font-size: .8rem; color: var(--text-mid); }
+    .cover-upload-hint { font-size: .68rem; color: var(--text-dim); margin-top: 4px; }
+    .cover-upload-prog { font-size: .75rem; color: var(--blue-bright); margin-top: 8px; display: none; }
+    .cover-clear-btn { width: 100%; padding: 9px; border: 1px solid var(--error); border-radius: 8px; background: none; color: var(--error); font-family: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; transition: background .15s; }
+    .cover-clear-btn:hover { background: rgba(255,79,106,.1); }
+
     /* ── QR MODAL ─────────────────────────────── */
     .qr-modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 300;
@@ -1358,6 +1380,33 @@
             <option value="false">🔒 Private</option>
           </select>
         </div>
+        <div class="mfield">
+          <label>COVER IMAGE</label>
+          <div class="cover-preview" id="editCoverPreview">
+            <span class="cover-preview-placeholder" id="editCoverPlaceholder">No cover set</span>
+          </div>
+          <div class="cover-tabs">
+            <button class="cover-tab active" id="ctabPick" onclick="switchCoverTab('pick')">📂 From uploads</button>
+            <button class="cover-tab" id="ctabUpload" onclick="switchCoverTab('upload')">⬆ Upload new</button>
+            <button class="cover-tab" id="ctabClear" onclick="switchCoverTab('clear')">✕ Clear</button>
+          </div>
+          <div class="cover-pane active" id="cpanePick">
+            <div class="cover-grid" id="editCoverGrid">
+              <div class="cover-empty-msg" style="grid-column:1/-1">Loading…</div>
+            </div>
+          </div>
+          <div class="cover-pane" id="cpaneUpload">
+            <div class="cover-upload-area" onclick="document.getElementById('coverFileInput').click()">
+              <input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="uploadCoverFile(this)">
+              <div class="cover-upload-label">Click to choose an image</div>
+              <div class="cover-upload-hint">JPEG, PNG, WebP — max 10 MB</div>
+              <div class="cover-upload-prog" id="coverUploadProg">Uploading…</div>
+            </div>
+          </div>
+          <div class="cover-pane" id="cpaneClear">
+            <button class="cover-clear-btn" onclick="doClearCover()">🗑 Remove current cover image</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1805,8 +1854,10 @@
   }
 
   // ── Edit folder modal ────────────────────────────
-  var _editFolderIdx = -1;
-  var _editTier = 'subscription';
+  var _editFolderIdx  = -1;
+  var _editTier       = 'subscription';
+  var _editCoverUrl     = undefined; // undefined = unchanged, null = clear, string = new URL
+  var _editCoverChanged = false;
   function openEditModal(idx) {
     _editFolderIdx = idx;
     var f = _currentFolders[idx];
@@ -1816,11 +1867,19 @@
     document.getElementById('editFolderDesc').value = f.description || '';
     document.getElementById('editFolderVisibility').value = f.is_public !== false ? 'true' : 'false';
     selectEditTier(_editTier);
+    // Cover
+    _editCoverUrl = f.cover_url || null;
+    _editCoverChanged = false;
+    switchCoverTab('pick');
+    updateCoverPreview(_editCoverUrl);
+    loadEditFolderImages(f.id);
     document.getElementById('editFolderModal').classList.add('open');
   }
   function closeEditModal() {
     document.getElementById('editFolderModal').classList.remove('open');
     _editFolderIdx = -1;
+    _editCoverChanged = false;
+    document.getElementById('coverFileInput').value = '';
   }
   function selectEditTier(tier) {
     _editTier = tier;
@@ -1831,6 +1890,107 @@
     });
     if (map[tier]) document.getElementById(map[tier]).className = 'tier-opt ' + clsMap[tier];
   }
+
+  function switchCoverTab(tab) {
+    var tabs  = { pick: 'ctabPick', upload: 'ctabUpload', clear: 'ctabClear' };
+    var panes = { pick: 'cpanePick', upload: 'cpaneUpload', clear: 'cpaneClear' };
+    Object.values(tabs).forEach(function(id)  { document.getElementById(id).classList.remove('active'); });
+    Object.values(panes).forEach(function(id) { document.getElementById(id).classList.remove('active'); });
+    document.getElementById(tabs[tab]).classList.add('active');
+    document.getElementById(panes[tab]).classList.add('active');
+  }
+
+  function updateCoverPreview(url) {
+    var el = document.getElementById('editCoverPreview');
+    var ph = document.getElementById('editCoverPlaceholder');
+    if (url) {
+      el.style.backgroundImage = 'url(\'' + url + '\')';
+      ph.style.display = 'none';
+    } else {
+      el.style.backgroundImage = '';
+      ph.style.display = '';
+    }
+  }
+
+  function loadEditFolderImages(folderId) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var grid = document.getElementById('editCoverGrid');
+    grid.innerHTML = '<div class="cover-empty-msg" style="grid-column:1/-1">Loading…</div>';
+    fetch('https://api.dropsub.com/api/folders/' + folderId + '/files', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var files = (data.folder && data.folder.files) ? data.folder.files : (data.files || []);
+      var images = files.filter(function(f) {
+        return f.file_type === 'image' || (f.mime_type && f.mime_type.startsWith('image/'));
+      });
+      if (!images.length) {
+        grid.innerHTML = '<div class="cover-empty-msg" style="grid-column:1/-1">No images in this folder yet</div>';
+        return;
+      }
+      grid.innerHTML = images.map(function(f) {
+        var src = f.thumbnail_url || f.url || '';
+        var sel = (_editCoverUrl && src && _editCoverUrl === src) ? ' selected' : '';
+        return '<div class="cover-grid-item' + sel + '" onclick="pickCoverFromGrid(\'' + src.replace(/'/g, "\\'") + '\', this)">' +
+          '<img src="' + src + '" alt="" onerror="this.parentElement.style.display=\'none\'">' +
+          '</div>';
+      }).join('');
+    })
+    .catch(function() {
+      grid.innerHTML = '<div class="cover-empty-msg" style="grid-column:1/-1">Failed to load images</div>';
+    });
+  }
+
+  function pickCoverFromGrid(url, el) {
+    _editCoverUrl = url;
+    _editCoverChanged = true;
+    document.querySelectorAll('#editCoverGrid .cover-grid-item').forEach(function(item) {
+      item.classList.remove('selected');
+    });
+    el.classList.add('selected');
+    updateCoverPreview(url);
+  }
+
+  function uploadCoverFile(input) {
+    if (!input.files || !input.files[0]) return;
+    var f = _currentFolders[_editFolderIdx];
+    if (!f) return;
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var prog = document.getElementById('coverUploadProg');
+    prog.style.display = 'block';
+    var formData = new FormData();
+    formData.append('image', input.files[0]);
+    fetch('https://api.dropsub.com/api/folders/' + f.id + '/cover', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      prog.style.display = 'none';
+      input.value = '';
+      if (!result.ok) { showToast('Upload failed: ' + (result.data.error || 'unknown')); return; }
+      _editCoverUrl = result.data.url;
+      _editCoverChanged = true;
+      f.cover_url = _editCoverUrl;
+      updateCoverPreview(_editCoverUrl);
+      showToast('Cover uploaded');
+    })
+    .catch(function() {
+      prog.style.display = 'none';
+      input.value = '';
+      showToast('Upload failed — check your connection');
+    });
+  }
+
+  function doClearCover() {
+    _editCoverUrl = null;
+    _editCoverChanged = true;
+    updateCoverPreview(null);
+    showToast('Cover will be removed on save');
+  }
+
   function saveEditFolder() {
     if (_editFolderIdx < 0) return;
     var name = document.getElementById('editFolderName').value.trim();
@@ -1839,15 +1999,17 @@
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     var btn = document.getElementById('editFolderSaveBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
+    var patchBody = {
+      name: name,
+      description: document.getElementById('editFolderDesc').value.trim(),
+      access_type: _editTier,
+      is_public: document.getElementById('editFolderVisibility').value === 'true'
+    };
+    if (_editCoverChanged) patchBody.cover_url = _editCoverUrl;
     fetch('https://api.dropsub.com/api/folders/' + f.id, {
       method: 'PATCH',
       headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name,
-        description: document.getElementById('editFolderDesc').value.trim(),
-        access_type: _editTier,
-        is_public: document.getElementById('editFolderVisibility').value === 'true'
-      })
+      body: JSON.stringify(patchBody)
     })
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
     .then(function(result) {
