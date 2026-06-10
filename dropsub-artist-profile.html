@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Artist Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-sidebar:    #0d1a30;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+    }
+
+    html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--bg-deepest); color: var(--text-white); display: flex; flex-direction: column; }
+
+    /* ── TOP NAV ─────────────────────────────────── */
+    .topnav { height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 50; }
+    .topnav-left { display: flex; align-items: center; gap: 16px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: .95rem; text-decoration: none; color: var(--text-white); }
+    .logo-icon { width: 30px; height: 30px; background: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 20px; height: 20px; }
+    .nav-tabs { display: flex; gap: 2px; }
+    .nav-tab { padding: 5px 12px; border-radius: 6px; font-size: .8rem; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .nav-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-tab.active { background: var(--bg-card); color: var(--text-white); }
+    .topnav-right { display: flex; align-items: center; gap: 10px; }
+    .user-menu-wrap { position: relative; }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--blue-bright); background: linear-gradient(135deg, #2979ff, #7c4dff); display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-panel); border: 1px solid var(--border-bright); border-radius: 12px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 100; overflow: hidden; animation: dropIn .15s ease; }
+    .user-dropdown.open { display: block; }
+    @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .user-dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .82rem; color: var(--text-mid); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .dropdown-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .dropdown-item.danger:hover { color: #f87171; }
+    .dropdown-divider { height: 1px; background: var(--border); }
+
+    /* ── APP SHELL ───────────────────────────────── */
+    .app-shell { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── LEFT SIDEBAR ────────────────────────────── */
+    .left-nav { width: 220px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px 0; flex-shrink: 0; overflow-y: auto; }
+    .left-nav::-webkit-scrollbar { width: 0; }
+    .nav-section-label { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); padding: 12px 16px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; transition: all .15s; font-size: .83rem; font-weight: 500; color: var(--text-mid); margin: 1px 8px; border-radius: 8px; text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-item.active { background: var(--bg-card); color: var(--text-white); }
+    .nav-item.active .nav-icon { color: var(--blue-bright); }
+    .nav-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+    .artist-mini { margin: 0 8px 8px; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+    .artist-mini-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .artist-mini-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid)); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 800; border: 2px solid var(--blue-bright); overflow: hidden; flex-shrink: 0; }
+    .artist-mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .artist-mini-name { font-size: .85rem; font-weight: 800; color: var(--text-white); }
+    .artist-mini-role { font-size: .68rem; color: var(--text-dim); }
+
+    /* ── MAIN ────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .page-header { padding: 20px 28px 16px; background: var(--bg-panel); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .page-title { font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em; }
+    .page-subtitle { font-size: .78rem; color: var(--text-mid); margin-top: 3px; }
+    .content-scroll { flex: 1; overflow-y: auto; padding: 28px; }
+    .content-scroll::-webkit-scrollbar { width: 6px; }
+    .content-scroll::-webkit-scrollbar-track { background: transparent; }
+    .content-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+    .settings-layout { max-width: 680px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── LOADING ─────────────────────────────────── */
+    .page-loading { display: flex; align-items: center; gap: 12px; padding: 60px 0; color: var(--text-mid); font-size: .85rem; }
+    .page-loading.hidden { display: none; }
+    .spinner { width: 24px; height: 24px; border-radius: 50%; border: 3px solid var(--border-bright); border-top-color: var(--blue-bright); animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SETTINGS CARD ───────────────────────────── */
+    .settings-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .card-header { padding: 18px 24px 14px; border-bottom: 1px solid var(--border); }
+    .card-title { font-size: .92rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .card-desc { font-size: .77rem; color: var(--text-mid); margin-top: 4px; line-height: 1.5; }
+    .card-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+    .card-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    /* ── IMAGE UPLOAD ZONES ──────────────────────── */
+    .img-upload-row { display: flex; align-items: center; gap: 20px; }
+    .avatar-preview {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid));
+      border: 3px solid var(--border-bright);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 800; flex-shrink: 0;
+      overflow: hidden; position: relative;
+    }
+    .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .banner-preview {
+      width: 100%; height: 120px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue-dim) 0%, #0a1930 100%);
+      border: 1px solid var(--border-bright);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .banner-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .banner-placeholder { font-size: .8rem; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .banner-placeholder-icon { font-size: 1.6rem; }
+    .img-upload-info { display: flex; flex-direction: column; gap: 8px; }
+    .img-upload-info p { font-size: .78rem; color: var(--text-mid); line-height: 1.5; }
+    .btn-img-upload {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 8px;
+      background: var(--bg-hover); border: 1px solid var(--border-bright);
+      color: var(--text-light); font-family: inherit; font-size: .8rem;
+      font-weight: 600; cursor: pointer; transition: all .15s;
+    }
+    .btn-img-upload:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-img-upload:disabled { opacity: .45; cursor: not-allowed; }
+    .img-upload-input { display: none; }
+    .upload-status { font-size: .75rem; color: var(--text-dim); min-height: 16px; }
+    .upload-status.ok { color: #4ade80; }
+    .upload-status.err { color: #f87171; }
+
+    /* ── FORM FIELDS ─────────────────────────────── */
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field-label { font-size: .7rem; font-weight: 700; color: var(--text-dim); letter-spacing: .09em; text-transform: uppercase; }
+    .field-input { width: 100%; padding: 10px 14px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--border-bright); color: var(--text-white); font-family: inherit; font-size: .86rem; outline: none; transition: border-color .15s; }
+    .field-input:focus { border-color: var(--blue-bright); }
+    .field-input::placeholder { color: var(--text-dim); }
+    textarea.field-input { resize: vertical; min-height: 90px; line-height: 1.5; }
+    .field-hint { font-size: .7rem; color: var(--text-dim); line-height: 1.4; }
+
+    /* Social link fields with platform prefix icon */
+    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .social-field { display: flex; flex-direction: column; gap: 6px; }
+    .social-input-wrap { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 8px; overflow: hidden; transition: border-color .15s; }
+    .social-input-wrap:focus-within { border-color: var(--blue-bright); }
+    .social-prefix { padding: 0 10px 0 12px; font-size: .85rem; white-space: nowrap; color: var(--text-mid); flex-shrink: 0; border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; }
+    .social-input { flex: 1; padding: 10px 12px; background: none; border: none; outline: none; color: var(--text-white); font-family: inherit; font-size: .84rem; }
+    .social-input::placeholder { color: var(--text-dim); }
+
+    /* ── INLINE BANNER ───────────────────────────── */
+    .inline-banner { display: none; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: .8rem; font-weight: 600; }
+    .inline-banner.show { display: flex; }
+    .inline-banner.success { background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.25); color: #4ade80; }
+    .inline-banner.error-banner { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); color: #f87171; }
+
+    /* ── SAVE BUTTON ─────────────────────────────── */
+    .btn-save { padding: 9px 24px; border-radius: 8px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; color: #fff; font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; transition: all .15s; letter-spacing: .02em; box-shadow: 0 3px 12px rgba(41,121,255,.3); display: flex; align-items: center; gap: 7px; }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(41,121,255,.45); }
+    .btn-save:disabled { opacity: .6; pointer-events: none; }
+
+    /* ── TOAST ───────────────────────────────────── */
+    #toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); border: 1px solid var(--blue-bright); border-radius: 8px; padding: 10px 20px; font-size: .85rem; font-weight: 600; color: var(--text-white); z-index: 300; opacity: 0; transition: opacity .3s; box-shadow: 0 8px 32px rgba(41,121,255,.25); pointer-events: none; white-space: nowrap; }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<script>
+  (function() {
+    var t = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!t) window.location.replace('dropsub-login.html');
+  })();
+</script>
+
+<!-- ══ TOP NAV ══════════════════════════════════════════════════ -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-artist-dashboard.html">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 7C3 5.89543 3.89543 5 5 5H10L12 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" fill="#111" stroke="#111" stroke-width="1.5"/>
+          <text x="6.5" y="15.5" font-size="5.5" font-weight="900" fill="white" font-family="Arial">DS</text>
+        </svg>
+      </div>
+      <span>DropSub</span>
+    </a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="dropsub-artist-dashboard.html">Artist Dashboard</a>
+      <a class="nav-tab" href="dropsub-artist-analytics.html">Analytics</a>
+      <a class="nav-tab" href="dropsub-payout-settings.html">Payouts</a>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <div class="user-menu-wrap">
+      <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">—</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="dropdownName">—</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <a class="dropdown-item" href="dropsub-account-settings.html">⚙️ Account Settings</a>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item danger" onclick="signOut()">🚪 Sign out</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ APP SHELL ════════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ── LEFT SIDEBAR ──────────────────────────────── -->
+  <div class="left-nav">
+    <div class="artist-mini">
+      <div class="artist-mini-top">
+        <div class="artist-mini-avatar" id="sidebarAvatar">—</div>
+        <div>
+          <div class="artist-mini-name" id="sidebarName">—</div>
+          <div class="artist-mini-role" id="sidebarRole">Artist</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Manage</div>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">⬆️</span>Upload Content</a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">👥</span>Subscribers</a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Revenue</div>
+    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon">📈</span>Analytics</a>
+    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon">💳</span>Payouts</a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item active"><span class="nav-icon">🎸</span>Artist Profile</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
+
+    <div class="nav-divider"></div>
+    <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
+  </div>
+
+  <!-- ── MAIN ──────────────────────────────────────── -->
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title">🎸 Artist Profile</div>
+      <div class="page-subtitle">Public-facing branding — visible to your fans and on your artist page</div>
+    </div>
+
+    <div class="content-scroll">
+      <div class="settings-layout">
+
+        <div class="page-loading" id="pageLoading">
+          <div class="spinner"></div>
+          Loading artist profile…
+        </div>
+
+        <!-- ── Profile Photo ── -->
+        <div class="settings-card" id="photoCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">📷 Profile Photo</div>
+            <div class="card-desc">Circular avatar shown next to your name everywhere on DropSub.</div>
+          </div>
+          <div class="card-body">
+            <div class="img-upload-row">
+              <div class="avatar-preview" id="avatarPreview">
+                <span id="avatarInitials">—</span>
+              </div>
+              <div class="img-upload-info">
+                <p>JPG, PNG or WebP · max 10 MB · recommended 400×400 px</p>
+                <button class="btn-img-upload" id="avatarUploadBtn" onclick="document.getElementById('avatarInput').click()">
+                  📤 Change photo
+                </button>
+                <input type="file" id="avatarInput" class="img-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadImage('avatar', this)"/>
+                <div class="upload-status" id="avatarStatus"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Profile Banner ── -->
+        <div class="settings-card" id="bannerCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">🖼️ Profile Banner</div>
+            <div class="card-desc">Wide banner displayed at the top of your public artist page.</div>
+          </div>
+          <div class="card-body">
+            <div class="banner-preview" id="bannerPreview">
+              <div class="banner-placeholder">
+                <div class="banner-placeholder-icon">🖼️</div>
+                No banner set
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <button class="btn-img-upload" id="bannerUploadBtn" onclick="document.getElementById('bannerInput').click()">
+                📤 Change banner
+              </button>
+              <input type="file" id="bannerInput" class="img-upload-input" accept="image/jpeg,image/png,image/webp" onchange="uploadImage('banner', this)"/>
+              <div class="upload-status" id="bannerStatus"></div>
+              <span style="font-size:.74rem;color:var(--text-dim);margin-left:auto;">JPG or PNG · max 10 MB · recommended 1500×500 px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Artist Info ── -->
+        <div class="settings-card" id="infoCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">✏️ Artist Info</div>
+            <div class="card-desc">Your public display name and bio shown to fans.</div>
+          </div>
+          <div class="card-body">
+            <div class="field-group">
+              <label class="field-label">Artist name</label>
+              <input class="field-input" type="text" id="fieldName" placeholder="Your artist or band name" maxlength="120"/>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Bio</label>
+              <textarea class="field-input" id="fieldBio" placeholder="Tell your fans who you are — your story, your sound, your vibe…" maxlength="1000"></textarea>
+              <span class="field-hint">Up to 1000 characters.</span>
+            </div>
+            <div class="inline-banner" id="infoBanner"></div>
+          </div>
+          <div class="card-footer">
+            <span style="font-size:.74rem;color:var(--text-dim)">Changes are visible on your public page immediately.</span>
+            <button class="btn-save" id="infoSaveBtn" onclick="saveInfo()">
+              <span id="infoSaveLabel">Save changes</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Social Links ── -->
+        <div class="settings-card" id="socialCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">🔗 Social Links</div>
+            <div class="card-desc">Displayed on your public artist page so fans can follow you everywhere.</div>
+          </div>
+          <div class="card-body">
+            <div class="social-grid">
+              <div class="social-field">
+                <label class="field-label">Instagram</label>
+                <div class="social-input-wrap">
+                  <span class="social-prefix">instagram.com/</span>
+                  <input class="social-input" type="text" id="fieldInstagram" placeholder="yourhandle"/>
+                </div>
+              </div>
+              <div class="social-field">
+                <label class="field-label">X / Twitter</label>
+                <div class="social-input-wrap">
+                  <span class="social-prefix">x.com/</span>
+                  <input class="social-input" type="text" id="fieldTwitter" placeholder="yourhandle"/>
+                </div>
+              </div>
+              <div class="social-field">
+                <label class="field-label">TikTok</label>
+                <div class="social-input-wrap">
+                  <span class="social-prefix">tiktok.com/@</span>
+                  <input class="social-input" type="text" id="fieldTikTok" placeholder="yourhandle"/>
+                </div>
+              </div>
+              <div class="social-field">
+                <label class="field-label">YouTube</label>
+                <div class="social-input-wrap">
+                  <span class="social-prefix">youtube.com/</span>
+                  <input class="social-input" type="text" id="fieldYouTube" placeholder="@yourchannel"/>
+                </div>
+              </div>
+              <div class="social-field">
+                <label class="field-label">Spotify</label>
+                <div class="social-input-wrap">
+                  <span class="social-prefix">open.spotify.com/artist/</span>
+                  <input class="social-input" type="text" id="fieldSpotify" placeholder="artistid"/>
+                </div>
+              </div>
+              <div class="social-field">
+                <label class="field-label">Apple Music</label>
+                <div class="social-input-wrap">
+                  <span class="social-prefix">music.apple.com/artist/</span>
+                  <input class="social-input" type="text" id="fieldAppleMusic" placeholder="artistid"/>
+                </div>
+              </div>
+            </div>
+            <div class="inline-banner" id="socialBanner"></div>
+          </div>
+          <div class="card-footer">
+            <span style="font-size:.74rem;color:var(--text-dim)">Enter just the handle or ID — not the full URL.</span>
+            <button class="btn-save" id="socialSaveBtn" onclick="saveSocial()">
+              <span id="socialSaveLabel">Save changes</span>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.settings-layout -->
+    </div><!-- /.content-scroll -->
+  </div><!-- /.main -->
+</div><!-- /.app-shell -->
+
+<div id="toast"></div>
+
+<script>
+  var _artistId = null;
+  var _token    = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+
+  function token() { return localStorage.getItem('access_token') || sessionStorage.getItem('access_token'); }
+
+  // ── User menu ──────────────────────────────────────────────────
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu-wrap')) {
+      document.getElementById('userDropdown').classList.remove('open');
+    }
+  });
+
+  function signOut() {
+    localStorage.removeItem('access_token');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('ds_profile');
+    window.location.replace('dropsub-login.html');
+  }
+
+  // ── Toast ──────────────────────────────────────────────────────
+  var _toastTimer;
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2600);
+  }
+
+  // ── Banner helpers ─────────────────────────────────────────────
+  function showBanner(id, type, msg) {
+    var el = document.getElementById(id);
+    el.className = 'inline-banner show ' + (type === 'success' ? 'success' : 'error-banner');
+    el.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+  }
+  function hideBanner(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+
+  // ── Load profile ───────────────────────────────────────────────
+  function loadProfile() {
+    if (!_artistId) return;
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(_artistId) + '/profile', {
+      headers: { 'Authorization': 'Bearer ' + token() }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.artist) return;
+      var a = data.artist;
+
+      // Artist name field
+      if (a.name) document.getElementById('fieldName').value = a.name;
+
+      // Bio
+      if (a.bio) document.getElementById('fieldBio').value = a.bio;
+
+      // Avatar
+      if (a.avatar_url) {
+        var preview = document.getElementById('avatarPreview');
+        preview.innerHTML = '<img src="' + a.avatar_url + '" alt="Avatar"/>';
+      }
+
+      // Banner
+      if (a.banner_url) {
+        var bannerEl = document.getElementById('bannerPreview');
+        bannerEl.innerHTML = '<img src="' + a.banner_url + '" alt="Banner"/>';
+      }
+
+      // Social links — store only the handle/id part, strip full URLs if present
+      var socials = {
+        fieldInstagram: a.instagram,
+        fieldTwitter:   a.twitter,
+        fieldTikTok:    a.tiktok,
+        fieldYouTube:   a.youtube,
+        fieldSpotify:   a.spotify,
+        fieldAppleMusic:a.apple_music
+      };
+      Object.keys(socials).forEach(function(id) {
+        if (socials[id]) document.getElementById(id).value = socials[id];
+      });
+
+      // Show all cards
+      ['photoCard','bannerCard','infoCard','socialCard'].forEach(function(id) {
+        document.getElementById(id).style.display = '';
+      });
+    })
+    .catch(function() {
+      ['photoCard','bannerCard','infoCard','socialCard'].forEach(function(id) {
+        document.getElementById(id).style.display = '';
+      });
+    });
+  }
+
+  // ── Image upload ───────────────────────────────────────────────
+  function uploadImage(type, input) {
+    if (!input.files || !input.files[0]) return;
+    var file  = input.files[0];
+    var btnId  = type === 'avatar' ? 'avatarUploadBtn' : 'bannerUploadBtn';
+    var statId = type === 'avatar' ? 'avatarStatus'    : 'bannerStatus';
+    var btn    = document.getElementById(btnId);
+    var stat   = document.getElementById(statId);
+
+    btn.disabled = true;
+    stat.className = 'upload-status';
+    stat.textContent = 'Uploading…';
+
+    // Show local preview immediately
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      if (type === 'avatar') {
+        document.getElementById('avatarPreview').innerHTML = '<img src="' + e.target.result + '" alt="Avatar"/>';
+        // Also update sidebar avatar
+        var sa = document.getElementById('sidebarAvatar');
+        if (sa) sa.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>';
+      } else {
+        document.getElementById('bannerPreview').innerHTML = '<img src="' + e.target.result + '" alt="Banner"/>';
+      }
+    };
+    reader.readAsDataURL(file);
+
+    var form = new FormData();
+    form.append('image', file);
+
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(_artistId) + '/upload-image?type=' + type, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token() },
+      body: form
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      btn.disabled = false;
+      if (res.ok) {
+        stat.className = 'upload-status ok';
+        stat.textContent = '✓ Uploaded';
+        setTimeout(function() { stat.textContent = ''; }, 3000);
+      } else {
+        stat.className = 'upload-status err';
+        stat.textContent = res.data.error || 'Upload failed';
+      }
+    })
+    .catch(function() {
+      btn.disabled = false;
+      stat.className = 'upload-status err';
+      stat.textContent = 'Network error — try again';
+    });
+
+    input.value = '';
+  }
+
+  // ── Save artist info (name + bio) ──────────────────────────────
+  function saveInfo() {
+    hideBanner('infoBanner');
+    var name = (document.getElementById('fieldName').value || '').trim();
+    if (!name) {
+      showBanner('infoBanner', 'error', 'Artist name is required.');
+      return;
+    }
+    var btn   = document.getElementById('infoSaveBtn');
+    var label = document.getElementById('infoSaveLabel');
+    btn.disabled = true;
+    label.textContent = 'Saving…';
+
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(_artistId), {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        bio:  (document.getElementById('fieldBio').value || '').trim() || null
+      })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      btn.disabled = false;
+      label.textContent = 'Save changes';
+      if (res.ok) {
+        showBanner('infoBanner', 'success', 'Profile updated.');
+        document.getElementById('sidebarName').textContent = name;
+      } else {
+        showBanner('infoBanner', 'error', res.data.error || 'Could not save changes.');
+      }
+    })
+    .catch(function() {
+      btn.disabled = false;
+      label.textContent = 'Save changes';
+      showBanner('infoBanner', 'error', 'Network error — please try again.');
+    });
+  }
+
+  // ── Save social links ──────────────────────────────────────────
+  function saveSocial() {
+    hideBanner('socialBanner');
+    var btn   = document.getElementById('socialSaveBtn');
+    var label = document.getElementById('socialSaveLabel');
+    btn.disabled = true;
+    label.textContent = 'Saving…';
+
+    var payload = {
+      instagram:   (document.getElementById('fieldInstagram').value || '').trim()  || null,
+      twitter:     (document.getElementById('fieldTwitter').value   || '').trim()  || null,
+      tiktok:      (document.getElementById('fieldTikTok').value    || '').trim()  || null,
+      youtube:     (document.getElementById('fieldYouTube').value   || '').trim()  || null,
+      spotify:     (document.getElementById('fieldSpotify').value   || '').trim()  || null,
+      apple_music: (document.getElementById('fieldAppleMusic').value|| '').trim()  || null
+    };
+
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(_artistId), {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      btn.disabled = false;
+      label.textContent = 'Save changes';
+      if (res.ok) {
+        showBanner('socialBanner', 'success', 'Social links saved.');
+      } else {
+        showBanner('socialBanner', 'error', res.data.error || 'Could not save links.');
+      }
+    })
+    .catch(function() {
+      btn.disabled = false;
+      label.textContent = 'Save changes';
+      showBanner('socialBanner', 'error', 'Network error — please try again.');
+    });
+  }
+
+  // ── Fetch user profile & artist ID ────────────────────────────
+  function fetchUserProfile() {
+    // Apply cached profile immediately
+    var cached = sessionStorage.getItem('ds_profile');
+    if (cached) {
+      try {
+        var c = JSON.parse(cached);
+        applyUser(c);
+      } catch(e) {}
+    }
+
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token() }
+    })
+    .then(function(r) {
+      if (r.status === 401) {
+        localStorage.removeItem('access_token');
+        sessionStorage.removeItem('access_token');
+        window.location.replace('dropsub-login.html');
+        return null;
+      }
+      return r.json();
+    })
+    .then(function(data) {
+      if (!data) return;
+      var user = data.user || data;
+      if (user.role === 'fan') { window.location.replace('dropsub-fan-dashboard.html'); return; }
+      sessionStorage.setItem('ds_profile', JSON.stringify(user));
+      applyUser(user);
+    })
+    .catch(function() {});
+  }
+
+  function applyUser(user) {
+    var name     = user.full_name || user.name || user.username || '';
+    var email    = user.email || '';
+    var role     = user.role  || '';
+    var artistId = user.artist ? user.artist.id : (user.artist_id || null);
+    var initials = name.split(' ').filter(Boolean)
+      .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '?';
+
+    document.getElementById('navAvatar').textContent     = initials;
+    document.getElementById('sidebarAvatar').textContent = initials;
+    if (name)  {
+      document.getElementById('dropdownName').textContent = name;
+      document.getElementById('sidebarName').textContent  = name;
+    }
+    if (email) document.getElementById('dropdownEmail').textContent = email;
+    if (role)  document.getElementById('sidebarRole').textContent   = role.charAt(0).toUpperCase() + role.slice(1);
+
+    // Avatar in sidebar
+    if (user.artist && user.artist.avatar_url) {
+      var sa = document.getElementById('sidebarAvatar');
+      sa.innerHTML = '<img src="' + user.artist.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>';
+    }
+
+    // Update initials shown in the avatar preview before profile loads
+    document.getElementById('avatarInitials').textContent = initials;
+
+    // Once we have the artist ID, load the full profile
+    if (artistId && artistId !== _artistId) {
+      _artistId = artistId;
+      document.getElementById('pageLoading').classList.add('hidden');
+      loadProfile();
+    }
+  }
+
+  // ── Init ───────────────────────────────────────────────────────
+  fetchUserProfile();
+</script>
+</body>
+</html>
