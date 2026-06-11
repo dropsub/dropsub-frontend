@@ -174,6 +174,7 @@
     #toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); border: 1px solid var(--blue-bright); border-radius: 8px; padding: 10px 20px; font-size: .85rem; font-weight: 600; color: var(--text-white); z-index: 300; opacity: 0; transition: opacity .3s; box-shadow: 0 8px 32px rgba(41,121,255,.25); pointer-events: none; white-space: nowrap; }
     #toast.show { opacity: 1; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -209,7 +210,7 @@
           <div class="user-dropdown-name" id="dropdownName">—</div>
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
-        <a class="dropdown-item" href="dropsub-account-settings.html">⚙️ Account Settings</a>
+        <a class="dropdown-item" href="dropsub-account-settings.html"><i data-lucide="settings"></i> Account Settings</a>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item danger" onclick="signOut()">🚪 Sign out</div>
       </div>
@@ -233,9 +234,9 @@
     </div>
 
     <div class="nav-section-label">Manage</div>
-    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
-    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">⬆️</span>Upload Content</a>
-    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">👥</span>Subscribers</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers</a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
@@ -245,7 +246,7 @@
     <div class="nav-divider"></div>
     <div class="nav-section-label">Settings</div>
     <a class="nav-item active"><span class="nav-icon">🎸</span>Artist Profile</a>
-    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
     <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
@@ -269,7 +270,7 @@
         <!-- ── Profile Photo ── -->
         <div class="settings-card" id="photoCard" style="display:none">
           <div class="card-header">
-            <div class="card-title">📷 Profile Photo</div>
+            <div class="card-title"><i data-lucide="camera"></i> Profile Photo</div>
             <div class="card-desc">Circular avatar shown next to your name everywhere on DropSub.</div>
           </div>
           <div class="card-body">
@@ -316,7 +317,7 @@
         <!-- ── Artist Info ── -->
         <div class="settings-card" id="infoCard" style="display:none">
           <div class="card-header">
-            <div class="card-title">✏️ Artist Info</div>
+            <div class="card-title"><i data-lucide="pencil"></i> Artist Info</div>
             <div class="card-desc">Your public display name and bio shown to fans.</div>
           </div>
           <div class="card-body">
@@ -371,7 +372,7 @@
         <!-- ── Social Links ── -->
         <div class="settings-card" id="socialCard" style="display:none">
           <div class="card-header">
-            <div class="card-title">🔗 Social Links</div>
+            <div class="card-title"><i data-lucide="link"></i> Social Links</div>
             <div class="card-desc">Displayed on your public artist page so fans can follow you everywhere.</div>
           </div>
           <div class="card-body">
@@ -742,5 +743,6 @@
   // ── Init ───────────────────────────────────────────────────────
   fetchUserProfile();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

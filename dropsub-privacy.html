@@ -146,6 +146,7 @@
       .rights-table { font-size: .78rem; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -184,7 +185,7 @@
 
   <!-- ── PAGE HERO ─────────────────────────────────── -->
   <div class="doc-hero">
-    <div class="doc-eyebrow">🔒 Legal</div>
+    <div class="doc-eyebrow"><i data-lucide="lock"></i> Legal</div>
     <h1 class="doc-title">Privacy Policy</h1>
     <div class="doc-meta">
       <div>📅 Last updated: June 1, 2025</div>
@@ -486,5 +487,6 @@
     document.getElementById('nav').style.boxShadow = window.scrollY > 10 ? '0 4px 24px rgba(0,0,0,.4)' : 'none';
   });
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

@@ -276,6 +276,7 @@
     .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--blue-bright); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -303,7 +304,7 @@
     </div>
   </div>
   <div class="topnav-right">
-    <div class="notif-btn" onclick="showToast('No new notifications')">🔔<div class="notif-dot"></div></div>
+    <div class="notif-btn" onclick="showToast('No new notifications')"><i data-lucide="bell"></i><div class="notif-dot"></div></div>
     <div class="user-menu-wrap">
       <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">—</div>
       <div class="user-dropdown" id="userDropdown">
@@ -312,7 +313,7 @@
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
         <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
-        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon">⚙️</span>Settings</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
         <div class="user-dropdown-divider"></div>
         <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon">🚪</span>Sign out</div>
       </div>
@@ -330,7 +331,7 @@
   </div>
   <div class="upload-cta-right">
     <a class="btn-cta-ghost" href="dropsub-artist-analytics.html">📈 View Analytics</a>
-    <a class="btn-upload-now" href="dropsub-artist-dashboard.html">⬆ Upload Content</a>
+    <a class="btn-upload-now" href="dropsub-artist-dashboard.html"><i data-lucide="upload"></i> Upload Content</a>
   </div>
 </div>
 
@@ -360,10 +361,10 @@
     </div>
 
     <div class="nav-section-label">Manage</div>
-    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
     <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon">📁</span>Content Folders</a>
-    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">⬆️</span>Upload Content</a>
-    <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon">👥</span>Subscribers</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
+    <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers</a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
@@ -375,7 +376,7 @@
     <div class="nav-section-label">Settings</div>
     <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon">🎸</span>Artist Profile</a>
     <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
-    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
     <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
@@ -415,9 +416,9 @@
             <div class="connect-cta-desc">DropSub uses Stripe Connect to securely transfer your earnings directly to your bank. Set up takes about 5 minutes.</div>
             <div class="connect-cta-points">
               <div class="connect-cta-point"><span class="cp-icon">🏦</span> Direct deposits to your bank account</div>
-              <div class="connect-cta-point"><span class="cp-icon">🔒</span> Bank-grade security — we never store your details</div>
+              <div class="connect-cta-point"><span class="cp-icon"><i data-lucide="lock"></i></span> Bank-grade security — we never store your details</div>
               <div class="connect-cta-point"><span class="cp-icon">💸</span> Automatic payouts on your schedule</div>
-              <div class="connect-cta-point"><span class="cp-icon">📊</span> Full payout history and reporting</div>
+              <div class="connect-cta-point"><span class="cp-icon"><i data-lucide="bar-chart-2"></i></span> Full payout history and reporting</div>
             </div>
           </div>
           <div class="connect-cta-right">
@@ -425,7 +426,7 @@
               <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="white"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="#635BFF"/></svg>
               Connect with Stripe
             </button>
-            <div class="connect-note">🔒 Powered by Stripe — your data is encrypted</div>
+            <div class="connect-note"><i data-lucide="lock"></i> Powered by Stripe — your data is encrypted</div>
           </div>
         </div>
         <!-- Pending -->
@@ -461,7 +462,7 @@
         </div>
         <!-- Enabled -->
         <div id="connectEnabled" class="connect-status" style="display:none;">
-          <div class="connect-status-icon enabled">✅</div>
+          <div class="connect-status-icon enabled"><i data-lucide="check-circle"></i></div>
           <div class="connect-status-body">
             <div class="connect-status-title enabled">Payouts enabled</div>
             <div class="connect-status-desc">Your Stripe account is fully verified. Earnings are automatically transferred to your bank account on your payout schedule.</div>
@@ -576,7 +577,7 @@
             </div>
             <div id="scheduleNoAccount" style="display:none;">
               <div class="panel-empty" style="padding:20px;">
-                <div class="panel-empty-icon" style="font-size:1.4rem;">🔗</div>
+                <div class="panel-empty-icon" style="font-size:1.4rem;"><i data-lucide="link"></i></div>
                 Connect Stripe to see your payout schedule.
               </div>
             </div>
@@ -1011,5 +1012,6 @@
   fetchUserProfile();
   loadPayoutSettings();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

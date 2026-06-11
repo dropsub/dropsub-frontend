@@ -515,6 +515,7 @@
     .file-area::-webkit-scrollbar-track { background: transparent; }
     .file-area::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -546,10 +547,10 @@
   </div>
   <div class="topnav-right">
     <div class="search-bar">
-      <span>🔍</span>
+      <span><i data-lucide="search"></i></span>
       <input type="text" placeholder="Search artists, folders, tags…"/>
     </div>
-    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
     <div class="user-avatar" id="userAvatar">RF</div>
     <button class="btn-upgrade">PRO</button>
   </div>
@@ -565,7 +566,7 @@
       <div class="artist-name">BANGCHAN</div>
     </div>
     <div class="artist-item" onclick="switchArtist(this,'DOECHII','#DOECHII #SWAMP #TDE','Hip-Hop · TDE')">
-      <div class="artist-ring">🎵</div>
+      <div class="artist-ring"><i data-lucide="music"></i></div>
       <div class="artist-name">DOECHII</div>
     </div>
     <div class="artist-item" onclick="switchArtist(this,'SABRINA CARPENTER','#SABRINA #ESPRESSO #POP','Pop · Island Records')">
@@ -599,7 +600,7 @@
           <div style="font-size:.7rem; color:var(--text-mid);">STUDIO SESSION</div>
         </div>
         <div class="media-col active-frame" style="background: linear-gradient(135deg, #1c3060, #0a1428); display:flex; align-items:center; justify-content:center; position:relative;">
-          <div style="font-size:4rem; opacity:.5;">🎵</div>
+          <div style="font-size:4rem; opacity:.5;"><i data-lucide="music"></i></div>
           <div class="play-btn" onclick="showToast('Playing featured content…')">▶</div>
         </div>
         <div class="media-col tinted" style="background: linear-gradient(135deg, #2a1020, #100818); display:flex; align-items:center; justify-content:center;">
@@ -621,7 +622,7 @@
     <!-- Toolbar -->
     <div class="toolbar">
       <div class="toolbar-btn" onclick="showToast('Organize view opened!')">
-        <span class="icon">📂</span> ORGANIZE
+        <span class="icon"><i data-lucide="folder"></i></span> ORGANIZE
       </div>
       <div class="toolbar-spacer"></div>
       <div style="font-size:.75rem; color:var(--text-dim); margin-right:8px;" id="folderCount">6 folders · 847 files</div>
@@ -672,8 +673,8 @@
       <div class="date-header">DATE: JUNE 29, 2023</div>
       <div class="thumb-grid">
         <div class="thumb" onclick="showToast('Opening photo…')">📸</div>
-        <div class="thumb" onclick="showToast('Opening photo…')">🎬</div>
-        <div class="thumb" onclick="showToast('Opening photo…')">📷</div>
+        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="video"></i></div>
+        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="camera"></i></div>
         <div class="thumb" onclick="showToast('Opening photo…')">🎥</div>
         <div class="thumb" onclick="showToast('Opening photo…')">📸</div>
         <div class="thumb" onclick="showToast('Opening photo…')">🎞</div>
@@ -704,7 +705,7 @@
           </div>
         </div>
         <div class="pinned-item" onclick="showToast('Opening pinned item…')">
-          <div class="pinned-icon">🎵</div>
+          <div class="pinned-icon"><i data-lucide="music"></i></div>
           <div>
             <div class="pinned-name">Unreleased Demos</div>
             <div class="pinned-meta">Premium · $7.99</div>
@@ -739,7 +740,7 @@
       <div style="background:var(--bg-card); border-radius:4px; height:5px; overflow:hidden;">
         <div style="background:linear-gradient(90deg,var(--blue-bright),#7c4dff); width:25%; height:100%; border-radius:4px;"></div>
       </div>
-      <div style="font-size:.65rem; color:var(--text-dim); margin-top:6px; line-height:1.5;">Content archived to blockchain<br>🔗 Permanent storage enabled</div>
+      <div style="font-size:.65rem; color:var(--text-dim); margin-top:6px; line-height:1.5;">Content archived to blockchain<br><i data-lucide="link"></i> Permanent storage enabled</div>
     </div>
 
   </aside>
@@ -748,7 +749,7 @@
 <!-- ══ STATUS BAR ════════════════════════════════════════════ -->
 <div class="status-bar">
   <div class="status-item"><span class="status-dot"></span> Connected</div>
-  <div class="status-item">🔗 Blockchain sync: Active</div>
+  <div class="status-item"><i data-lucide="link"></i> Blockchain sync: Active</div>
   <div class="status-item">☁️ Cloud backup: On</div>
   <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
 </div>
@@ -756,7 +757,7 @@
 <!-- ══ SUBSCRIPTION MODAL ════════════════════════════════════ -->
 <div class="modal-overlay" id="subModal">
   <div class="modal">
-    <div class="modal-icon" id="subModalIcon">🔒</div>
+    <div class="modal-icon" id="subModalIcon"><i data-lucide="lock"></i></div>
     <h3 id="subModalTitle">Unlock This Folder</h3>
     <p id="subModalDesc">Subscribe to get full access to this content folder and all future drops from this artist.</p>
     <div class="modal-tiers">
@@ -796,7 +797,7 @@
     <h3>Contribute to <span id="fanUploadFolderName" style="color:var(--accent-gold);"></span></h3>
     <p>Upload your photos and videos from this event. The artist reviews and approves all fan submissions before they go live in the archive.</p>
     <div class="upload-drop" onclick="showToast('File picker coming soon…')">
-      <span class="drop-icon">⬆️</span>
+      <span class="drop-icon"><i data-lucide="upload"></i></span>
       <p>Drop files here or <strong>browse to upload</strong></p>
       <p style="font-size:.72rem;margin-top:5px;">Photos and videos — max 500 MB per file</p>
     </div>
@@ -1157,5 +1158,6 @@
   renderTable(artists['BANGCHAN'].folders);
   fetchUserProfile();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

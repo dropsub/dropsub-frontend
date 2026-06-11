@@ -129,6 +129,7 @@
       .footer-bottom { flex-direction:column; gap:8px; text-align:center; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
@@ -176,8 +177,8 @@
         <div class="mission-stat-label">of MIYAVI content sitting in Dropbox — until DropSub</div>
         <div class="mission-items">
           <div class="mission-item"><div class="mi-icon">📁</div><div>5,000+ photos, videos, and audio files organized into monetized folders</div></div>
-          <div class="mission-item"><div class="mi-icon">💰</div><div>$80,000+ earned from content that was previously earning nothing</div></div>
-          <div class="mission-item"><div class="mi-icon">👥</div><div>Thousands of fans paying for unprecedented behind-the-scenes access</div></div>
+          <div class="mission-item"><div class="mi-icon"><i data-lucide="dollar-sign"></i></div><div>$80,000+ earned from content that was previously earning nothing</div></div>
+          <div class="mission-item"><div class="mi-icon"><i data-lucide="users"></i></div><div>Thousands of fans paying for unprecedented behind-the-scenes access</div></div>
           <div class="mission-item"><div class="mi-icon">⛓️</div><div>Every file secured on the blockchain — living forever, accessible always</div></div>
         </div>
       </div>
@@ -207,7 +208,7 @@
     <h2 class="section-title">Our values</h2>
     <div class="values-grid">
       <div class="value-card">
-        <div class="value-icon">🎨</div>
+        <div class="value-icon"><i data-lucide="palette"></i></div>
         <div class="value-name">Artists first</div>
         <div class="value-desc">Every product decision starts with what's best for the artist. Pricing, tools, analytics — all designed around the creator's perspective and workflow.</div>
       </div>
@@ -227,7 +228,7 @@
         <div class="value-desc">No algorithm stands between artists and their fans. On DropSub, fans choose who they support and get direct, unmediated access to that artist's world.</div>
       </div>
       <div class="value-card">
-        <div class="value-icon">🔒</div>
+        <div class="value-icon"><i data-lucide="lock"></i></div>
         <div class="value-name">Privacy by default</div>
         <div class="value-desc">Fan data is never sold. Artist content is never used for advertising. DropSub is a product business, not a data business.</div>
       </div>
@@ -328,5 +329,6 @@
 <script>
   window.addEventListener('scroll',function(){document.getElementById('nav').style.boxShadow=window.scrollY>10?'0 4px 24px rgba(0,0,0,.4)':'none';});
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

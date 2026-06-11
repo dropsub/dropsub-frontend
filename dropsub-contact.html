@@ -108,6 +108,7 @@
       .footer-bottom{flex-direction:column;gap:8px;text-align:center;}
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <div class="bg-fixed"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
@@ -220,7 +221,7 @@
         </div>
       </div>
       <div class="cc-item">
-        <div class="cc-icon blue">🔒</div>
+        <div class="cc-icon blue"><i data-lucide="lock"></i></div>
         <div>
           <div class="cc-label">Legal</div>
           <div class="cc-value"><a href="dropsub-privacy.html">Privacy Policy</a></div>
@@ -335,5 +336,6 @@
       });
   }
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

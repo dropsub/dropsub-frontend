@@ -234,6 +234,7 @@
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 24px; padding: 9px 18px; font-size: .81rem; color: var(--text-white); font-weight: 500; opacity: 0; transition: all .25s; z-index: 400; white-space: nowrap; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -259,7 +260,7 @@
     </div>
   </div>
   <div class="topnav-right">
-    <div class="notif-btn" onclick="showToast('3 new subscriber notifications')">🔔<div class="notif-dot"></div></div>
+    <div class="notif-btn" onclick="showToast('3 new subscriber notifications')"><i data-lucide="bell"></i><div class="notif-dot"></div></div>
     <div class="user-menu-wrap">
       <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">RF</div>
       <div class="user-dropdown" id="userDropdown">
@@ -268,7 +269,7 @@
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
         <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
-        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon">⚙️</span>Settings</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
         <div class="user-dropdown-divider"></div>
         <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon">🚪</span>Sign out</div>
       </div>
@@ -279,14 +280,14 @@
 <!-- ── UPLOAD CTA BAR ───────────────────────────── -->
 <div class="upload-cta-bar">
   <div class="upload-cta-left">
-    <div class="upload-cta-icon">📊</div>
+    <div class="upload-cta-icon"><i data-lucide="bar-chart-2"></i></div>
     <div class="upload-cta-text">
       <strong>You're viewing Analytics.</strong> Go back to your dashboard to upload content, manage folders, and set pricing.
     </div>
   </div>
   <div class="upload-cta-right">
     <a class="btn-cta-ghost" href="dropsub-artist-dashboard.html">← Dashboard</a>
-    <a class="btn-upload-now" href="dropsub-artist-dashboard.html">⬆ Upload Content</a>
+    <a class="btn-upload-now" href="dropsub-artist-dashboard.html"><i data-lucide="upload"></i> Upload Content</a>
   </div>
 </div>
 
@@ -316,10 +317,10 @@
     </div>
 
     <div class="nav-section-label">Manage</div>
-    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
     <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon">📁</span>Content Folders<span class="nav-badge">12</span></a>
-    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon">⬆️</span>Upload Content</a>
-    <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge" id="navSubsBadge">—</span></a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
+    <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers<span class="nav-badge" id="navSubsBadge">—</span></a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
@@ -331,7 +332,7 @@
     <div class="nav-section-label">Settings</div>
     <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon">🎸</span>Artist Profile</a>
     <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
-    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
     <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
@@ -370,7 +371,7 @@
       <!-- Revenue chart -->
       <div class="panel" id="chartPanel">
         <div class="panel-header">
-          <div class="panel-title">💰 Revenue Over Time</div>
+          <div class="panel-title"><i data-lucide="dollar-sign"></i> Revenue Over Time</div>
           <div class="panel-actions">
             <span style="font-size:.72rem;color:var(--text-dim);" id="chartRangeLabel">Last 30 days</span>
           </div>
@@ -943,5 +944,6 @@
   loadAnalytics(currentRange);
   loadActivity();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

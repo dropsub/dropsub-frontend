@@ -345,6 +345,7 @@
     }
     #toast.show { opacity: 1; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -375,10 +376,10 @@
   </div>
   <div class="topnav-right">
     <div class="search-bar">
-      <span>🔍</span>
+      <span><i data-lucide="search"></i></span>
       <input type="text" placeholder="Search artists, folders, tags…"/>
     </div>
-    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
     <div class="user-avatar" id="userAvatar">—</div>
     <button class="btn-upgrade">PRO</button>
   </div>
@@ -450,7 +451,7 @@
         <!-- ── 3. CHANGE PASSWORD ── -->
         <div class="settings-card" id="passwordCard" style="display:none;">
           <div class="card-header">
-            <div class="card-title"><span class="card-icon">🔒</span> Password</div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="lock"></i></span> Password</div>
             <div class="card-desc">Choose a strong password you don't use anywhere else.</div>
           </div>
           <div class="card-body">
@@ -507,7 +508,7 @@
 <!-- ══ STATUS BAR ════════════════════════════════════════════ -->
 <div class="status-bar">
   <div class="status-item"><span class="status-dot"></span> Connected</div>
-  <div class="status-item">🔗 Blockchain sync: Active</div>
+  <div class="status-item"><i data-lucide="link"></i> Blockchain sync: Active</div>
   <div class="status-item">☁️ Cloud backup: On</div>
   <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
 </div>
@@ -844,5 +845,6 @@
   // ── Init ─────────────────────────────────────────────────────
   fetchUserProfile();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

@@ -854,7 +854,7 @@
     </div>
   </div>
   <div class="topnav-right">
-    <div class="notif-btn" onclick="showToast('3 new subscriber notifications')">🔔<div class="notif-dot"></div></div>
+    <div class="notif-btn" onclick="showToast('3 new subscriber notifications')"><i data-lucide="bell"></i><div class="notif-dot"></div></div>
     <div class="user-menu-wrap">
       <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">RF</div>
       <div class="user-dropdown" id="userDropdown">
@@ -863,7 +863,7 @@
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
         <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
-        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon">⚙️</span>Settings</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
         <div class="user-dropdown-divider"></div>
         <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'"><span class="dd-icon">🚪</span>Sign out</div>
       </div>
@@ -874,7 +874,7 @@
 <!-- ── MOBILE UPLOAD CTA BAR — hero feature ───── -->
 <div class="upload-cta-bar">
   <div class="upload-cta-left">
-    <div class="upload-cta-icon">📱</div>
+    <div class="upload-cta-icon"><i data-lucide="smartphone"></i></div>
     <div class="upload-cta-text">
       <strong>Share from your phone instantly</strong> — scan the QR code to upload directly from your camera roll, no app needed.
     </div>
@@ -885,7 +885,7 @@
       Show QR Code
     </button>
     <button class="btn-upload-now" onclick="openUploadModal()">
-      ⬆ Upload Content
+      <i data-lucide="upload"></i> Upload Content
     </button>
   </div>
 </div>
@@ -918,11 +918,11 @@
     </div>
 
     <div class="nav-section-label">Manage</div>
-    <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon">📊</span>Dashboard</a>
+    <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
     <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon">📁</span>Drops<span class="nav-badge" id="dropsBadge">0</span></a>
-    <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon">⬆️</span>Upload Content</a>
-    <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon">🔍</span>Discover</a>
-    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon">👥</span>Subscribers<span class="nav-badge" id="navSubsBadge">0</span></a>
+    <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
+    <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon"><i data-lucide="search"></i></span>Discover</a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers<span class="nav-badge" id="navSubsBadge">0</span></a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
@@ -932,7 +932,7 @@
     <div class="nav-section-label">Settings</div>
     <a class="nav-item" href="dropsub-artist-profile.html"><span class="nav-icon">🎸</span>Artist Profile</a>
     <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
-    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon">⚙️</span>Settings</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
     <a class="nav-item" href="dropsub-login.html"><span class="nav-icon">🚪</span>Sign out</a>
@@ -947,7 +947,7 @@
         <div class="stat-card" onclick="window.location.href='dropsub-artist-analytics.html'" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Revenue MTD</div>
-            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-icon"><i data-lucide="dollar-sign"></i></div>
           </div>
           <div class="stat-card-value gold" id="statRevValue">—</div>
           <div class="stat-card-delta neutral" id="statRevDelta">This month</div>
@@ -955,7 +955,7 @@
         <div class="stat-card" onclick="window.location.href='dropsub-subscriptions.html'" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Subscribers</div>
-            <div class="stat-card-icon">👥</div>
+            <div class="stat-card-icon"><i data-lucide="users"></i></div>
           </div>
           <div class="stat-card-value blue" id="statSubsValue">—</div>
           <div class="stat-card-delta neutral" id="statSubsDelta">Total active</div>
@@ -963,7 +963,7 @@
         <div class="stat-card" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'})" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Total Files</div>
-            <div class="stat-card-icon">📂</div>
+            <div class="stat-card-icon"><i data-lucide="folder"></i></div>
           </div>
           <div class="stat-card-value" id="statFilesValue">—</div>
           <div class="stat-card-delta neutral" id="statFilesDelta">Across folders</div>
@@ -999,9 +999,9 @@
             </div>
           </div>
           <div class="drops-toolbar">
-            <button class="dtb-btn" onclick="openUploadModal()"><span>⬆️</span> UPLOAD</button>
-            <button class="dtb-btn" onclick="openCreateModal()"><span>✏️</span> CREATE</button>
-            <button class="dtb-btn" id="organizeBtn" onclick="toggleOrganizeMode()"><span>📂</span> ORGANIZE</button>
+            <button class="dtb-btn" onclick="openUploadModal()"><span><i data-lucide="upload"></i></span> UPLOAD</button>
+            <button class="dtb-btn" onclick="openCreateModal()"><span><i data-lucide="pencil"></i></span> CREATE</button>
+            <button class="dtb-btn" id="organizeBtn" onclick="toggleOrganizeMode()"><span><i data-lucide="folder"></i></span> ORGANIZE</button>
             <button class="dtb-btn" id="organizeDoneBtn" style="display:none;background:var(--blue-bright);color:#fff;border-color:var(--blue-bright);" onclick="toggleOrganizeMode()"><span>✓</span> DONE</button>
           </div>
           <table class="folder-table">
@@ -1025,7 +1025,7 @@
           <!-- Mobile upload — HERO FEATURE -->
           <div class="mobile-upload-card">
             <div class="mu-label"><div class="mu-label-dot"></div>Mobile Upload</div>
-            <div class="mu-title">📱 Upload from your phone</div>
+            <div class="mu-title"><i data-lucide="smartphone"></i> Upload from your phone</div>
             <div class="mu-desc">Scan this QR code on your phone to instantly upload photos and videos from your camera roll directly to your archive.</div>
             <div class="qr-wrap" onclick="openQRModal()">
               <div id="qrcode-sidebar" style="width:130px;height:130px;display:block;margin:0 auto;border-radius:6px;overflow:hidden;"></div>
@@ -1045,7 +1045,7 @@
           <!-- Earnings chart -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">💰 Monthly Earnings</div>
+              <div class="panel-title"><i data-lucide="dollar-sign"></i> Monthly Earnings</div>
               <button class="panel-btn" onclick="showToast('Full analytics coming soon')">View all →</button>
             </div>
             <div class="earnings-chart">
@@ -1114,7 +1114,7 @@
   ondrop="event.preventDefault(); event.stopPropagation();">
   <div class="upload-modal">
     <div class="modal-header">
-      <div class="modal-title">⬆️ Upload Content</div>
+      <div class="modal-title"><i data-lucide="upload"></i> Upload Content</div>
       <div class="modal-close" onclick="closeUploadModal()">✕</div>
     </div>
     <div class="modal-body">
@@ -1124,10 +1124,10 @@
           💻 Desktop Upload
         </div>
         <div class="upload-tab" id="tabPhone" onclick="switchUploadTab('phone')">
-          📱 Phone Upload
+          <i data-lucide="smartphone"></i> Phone Upload
         </div>
         <div class="upload-tab" id="tabURL" onclick="switchUploadTab('url')">
-          🔗 Link / URL
+          <i data-lucide="link"></i> Link / URL
         </div>
       </div>
 
@@ -1141,18 +1141,18 @@
           ondragenter="event.preventDefault(); event.stopPropagation(); return false;"
           ondragleave="this.classList.remove('dragover')"
           ondrop="handleDrop(event)">
-          <span class="drop-icon">🎬</span>
+          <span class="drop-icon"><i data-lucide="video"></i></span>
           <div class="drop-title">Drop media here</div>
           <div class="drop-sub">Photos · Videos · Audio</div>
           <div class="drop-types">
             <span class="drop-type-tag"><span class="dt-icon">🖼</span> JPG, PNG, WebP, GIF <span class="dt-limit">· 10 MB</span></span>
-            <span class="drop-type-tag"><span class="dt-icon">🎬</span> MP4, MOV, AVI, MKV, WebM <span class="dt-limit">· 500 MB</span></span>
-            <span class="drop-type-tag"><span class="dt-icon">🎵</span> MP3, WAV, AAC, FLAC, M4A <span class="dt-limit">· 50 MB</span></span>
+            <span class="drop-type-tag"><span class="dt-icon"><i data-lucide="video"></i></span> MP4, MOV, AVI, MKV, WebM <span class="dt-limit">· 500 MB</span></span>
+            <span class="drop-type-tag"><span class="dt-icon"><i data-lucide="music"></i></span> MP3, WAV, AAC, FLAC, M4A <span class="dt-limit">· 50 MB</span></span>
           </div>
           <div class="media-pick-btns">
-            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputPhoto').click()">📷 Photos</button>
-            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputVideo').click()">🎬 Video</button>
-            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputAudio').click()">🎵 Audio</button>
+            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputPhoto').click()"><i data-lucide="camera"></i> Photos</button>
+            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputVideo').click()"><i data-lucide="video"></i> Video</button>
+            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputAudio').click()"><i data-lucide="music"></i> Audio</button>
           </div>
         </div>
         <!-- Selected file list -->
@@ -1230,7 +1230,7 @@
               <div class="tier-opt-name">Subscription</div>
             </div>
             <div class="tier-opt" id="tierPremium" onclick="selectTier('premium')">
-              <span class="tier-opt-icon">⭐</span>
+              <span class="tier-opt-icon"><i data-lucide="star"></i></span>
               <div class="tier-opt-name">Premium</div>
             </div>
           </div>
@@ -1255,7 +1255,7 @@
         <div class="mfield">
           <label>Visibility</label>
           <div class="priv-row">
-            <button class="priv-btn pub" id="uploadPrivBtn" onclick="toggleUploadPrivacy()">🌐 Public</button>
+            <button class="priv-btn pub" id="uploadPrivBtn" onclick="toggleUploadPrivacy()"><i data-lucide="globe"></i> Public</button>
             <span class="priv-desc" id="uploadPrivDesc">Visible to anyone browsing your page</span>
           </div>
         </div>
@@ -1274,7 +1274,7 @@
     </div>
     <div class="modal-footer">
       <button class="mfooter-btn cancel" onclick="closeUploadModal()">Cancel</button>
-      <button class="mfooter-btn submit" id="submitUploadBtn" onclick="doUpload()" disabled style="opacity:.45;cursor:not-allowed;">⬆ Upload & Archive</button>
+      <button class="mfooter-btn submit" id="submitUploadBtn" onclick="doUpload()" disabled style="opacity:.45;cursor:not-allowed;"><i data-lucide="upload"></i> Upload & Archive</button>
     </div>
   </div>
 </div>
@@ -1282,7 +1282,7 @@
 <!-- ── QR MODAL ────────────────────────────────── -->
 <div class="qr-modal-overlay" id="qrModal">
   <div class="qr-modal">
-    <div class="qr-modal-title">📱 Upload from Your Phone</div>
+    <div class="qr-modal-title"><i data-lucide="smartphone"></i> Upload from Your Phone</div>
     <div class="qr-modal-sub">Scan this code with your phone camera to access the mobile upload page for your MIYAVI archive.</div>
     <div class="qr-modal-code" onclick="showToast('QR code enlarged')">
       <div id="qrcode-modal" style="width:180px;height:180px;border-radius:8px;overflow:hidden;"></div>
@@ -1299,7 +1299,7 @@
 <div class="modal-overlay" id="createModal">
   <div class="upload-modal">
     <div class="modal-header">
-      <div class="modal-title">✏️ Create New Drop</div>
+      <div class="modal-title"><i data-lucide="pencil"></i> Create New Drop</div>
       <div class="modal-close" onclick="closeCreateModal()">✕</div>
     </div>
     <div class="modal-body">
@@ -1326,7 +1326,7 @@
               <div class="tier-opt-name">Subscription</div>
             </div>
             <div class="tier-opt" id="ctierPremium" onclick="selectCreateTier('premium')">
-              <span class="tier-opt-icon">⭐</span>
+              <span class="tier-opt-icon"><i data-lucide="star"></i></span>
               <div class="tier-opt-name">Premium</div>
             </div>
           </div>
@@ -1370,7 +1370,7 @@
 <div class="modal-overlay" id="editFolderModal" onclick="if(event.target===this)closeEditModal()">
   <div class="upload-modal">
     <div class="modal-header">
-      <div class="modal-title">✏️ Edit Folder</div>
+      <div class="modal-title"><i data-lucide="pencil"></i> Edit Folder</div>
       <div class="modal-close" onclick="closeEditModal()">✕</div>
     </div>
     <div class="modal-body">
@@ -1395,7 +1395,7 @@
               <div class="tier-opt-name">Subscription</div>
             </div>
             <div class="tier-opt" id="etierPremium" onclick="selectEditTier('premium')">
-              <span class="tier-opt-icon">⭐</span>
+              <span class="tier-opt-icon"><i data-lucide="star"></i></span>
               <div class="tier-opt-name">Premium</div>
             </div>
           </div>
@@ -1403,8 +1403,8 @@
         <div class="mfield">
           <label>VISIBILITY</label>
           <select id="editFolderVisibility">
-            <option value="true">🌐 Public</option>
-            <option value="false">🔒 Private</option>
+            <option value="true"><i data-lucide="globe"></i> Public</option>
+            <option value="false"><i data-lucide="lock"></i> Private</option>
           </select>
         </div>
         <div class="mfield">
@@ -1413,8 +1413,8 @@
             <span class="cover-preview-placeholder" id="editCoverPlaceholder">No cover set</span>
           </div>
           <div class="cover-tabs">
-            <button class="cover-tab active" id="ctabPick" onclick="switchCoverTab('pick')">📂 From uploads</button>
-            <button class="cover-tab" id="ctabUpload" onclick="switchCoverTab('upload')">⬆ Upload new</button>
+            <button class="cover-tab active" id="ctabPick" onclick="switchCoverTab('pick')"><i data-lucide="folder"></i> From uploads</button>
+            <button class="cover-tab" id="ctabUpload" onclick="switchCoverTab('upload')"><i data-lucide="upload"></i> Upload new</button>
             <button class="cover-tab" id="ctabClear" onclick="switchCoverTab('clear')">✕ Clear</button>
           </div>
           <div class="cover-pane active" id="cpanePick">
@@ -1431,7 +1431,7 @@
             </div>
           </div>
           <div class="cover-pane" id="cpaneClear">
-            <button class="cover-clear-btn" onclick="doClearCover()">🗑 Remove current cover image</button>
+            <button class="cover-clear-btn" onclick="doClearCover()"><i data-lucide="trash-2"></i> Remove current cover image</button>
           </div>
         </div>
         <div class="mfield">
@@ -1441,9 +1441,9 @@
           <input type="file" id="editAddVideo" multiple accept="video/*,.mp4,.mov,.avi,.mkv,.webm" style="display:none" onchange="uploadEditFiles(this.files,this)"/>
           <input type="file" id="editAddAudio" multiple accept="audio/*,.mp3,.wav,.aac,.flac,.m4a" style="display:none" onchange="uploadEditFiles(this.files,this)"/>
           <div class="media-pick-btns" style="justify-content:flex-start;">
-            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddPhoto').click()">📷 Photos</button>
-            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddVideo').click()">🎬 Video</button>
-            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddAudio').click()">🎵 Audio</button>
+            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddPhoto').click()"><i data-lucide="camera"></i> Photos</button>
+            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddVideo').click()"><i data-lucide="video"></i> Video</button>
+            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddAudio').click()"><i data-lucide="music"></i> Audio</button>
           </div>
           <div id="editAddFilesStatus" style="display:none;margin-top:8px;">
             <div class="progress-item">
@@ -1482,7 +1482,7 @@
   <div class="more-menu-sep"></div>
   <div class="more-menu-item" onclick="showToast('Coming soon'); closeMoreMenu()">🔑 Manage permissions</div>
   <div class="more-menu-sep"></div>
-  <div class="more-menu-item danger" onclick="openDeleteConfirm(); closeMoreMenu()">🗑 Delete folder</div>
+  <div class="more-menu-item danger" onclick="openDeleteConfirm(); closeMoreMenu()"><i data-lucide="trash-2"></i> Delete folder</div>
 </div>
 
 <div class="collab-modal-overlay" id="collabModal" onclick="if(event.target===this)closeCollabModal()">
@@ -1495,9 +1495,9 @@
     </div>
     <div class="collab-modal-features">
       <div class="collab-feature"><span class="collab-feature-icon">📸</span>Fans upload photos, videos, and recordings from your shows directly to your archive</div>
-      <div class="collab-feature"><span class="collab-feature-icon">✅</span>You review and approve submissions before they go live</div>
-      <div class="collab-feature"><span class="collab-feature-icon">💰</span>Set a revenue share with contributors or keep it as a fan community feature</div>
-      <div class="collab-feature"><span class="collab-feature-icon">🔒</span>Full moderation controls — approve, reject, or flag content instantly</div>
+      <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="check-circle"></i></span>You review and approve submissions before they go live</div>
+      <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="dollar-sign"></i></span>Set a revenue share with contributors or keep it as a fan community feature</div>
+      <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="lock"></i></span>Full moderation controls — approve, reject, or flag content instantly</div>
     </div>
     <button class="collab-modal-close" onclick="closeCollabModal()">Got it, notify me when it launches</button>
   </div>
@@ -2789,5 +2789,6 @@
   fetchUserProfile();
   fetchTaxStatus();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

@@ -337,6 +337,7 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -365,10 +366,10 @@
   </div>
   <div class="topnav-right">
     <div class="search-bar">
-      <span>🔍</span>
+      <span><i data-lucide="search"></i></span>
       <input type="text" placeholder="Search artists…"/>
     </div>
-    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
     <div class="user-avatar nav-avatar">RF</div>
     <button class="btn-upgrade">PRO</button>
   </div>
@@ -390,7 +391,7 @@
     </div>
   </div>
   <div class="topnav-right">
-    <div class="notif-btn" onclick="showToast('No new notifications')">🔔<div class="notif-dot"></div></div>
+    <div class="notif-btn" onclick="showToast('No new notifications')"><i data-lucide="bell"></i><div class="notif-dot"></div></div>
     <div class="user-menu-wrap">
       <div class="user-avatar nav-avatar" onclick="toggleUserMenu(event)">RF</div>
       <div class="user-dropdown" id="userDropdown">
@@ -398,8 +399,8 @@
           <div class="user-dropdown-name" id="dropdownName">—</div>
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
-        <div class="user-dropdown-item" onclick="window.location.href='dropsub-artist-dashboard.html'">📊 Dashboard</div>
-        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'">⚙️ Settings</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-artist-dashboard.html'"><i data-lucide="bar-chart-2"></i> Dashboard</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'"><i data-lucide="settings"></i> Settings</div>
         <div class="user-dropdown-divider"></div>
         <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'">🚪 Sign out</div>
       </div>
@@ -416,7 +417,7 @@
     <div class="hero-title">Find your next <em>favorite artist</em></div>
     <div class="hero-sub">Explore exclusive content from musicians, photographers, filmmakers, and more.</div>
     <div class="hero-search">
-      <span class="hero-search-icon">🔍</span>
+      <span class="hero-search-icon"><i data-lucide="search"></i></span>
       <input type="text" id="heroSearch" placeholder="Search artists, genres, tags…" oninput="onSearch(this.value)" autocomplete="off"/>
       <button class="hero-search-clear" id="searchClearBtn" onclick="clearSearch()">✕ Clear</button>
     </div>
@@ -426,10 +427,10 @@
   <div class="filter-bar">
     <div class="filter-tabs" id="filterTabs">
       <div class="filter-tab active" data-cat="all"       onclick="setFilter('all')">All</div>
-      <div class="filter-tab"        data-cat="music"     onclick="setFilter('music')">🎵 Music</div>
+      <div class="filter-tab"        data-cat="music"     onclick="setFilter('music')"><i data-lucide="music"></i> Music</div>
       <div class="filter-tab"        data-cat="photography" onclick="setFilter('photography')">📸 Photography</div>
-      <div class="filter-tab"        data-cat="film"      onclick="setFilter('film')">🎬 Film</div>
-      <div class="filter-tab"        data-cat="art"       onclick="setFilter('art')">🎨 Art</div>
+      <div class="filter-tab"        data-cat="film"      onclick="setFilter('film')"><i data-lucide="video"></i> Film</div>
+      <div class="filter-tab"        data-cat="art"       onclick="setFilter('art')"><i data-lucide="palette"></i> Art</div>
       <div class="filter-tab"        data-cat="sports"    onclick="setFilter('sports')">🏆 Sports</div>
     </div>
     <div class="filter-right">
@@ -450,7 +451,7 @@
     <!-- Featured section -->
     <div id="featuredSection">
       <div class="section-hd">
-        <div class="section-title">⭐ Featured Artists <span class="section-title-badge">HANDPICKED</span></div>
+        <div class="section-title"><i data-lucide="star"></i> Featured Artists <span class="section-title-badge">HANDPICKED</span></div>
       </div>
       <div class="featured-row" id="featuredGrid"></div>
     </div>
@@ -796,5 +797,6 @@
   renderPage();
   fetchRealArtists();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

@@ -627,6 +627,7 @@
       .proof-names { gap: 24px; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -740,7 +741,7 @@
             </div>
             <div class="preview-folder">
               <div class="preview-folder-left">
-                <div class="preview-folder-icon">⭐</div>
+                <div class="preview-folder-icon"><i data-lucide="star"></i></div>
                 <div>
                   <div class="preview-folder-name">20th Anniversary Futurism</div>
                   <div class="preview-folder-meta">1,200 files · 42 GB</div>
@@ -750,7 +751,7 @@
             </div>
             <div class="preview-folder">
               <div class="preview-folder-left">
-                <div class="preview-folder-icon">📂</div>
+                <div class="preview-folder-icon"><i data-lucide="folder"></i></div>
                 <div>
                   <div class="preview-folder-name">Birthday Event 2022</div>
                   <div class="preview-folder-meta">145 files · 3.2 GB</div>
@@ -797,7 +798,7 @@
     <div class="steps-grid">
       <div class="step-card fade-up">
         <div class="step-number">Step 01</div>
-        <div class="step-icon">📂</div>
+        <div class="step-icon"><i data-lucide="folder"></i></div>
         <div class="step-title">Upload your archive</div>
         <div class="step-desc">Drag and drop your content — photos, videos, audio, documents. Organize into folders by date, event, or type. Your team can contribute directly.</div>
       </div>
@@ -809,7 +810,7 @@
       </div>
       <div class="step-card fade-up">
         <div class="step-number">Step 03</div>
-        <div class="step-icon">💰</div>
+        <div class="step-icon"><i data-lucide="dollar-sign"></i></div>
         <div class="step-title">Fans pay, you earn</div>
         <div class="step-desc">Share your DropSub link. Fans subscribe or purchase. Revenue lands directly in your account. Content you already created, earning forever.</div>
       </div>
@@ -869,7 +870,7 @@
           </div>
         </div>
         <div class="tier-card fade-up">
-          <div class="tier-icon premium">⭐</div>
+          <div class="tier-icon premium"><i data-lucide="star"></i></div>
           <div class="tier-name">Premium Drop</div>
           <div class="tier-price">$<span>you set</span> <span>/ one-time</span></div>
           <div class="tier-desc">Exclusive one-time purchases for your most valuable content. Anniversary collections, tour archives, rare behind-the-scenes.</div>
@@ -894,21 +895,21 @@
         <div class="split-bullets">
           <div class="split-bullet"><div class="bullet-icon">📁</div><div>Upload and organize content by event, date, or type — your team can contribute directly.</div></div>
           <div class="split-bullet"><div class="bullet-icon">💳</div><div>Set your own prices. You control every tier, every folder, every release.</div></div>
-          <div class="split-bullet"><div class="bullet-icon">📊</div><div>Real-time analytics — see who's subscribing, what's performing, and where revenue is growing.</div></div>
+          <div class="split-bullet"><div class="bullet-icon"><i data-lucide="bar-chart-2"></i></div><div>Real-time analytics — see who's subscribing, what's performing, and where revenue is growing.</div></div>
           <div class="split-bullet"><div class="bullet-icon">🔐</div><div>Enterprise-grade security. Your content is protected with permission-based access at every level.</div></div>
           <div class="split-bullet"><div class="bullet-icon">⛓️</div><div>All content secured on the blockchain. Your archive lives forever.</div></div>
         </div>
         <a class="btn-split-blue" href="dropsub-signup.html">Start as an artist →</a>
       </div>
       <div class="split-card fans fade-up" id="fans">
-        <div class="split-tag gold">🎵 For Fans</div>
+        <div class="split-tag gold"><i data-lucide="music"></i> For Fans</div>
         <h3 class="split-title">Get closer to the artists you love</h3>
         <p class="split-desc">Go beyond the public feed. Access the real story — rehearsal footage, tour diaries, studio sessions, and rare archives that exist nowhere else.</p>
         <div class="split-bullets">
           <div class="split-bullet"><div class="bullet-icon">🗂️</div><div>Browse your favorite artist's full archive — organized, searchable, always growing.</div></div>
           <div class="split-bullet"><div class="bullet-icon">🔓</div><div>Choose your level — free discovery, monthly subscription, or one-time exclusive drops.</div></div>
-          <div class="split-bullet"><div class="bullet-icon">📱</div><div>Access on any device. Download what you love. Keep it forever with Premium purchases.</div></div>
-          <div class="split-bullet"><div class="bullet-icon">🔔</div><div>Get notified the moment your artist drops new content to a folder you're subscribed to.</div></div>
+          <div class="split-bullet"><div class="bullet-icon"><i data-lucide="smartphone"></i></div><div>Access on any device. Download what you love. Keep it forever with Premium purchases.</div></div>
+          <div class="split-bullet"><div class="bullet-icon"><i data-lucide="bell"></i></div><div>Get notified the moment your artist drops new content to a folder you're subscribed to.</div></div>
           <div class="split-bullet"><div class="bullet-icon">🌍</div><div>Support your artist directly. Every subscription goes straight to the people who made it.</div></div>
         </div>
         <a class="btn-split-gold" href="dropsub-signup.html">Start as a fan →</a>
@@ -1063,5 +1064,6 @@
       : 'none';
   });
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

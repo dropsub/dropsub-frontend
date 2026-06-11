@@ -142,6 +142,7 @@
     #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); border: 1px solid var(--blue-bright); border-radius: 8px; padding: 9px 20px; font-size: .84rem; font-weight: 600; color: var(--text-white); z-index: 300; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; box-shadow: 0 6px 24px rgba(41,121,255,.2); }
     #toast.show { opacity: 1; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -506,5 +507,6 @@
     showToast('Purchase flow coming soon');
   }
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

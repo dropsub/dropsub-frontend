@@ -453,6 +453,7 @@
       .step-label { display: none; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -512,7 +513,7 @@
         <div class="type-grid">
           <div class="type-option" id="fanOption" onclick="selectType('fan')">
             <div class="type-check">✓</div>
-            <span class="type-icon">🎵</span>
+            <span class="type-icon"><i data-lucide="music"></i></span>
             <div class="type-name">Fan</div>
             <div class="type-desc">Browse and subscribe to artist archives and exclusive content drops.</div>
           </div>
@@ -1007,5 +1008,6 @@
     document.getElementById('termsError').classList.remove('show');
   });
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

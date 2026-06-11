@@ -416,6 +416,7 @@
       .card-grid, .form-grid { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -492,7 +493,7 @@
 
             <div class="plan-opt" id="planPremium" onclick="selectPlan('premium')">
               <div class="plan-radio"><div class="plan-radio-dot"></div></div>
-              <div class="plan-icon">⭐</div>
+              <div class="plan-icon"><i data-lucide="star"></i></div>
               <div class="plan-info">
                 <div class="plan-name">Premium One-Time</div>
                 <div class="plan-desc">Purchase this archive forever. One payment, lifetime access.</div>
@@ -951,5 +952,6 @@
     'Then $7.99/month. Cancel anytime from your account settings.';
   fetchUserProfile();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

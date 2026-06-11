@@ -233,18 +233,19 @@
     }
     #errorMsg.show { display: block; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <div class="page">
 
   <div class="logo-bar">
-    <div class="logo-icon">🎵</div>
+    <div class="logo-icon"><i data-lucide="music"></i></div>
     DropSub
   </div>
 
   <!-- Error state (invalid/missing token) -->
   <div class="card error-card" id="invalidCard" style="display:none">
-    <div class="error-icon">🔒</div>
+    <div class="error-icon"><i data-lucide="lock"></i></div>
     <div class="error-title">Link invalid or expired</div>
     <div class="error-sub">This upload link is no longer valid. Ask the artist to generate a new one from their dashboard.</div>
   </div>
@@ -258,12 +259,12 @@
     </div>
 
     <div class="card">
-      <div class="card-title">📱 Upload files</div>
+      <div class="card-title"><i data-lucide="smartphone"></i> Upload files</div>
       <div class="card-sub">Select photos or videos from your camera roll to upload directly to your artist archive.</div>
 
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,.pdf" capture>
-        <div class="drop-icon">📷</div>
+        <div class="drop-icon"><i data-lucide="camera"></i></div>
         <div class="drop-text">
           <strong>Tap to select files</strong><br>
           Photos, videos, audio, or PDF
@@ -299,7 +300,7 @@
 
   <!-- Success state -->
   <div class="card success-card" id="successCard" style="display:none">
-    <div class="success-icon">✅</div>
+    <div class="success-icon"><i data-lucide="check-circle"></i></div>
     <div class="success-title">Upload complete!</div>
     <div class="success-sub" id="successSub">Your files have been sent to the artist archive and are pending review.</div>
     <button class="upload-more-btn" onclick="resetUpload()">Upload more files</button>
@@ -483,5 +484,6 @@
 
   init();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>

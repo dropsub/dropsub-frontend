@@ -477,6 +477,7 @@
     }
     #toast.show { opacity: 1; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -505,10 +506,10 @@
   </div>
   <div class="topnav-right">
     <div class="search-bar">
-      <span>🔍</span>
+      <span><i data-lucide="search"></i></span>
       <input type="text" placeholder="Search artists, folders, tags…"/>
     </div>
-    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
     <div class="user-avatar" id="userAvatar">—</div>
   </div>
 </nav>
@@ -587,7 +588,7 @@
 
       <!-- 403 Upgrade -->
       <div class="state-view" id="stateUpgrade">
-        <div class="state-icon lock">🔒</div>
+        <div class="state-icon lock"><i data-lucide="lock"></i></div>
         <div class="state-title">Access required</div>
         <div class="state-desc">Subscribe or purchase this folder to view its contents.</div>
         <div class="upgrade-box" id="upgradeBox">
@@ -612,7 +613,7 @@
 
       <!-- Empty folder -->
       <div class="state-view" id="stateEmpty">
-        <div class="state-icon empty">📂</div>
+        <div class="state-icon empty"><i data-lucide="folder"></i></div>
         <div class="state-title">No files yet</div>
         <div class="state-desc">This folder exists but doesn't have any files yet. Check back soon.</div>
         <a class="btn-back-link" href="dropsub-fan-dashboard.html">← Back to My Artists</a>
@@ -620,7 +621,7 @@
 
       <!-- Empty filter result -->
       <div class="state-view" id="stateFilterEmpty">
-        <div class="state-icon empty">🔍</div>
+        <div class="state-icon empty"><i data-lucide="search"></i></div>
         <div class="state-title">No files match this filter</div>
         <div class="state-desc" id="filterEmptyDesc">Try a different filter tab.</div>
         <button class="btn-back-link" onclick="setFilter('all')">Clear filter</button>
@@ -636,7 +637,7 @@
 <!-- ══ STATUS BAR ════════════════════════════════════════════ -->
 <div class="status-bar">
   <div class="status-item"><span class="status-dot"></span> Connected</div>
-  <div class="status-item">🔗 Blockchain sync: Active</div>
+  <div class="status-item"><i data-lucide="link"></i> Blockchain sync: Active</div>
   <div class="status-item">☁️ Cloud backup: On</div>
   <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
 </div>
@@ -1228,5 +1229,6 @@
   fetchUserProfile();
   loadFolder();
 </script>
+<script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
 </html>
