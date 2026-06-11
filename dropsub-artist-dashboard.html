@@ -516,6 +516,14 @@
       cursor: pointer; transition: opacity .15s;
     }
     .browse-btn:hover { opacity: .85; }
+    .media-pick-btns { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+    .media-pick-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 14px; background: var(--bg-hover); color: var(--text-light);
+      border: 1px solid var(--border-bright); border-radius: 6px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; transition: all .15s;
+    }
+    .media-pick-btn:hover { background: var(--blue-bright); color: #fff; border-color: var(--blue-bright); }
     .file-item {
       display: flex; align-items: center; gap: 8px;
       padding: 7px 10px; border-radius: 6px; background: var(--bg-card);
@@ -1123,22 +1131,27 @@
 
       <!-- Desktop drop zone -->
       <div id="desktopUpload">
-        <input type="file" id="fileInput" multiple style="display:none;" onchange="processFiles(this.files)"/>
+        <input type="file" id="fileInputPhoto" multiple accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.heic" style="display:none;" onchange="processFiles(this.files)"/>
+        <input type="file" id="fileInputVideo" multiple accept="video/*,.mp4,.mov,.avi,.mkv,.webm" style="display:none;" onchange="processFiles(this.files)"/>
+        <input type="file" id="fileInputAudio" multiple accept="audio/*,.mp3,.wav,.aac,.flac,.m4a" style="display:none;" onchange="processFiles(this.files)"/>
         <div class="drop-zone" id="dropZone"
-          onclick="document.getElementById('fileInput').click()"
           ondragover="event.preventDefault(); event.stopPropagation(); this.classList.add('dragover'); return false;"
           ondragenter="event.preventDefault(); event.stopPropagation(); return false;"
           ondragleave="this.classList.remove('dragover')"
           ondrop="handleDrop(event)">
-          <span class="drop-icon">📂</span>
-          <div class="drop-title">Drop files here or <span>click to browse</span></div>
-          <div class="drop-sub">Images, video, and audio</div>
+          <span class="drop-icon">🎬</span>
+          <div class="drop-title">Drop media here</div>
+          <div class="drop-sub">Photos · Videos · Audio</div>
           <div class="drop-types">
             <span class="drop-type-tag"><span class="dt-icon">🖼</span> JPG, PNG, WebP, GIF <span class="dt-limit">· 10 MB</span></span>
             <span class="drop-type-tag"><span class="dt-icon">🎬</span> MP4, MOV, AVI, MKV, WebM <span class="dt-limit">· 500 MB</span></span>
             <span class="drop-type-tag"><span class="dt-icon">🎵</span> MP3, WAV, AAC, FLAC, M4A <span class="dt-limit">· 50 MB</span></span>
           </div>
-          <button class="browse-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Browse Files</button>
+          <div class="media-pick-btns">
+            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputPhoto').click()">📷 Photos</button>
+            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputVideo').click()">🎬 Video</button>
+            <button class="media-pick-btn" onclick="event.stopPropagation(); document.getElementById('fileInputAudio').click()">🎵 Audio</button>
+          </div>
         </div>
         <!-- Selected file list -->
         <div id="fileList" style="display:none;margin-bottom:14px;">
@@ -1670,8 +1683,7 @@
     document.getElementById('fileList').style.display = 'none';
     document.getElementById('fileItems').innerHTML = '';
     document.getElementById('fileSummary').textContent = '';
-    var fi = document.getElementById('fileInput');
-    if (fi) fi.value = '';
+    ['fileInputPhoto','fileInputVideo','fileInputAudio'].forEach(function(id){ var fi = document.getElementById(id); if (fi) fi.value = ''; });
     // Reset folder selector
     var sel = document.getElementById('folderSelect');
     if (sel) sel.value = '';
