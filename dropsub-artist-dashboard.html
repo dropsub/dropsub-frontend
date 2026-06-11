@@ -862,10 +862,10 @@
           <div class="user-dropdown-name" id="dropdownName">Richard Frias</div>
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
-        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
+        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon"><i data-lucide="mic"></i></span>Artist Profile</div>
         <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
         <div class="user-dropdown-divider"></div>
-        <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'"><span class="dd-icon">🚪</span>Sign out</div>
+        <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'"><span class="dd-icon"><i data-lucide="log-out"></i></span>Sign out</div>
       </div>
     </div>
   </div>
@@ -919,23 +919,23 @@
 
     <div class="nav-section-label">Manage</div>
     <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
-    <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon">📁</span>Drops<span class="nav-badge" id="dropsBadge">0</span></a>
+    <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon"><i data-lucide="folder-open"></i></span>Drops<span class="nav-badge" id="dropsBadge">0</span></a>
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
     <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon"><i data-lucide="search"></i></span>Discover</a>
     <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers<span class="nav-badge" id="navSubsBadge">0</span></a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
-    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon">📈</span>Analytics</a>
-    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon">💳</span>Payouts<span class="nav-badge gold" id="navPayoutsBadge">$0</span></a>
+    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon"><i data-lucide="trending-up"></i></span>Analytics</a>
+    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon"><i data-lucide="credit-card"></i></span>Payouts<span class="nav-badge gold" id="navPayoutsBadge">$0</span></a>
     <div class="nav-divider"></div>
     <div class="nav-section-label">Settings</div>
-    <a class="nav-item" href="dropsub-artist-profile.html"><span class="nav-icon">🎸</span>Artist Profile</a>
-    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
+    <a class="nav-item" href="dropsub-artist-profile.html"><span class="nav-icon"><i data-lucide="mic"></i></span>Artist Profile</a>
+    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon"><i data-lucide="user"></i></span>Team Access</a>
     <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
-    <a class="nav-item" href="dropsub-login.html"><span class="nav-icon">🚪</span>Sign out</a>
+    <a class="nav-item" href="dropsub-login.html"><span class="nav-icon"><i data-lucide="log-out"></i></span>Sign out</a>
   </div>
 
   <!-- ── MAIN ──────────────────────────────────── -->
@@ -971,7 +971,7 @@
         <div class="stat-card" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'})" style="cursor:pointer">
           <div class="stat-card-top">
             <div class="stat-card-label">Storage Used</div>
-            <div class="stat-card-icon">☁️</div>
+            <div class="stat-card-icon"><i data-lucide="cloud"></i></div>
           </div>
           <div class="stat-card-value" id="statStorageValue">—</div>
           <div class="stat-card-delta neutral" id="statStorageDelta">Total used</div>
@@ -986,7 +986,7 @@
           <div class="panel-header">
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
               <div class="panel-title">
-                📁 Drops
+                <i data-lucide="folder-open"></i> Drops
                 <span id="dropsFolderCount" style="font-size:.7rem;font-weight:500;color:var(--text-dim);background:var(--bg-hover);padding:2px 8px;border-radius:10px;">0 folders</span>
               </div>
               <div class="drops-view-tabs">
@@ -1060,7 +1060,7 @@
           <!-- Recent activity -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">⚡ Recent Activity</div>
+              <div class="panel-title"><i data-lucide="zap"></i> Recent Activity</div>
               <button class="panel-btn" onclick="showToast('Activity log coming soon')">View all →</button>
             </div>
             <div class="activity-list" id="activityList"></div>
@@ -1069,12 +1069,12 @@
           <!-- Banking & Tax -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">🏦 Banking &amp; Tax</div>
+              <div class="panel-title"><i data-lucide="landmark"></i> Banking &amp; Tax</div>
               <span id="taxStatusBadge" class="tax-status not-submitted">● Not submitted</span>
             </div>
 
             <a class="tax-bank-btn" href="dropsub-payout-settings.html">
-              <span>💳 Bank account &amp; payout settings</span>
+              <span><i data-lucide="credit-card"></i> Bank account &amp; payout settings</span>
               <span class="tax-bank-btn-arrow">→</span>
             </a>
 
@@ -1082,7 +1082,7 @@
               <div class="tax-upload-label">W-9 / Tax document <span>(PDF only)</span></div>
               <div class="tax-file-row">
                 <input type="file" id="taxFileInput" class="tax-file-input" accept=".pdf" onchange="handleTaxFileSelect(this)"/>
-                <label class="tax-file-btn" for="taxFileInput">📄 Choose PDF</label>
+                <label class="tax-file-btn" for="taxFileInput"><i data-lucide="file-text"></i> Choose PDF</label>
                 <span class="tax-file-name" id="taxFileName">No file selected</span>
               </div>
             </div>
@@ -1121,7 +1121,7 @@
       <!-- Tabs -->
       <div class="upload-tabs">
         <div class="upload-tab active" id="tabDesktop" onclick="switchUploadTab('desktop')">
-          💻 Desktop Upload
+          <i data-lucide="monitor"></i> Desktop Upload
         </div>
         <div class="upload-tab" id="tabPhone" onclick="switchUploadTab('phone')">
           <i data-lucide="smartphone"></i> Phone Upload
@@ -1145,7 +1145,7 @@
           <div class="drop-title">Drop media here</div>
           <div class="drop-sub">Photos · Videos · Audio</div>
           <div class="drop-types">
-            <span class="drop-type-tag"><span class="dt-icon">🖼</span> JPG, PNG, WebP, GIF <span class="dt-limit">· 10 MB</span></span>
+            <span class="drop-type-tag"><span class="dt-icon"><i data-lucide="image"></i></span> JPG, PNG, WebP, GIF <span class="dt-limit">· 10 MB</span></span>
             <span class="drop-type-tag"><span class="dt-icon"><i data-lucide="video"></i></span> MP4, MOV, AVI, MKV, WebM <span class="dt-limit">· 500 MB</span></span>
             <span class="drop-type-tag"><span class="dt-icon"><i data-lucide="music"></i></span> MP3, WAV, AAC, FLAC, M4A <span class="dt-limit">· 50 MB</span></span>
           </div>
@@ -1222,11 +1222,11 @@
           <label>Access tier</label>
           <div class="tier-selector">
             <div class="tier-opt" id="tierFree" onclick="selectTier('free')">
-              <span class="tier-opt-icon">📣</span>
+              <span class="tier-opt-icon"><i data-lucide="megaphone"></i></span>
               <div class="tier-opt-name">Free</div>
             </div>
             <div class="tier-opt sel-sub" id="tierSub" onclick="selectTier('sub')">
-              <span class="tier-opt-icon">📋</span>
+              <span class="tier-opt-icon"><i data-lucide="clipboard"></i></span>
               <div class="tier-opt-name">Subscription</div>
             </div>
             <div class="tier-opt" id="tierPremium" onclick="selectTier('premium')">
@@ -1318,11 +1318,11 @@
           <label>Access tier</label>
           <div class="tier-selector">
             <div class="tier-opt" id="ctierFree" onclick="selectCreateTier('free')">
-              <span class="tier-opt-icon">📣</span>
+              <span class="tier-opt-icon"><i data-lucide="megaphone"></i></span>
               <div class="tier-opt-name">Free</div>
             </div>
             <div class="tier-opt sel-sub" id="ctierSub" onclick="selectCreateTier('sub')">
-              <span class="tier-opt-icon">📋</span>
+              <span class="tier-opt-icon"><i data-lucide="clipboard"></i></span>
               <div class="tier-opt-name">Subscription</div>
             </div>
             <div class="tier-opt" id="ctierPremium" onclick="selectCreateTier('premium')">
@@ -1387,11 +1387,11 @@
           <label>ACCESS TIER</label>
           <div class="tier-selector">
             <div class="tier-opt" id="etierFree" onclick="selectEditTier('free')">
-              <span class="tier-opt-icon">📣</span>
+              <span class="tier-opt-icon"><i data-lucide="megaphone"></i></span>
               <div class="tier-opt-name">Free</div>
             </div>
             <div class="tier-opt" id="etierSub" onclick="selectEditTier('subscription')">
-              <span class="tier-opt-icon">📋</span>
+              <span class="tier-opt-icon"><i data-lucide="clipboard"></i></span>
               <div class="tier-opt-name">Subscription</div>
             </div>
             <div class="tier-opt" id="etierPremium" onclick="selectEditTier('premium')">
@@ -1465,7 +1465,7 @@
 <!-- ══ CONFIRM DIALOG ══════════════════════════════════════════ -->
 <div class="confirm-overlay" id="confirmDialog" onclick="if(event.target===this)closeConfirm()">
   <div class="confirm-dialog">
-    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-icon" id="confirmIcon"><i data-lucide="alert-triangle"></i></div>
     <div class="confirm-title" id="confirmTitle">Are you sure?</div>
     <div class="confirm-desc" id="confirmDesc"></div>
     <div class="confirm-actions">
@@ -1477,24 +1477,24 @@
 
 <!-- ══ MORE MENU ════════════════════════════════════════════════ -->
 <div class="more-menu" id="moreMenu">
-  <div class="more-menu-item" id="moreMenuArchive" onclick="archiveFolder()">📦 Archive</div>
-  <div class="more-menu-item" id="moreMenuRestore" onclick="restoreFolder()" style="display:none">♻️ Restore to Drops</div>
+  <div class="more-menu-item" id="moreMenuArchive" onclick="archiveFolder()"><i data-lucide="archive"></i> Archive</div>
+  <div class="more-menu-item" id="moreMenuRestore" onclick="restoreFolder()" style="display:none"><i data-lucide="rotate-ccw"></i> Restore to Drops</div>
   <div class="more-menu-sep"></div>
-  <div class="more-menu-item" onclick="showToast('Coming soon'); closeMoreMenu()">🔑 Manage permissions</div>
+  <div class="more-menu-item" onclick="showToast('Coming soon'); closeMoreMenu()"><i data-lucide="key"></i> Manage permissions</div>
   <div class="more-menu-sep"></div>
   <div class="more-menu-item danger" onclick="openDeleteConfirm(); closeMoreMenu()"><i data-lucide="trash-2"></i> Delete folder</div>
 </div>
 
 <div class="collab-modal-overlay" id="collabModal" onclick="if(event.target===this)closeCollabModal()">
   <div class="collab-modal">
-    <div class="collab-modal-icon">🤝</div>
+    <div class="collab-modal-icon"><i data-lucide="handshake"></i></div>
     <div class="collab-modal-badge">Coming Soon</div>
     <div class="collab-modal-title">Collaboration Folders</div>
     <div class="collab-modal-desc">
       Artists will be able to designate folders as collaboration spaces — where fans can contribute their own content directly to your archive.
     </div>
     <div class="collab-modal-features">
-      <div class="collab-feature"><span class="collab-feature-icon">📸</span>Fans upload photos, videos, and recordings from your shows directly to your archive</div>
+      <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="camera"></i></span>Fans upload photos, videos, and recordings from your shows directly to your archive</div>
       <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="check-circle"></i></span>You review and approve submissions before they go live</div>
       <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="dollar-sign"></i></span>Set a revenue share with contributors or keep it as a fan community feature</div>
       <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="lock"></i></span>Full moderation controls — approve, reject, or flag content instantly</div>
@@ -1573,16 +1573,16 @@
       const type = f.access_type || f.type || 'sub';
       const fileCount = f.file_count || f.files || 0;
       const dateStr = f.created_at || f.event_date || f.date || null;
-      const icon = f.icon || (type === 'premium' ? '⭐' : '📁');
+      const icon = f.icon || (type === 'premium' ? '<i data-lucide="star"></i>' : '<i data-lucide="folder"></i>');
       const revenue = f.revenue || '—';
       const subs = f.subs || '—';
       const size = f.size || '—';
 
       const badge = type === 'sub' || type === 'subscription'
-        ? '<span class="access-badge sub">📋 SUBSCRIPTION</span>'
+        ? '<span class="access-badge sub"><i data-lucide="clipboard"></i> SUBSCRIPTION</span>'
         : type === 'free'
         ? '<span class="access-badge free">✓ FREE</span>'
-        : '<span class="access-badge premium">⭐ PREMIUM</span>';
+        : '<span class="access-badge premium"><i data-lucide="star"></i> PREMIUM</span>';
       const d = dateStr ? new Date(dateStr) : null;
       const date = d && !isNaN(d) ? d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—';
       const collabOn = f.collab === true;
@@ -2181,6 +2181,7 @@
     menu.style.top  = (rect.bottom + 6) + 'px';
     menu.style.left = Math.max(4, rect.right - 192) + 'px';
     menu.classList.add('open');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
   function closeMoreMenu() {
     document.getElementById('moreMenu').classList.remove('open');
