@@ -1098,7 +1098,10 @@
 </div><!-- /app-shell -->
 
 <!-- ── UPLOAD MODAL ─────────────────────────────── -->
-<div class="modal-overlay" id="uploadModal">
+<div class="modal-overlay" id="uploadModal"
+  ondragover="event.preventDefault(); event.stopPropagation(); return false;"
+  ondragenter="event.preventDefault(); event.stopPropagation(); return false;"
+  ondrop="event.preventDefault(); event.stopPropagation();">
   <div class="upload-modal">
     <div class="modal-header">
       <div class="modal-title">⬆️ Upload Content</div>
@@ -1123,8 +1126,8 @@
         <input type="file" id="fileInput" multiple style="display:none;" onchange="processFiles(this.files)"/>
         <div class="drop-zone" id="dropZone"
           onclick="document.getElementById('fileInput').click()"
-          ondragover="event.preventDefault(); this.classList.add('dragover')"
-          ondragenter="event.preventDefault()"
+          ondragover="event.preventDefault(); event.stopPropagation(); this.classList.add('dragover'); return false;"
+          ondragenter="event.preventDefault(); event.stopPropagation(); return false;"
           ondragleave="this.classList.remove('dragover')"
           ondrop="handleDrop(event)">
           <span class="drop-icon">📂</span>
@@ -1816,6 +1819,7 @@
 
   function handleDrop(e) {
     e.preventDefault();
+    e.stopPropagation();
     document.getElementById('dropZone').classList.remove('dragover');
     processFiles(e.dataTransfer.files);
   }
