@@ -1662,12 +1662,12 @@
   // ── Recent activity ──────────────────────────────
   function renderActivity() {
     const items = [
-      { icon: '👥', cls: 'blue', text: '<strong>43 new subscribers</strong> this week across all folders', time: '2 hours ago' },
-      { icon: '⬆️', cls: 'blue', text: 'You uploaded <strong>12 files</strong> to Kiyomizu Temple 2021', time: '5 hours ago' },
-      { icon: '💰', cls: 'gold', text: '<strong>$420</strong> payout processed to your bank account', time: 'Yesterday' },
-      { icon: '⭐', cls: 'gold', text: '<strong>3 fans</strong> purchased 20th Anniversary Futurism', time: '2 days ago' },
-      { icon: '🔔', cls: 'green', text: 'Serbia 2022 Backstage hit <strong>180 subscribers</strong>', time: '3 days ago' },
-      { icon: '📱', cls: 'blue', text: '8 files uploaded via <strong>mobile phone</strong> to NA Tour 2021', time: '4 days ago' },
+      { icon: '<i data-lucide="users"></i>',       cls: 'blue', text: '<strong>43 new subscribers</strong> this week across all folders', time: '2 hours ago' },
+      { icon: '<i data-lucide="upload"></i>',       cls: 'blue', text: 'You uploaded <strong>12 files</strong> to Kiyomizu Temple 2021', time: '5 hours ago' },
+      { icon: '<i data-lucide="dollar-sign"></i>',  cls: 'gold', text: '<strong>$420</strong> payout processed to your bank account', time: 'Yesterday' },
+      { icon: '<i data-lucide="star"></i>',         cls: 'gold', text: '<strong>3 fans</strong> purchased 20th Anniversary Futurism', time: '2 days ago' },
+      { icon: '<i data-lucide="bell"></i>',         cls: 'green', text: 'Serbia 2022 Backstage hit <strong>180 subscribers</strong>', time: '3 days ago' },
+      { icon: '<i data-lucide="smartphone"></i>',   cls: 'blue', text: '8 files uploaded via <strong>mobile phone</strong> to NA Tour 2021', time: '4 days ago' },
     ];
     const list = document.getElementById('activityList');
     list.innerHTML = items.map(a => `
@@ -1679,6 +1679,7 @@
         </div>
       </div>
     `).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ── Collab modal ─────────────────────────────────
