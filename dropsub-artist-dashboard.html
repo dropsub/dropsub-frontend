@@ -1432,6 +1432,24 @@
             <button class="cover-clear-btn" onclick="doClearCover()">🗑 Remove current cover image</button>
           </div>
         </div>
+        <div class="mfield">
+          <label>ADD FILES</label>
+          <input type="file" id="editAddPhoto" multiple accept="image/*,.jpg,.jpeg,.png,.webp,.gif,.heic" style="display:none" onchange="uploadEditFiles(this.files,this)"/>
+          <input type="file" id="editAddVideo" multiple accept="video/*,.mp4,.mov,.avi,.mkv,.webm" style="display:none" onchange="uploadEditFiles(this.files,this)"/>
+          <input type="file" id="editAddAudio" multiple accept="audio/*,.mp3,.wav,.aac,.flac,.m4a" style="display:none" onchange="uploadEditFiles(this.files,this)"/>
+          <div class="media-pick-btns" style="justify-content:flex-start;">
+            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddPhoto').click()">📷 Photos</button>
+            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddVideo').click()">🎬 Video</button>
+            <button class="media-pick-btn" type="button" onclick="document.getElementById('editAddAudio').click()">🎵 Audio</button>
+          </div>
+          <div id="editAddFilesStatus" style="display:none;margin-top:8px;">
+            <div class="progress-item">
+              <span class="progress-name" id="editAddFilesLabel">Uploading…</span>
+              <div class="progress-bar-wrap"><div class="progress-bar" id="editAddFilesBar" style="width:0%"></div></div>
+              <span class="progress-pct" id="editAddFilesPct">0%</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1856,7 +1874,7 @@
     _currentFolders.forEach(function(f) {
       var opt = document.createElement('option');
       opt.value = f.id || f.name;
-      opt.textContent = f.icon + ' ' + f.name;
+      opt.textContent = (f.icon ? f.icon + ' ' : '') + f.name;
       sel.appendChild(opt);
     });
     var newOpt = document.createElement('option');
@@ -1940,6 +1958,8 @@
     _editFolderIdx = -1;
     _editCoverChanged = false;
     document.getElementById('coverFileInput').value = '';
+    ['editAddPhoto','editAddVideo','editAddAudio'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('editAddFilesStatus').style.display = 'none';
   }
   function selectEditTier(tier) {
     _editTier = tier;
@@ -2042,6 +2062,65 @@
       input.value = '';
       showToast('Upload failed — check your connection');
     });
+  }
+
+  function uploadEditFiles(files, inputEl) {
+    if (!files || !files.length) return;
+    var f = _currentFolders[_editFolderIdx];
+    if (!f || !f.id) { showToast('No folder selected'); return; }
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var formData = new FormData();
+    Array.from(files).forEach(function(file) { formData.append('files', file); });
+    formData.append('folder_id', f.id);
+
+    var status = document.getElementById('editAddFilesStatus');
+    var bar    = document.getElementById('editAddFilesBar');
+    var pct    = document.getElementById('editAddFilesPct');
+    var lbl    = document.getElementById('editAddFilesLabel');
+    status.style.display = 'block';
+    lbl.textContent = 'Uploading ' + files.length + ' file' + (files.length !== 1 ? 's' : '') + '…';
+    lbl.style.color = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.dropsub.com/api/upload');
+    if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        var p = Math.round((e.loaded / e.total) * 100);
+        bar.style.width = p + '%';
+        pct.textContent = p + '%';
+      }
+    };
+
+    xhr.onload = function() {
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      if (inputEl) inputEl.value = '';
+      if (xhr.status >= 200 && xhr.status < 300) {
+        var count = files.length;
+        setTimeout(function() {
+          status.style.display = 'none';
+          fetchArtistFolders();
+          showToast('✓ ' + count + ' file' + (count !== 1 ? 's' : '') + ' added to folder');
+        }, 600);
+      } else {
+        lbl.textContent = 'Upload failed';
+        lbl.style.color = 'var(--error)';
+        setTimeout(function() { status.style.display = 'none'; }, 3000);
+        showToast('Upload failed — please try again');
+      }
+    };
+
+    xhr.onerror = function() {
+      if (inputEl) inputEl.value = '';
+      status.style.display = 'none';
+      showToast('Upload failed — check your connection');
+    };
+
+    xhr.send(formData);
   }
 
   function doClearCover() {
