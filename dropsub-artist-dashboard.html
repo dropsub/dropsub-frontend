@@ -824,6 +824,7 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <script>
@@ -1608,14 +1609,15 @@
             <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
               <button class="privacy-toggle-btn ${isPublic ? 'pub' : 'priv'}" onclick="event.stopPropagation();toggleFolderPrivacy(${idx})" title="${isPublic ? 'Public — click to make private' : 'Private — click to make public'}">${isPublic ? '🌐 Public' : '🔒 Private'}</button>
               <div class="folder-actions">
-                <div class="fol-btn" onclick="event.stopPropagation();shareFolderLink('${f.id}')" title="Copy share link">🔗</div>
-                <div class="fol-btn" onclick="event.stopPropagation();openEditModal(${idx})" title="Edit folder">✏️</div>
-                <div class="fol-btn" onclick="event.stopPropagation();openMoreMenu(${idx},this)" title="More options">⋯</div>
+                <div class="fol-btn" onclick="event.stopPropagation();shareFolderLink('${f.id}')" title="Copy share link"><i data-lucide="link"></i></div>
+                <div class="fol-btn" onclick="event.stopPropagation();openEditModal(${idx})" title="Edit folder"><i data-lucide="pencil"></i></div>
+                <div class="fol-btn" onclick="event.stopPropagation();openMoreMenu(${idx},this)" title="More options"><i data-lucide="more-horizontal"></i></div>
               </div>
             </div>
           </td>
         </tr>`;
     }).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function toggleCollab(idx) {
