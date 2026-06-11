@@ -212,7 +212,7 @@
         </div>
         <a class="dropdown-item" href="dropsub-account-settings.html"><i data-lucide="settings"></i> Account Settings</a>
         <div class="dropdown-divider"></div>
-        <div class="dropdown-item danger" onclick="signOut()">🚪 Sign out</div>
+        <div class="dropdown-item danger" onclick="signOut()"><i data-lucide="log-out"></i> Sign out</div>
       </div>
     </div>
   </div>
@@ -240,22 +240,22 @@
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
-    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon">📈</span>Analytics</a>
-    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon">💳</span>Payouts</a>
+    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon"><i data-lucide="trending-up"></i></span>Analytics</a>
+    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon"><i data-lucide="credit-card"></i></span>Payouts</a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Settings</div>
-    <a class="nav-item active"><span class="nav-icon">🎸</span>Artist Profile</a>
+    <a class="nav-item active"><span class="nav-icon"><i data-lucide="mic"></i></span>Artist Profile</a>
     <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
-    <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
+    <a class="nav-item" onclick="signOut()"><span class="nav-icon"><i data-lucide="log-out"></i></span>Sign out</a>
   </div>
 
   <!-- ── MAIN ──────────────────────────────────────── -->
   <div class="main">
     <div class="page-header">
-      <div class="page-title">🎸 Artist Profile</div>
+      <div class="page-title"><i data-lucide="mic"></i> Artist Profile</div>
       <div class="page-subtitle">Public-facing branding — visible to your fans and on your artist page</div>
     </div>
 
@@ -281,7 +281,7 @@
               <div class="img-upload-info">
                 <p>JPG, PNG or WebP · max 10 MB · recommended 400×400 px</p>
                 <button class="btn-img-upload" id="avatarUploadBtn" onclick="document.getElementById('avatarInput').click()">
-                  📤 Change photo
+                  <i data-lucide="share"></i> Change photo
                 </button>
                 <input type="file" id="avatarInput" class="img-upload-input" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadImage('avatar', this)"/>
                 <div class="upload-status" id="avatarStatus"></div>
@@ -293,19 +293,19 @@
         <!-- ── Profile Banner ── -->
         <div class="settings-card" id="bannerCard" style="display:none">
           <div class="card-header">
-            <div class="card-title">🖼️ Profile Banner</div>
+            <div class="card-title"><i data-lucide="image"></i> Profile Banner</div>
             <div class="card-desc">Wide banner displayed at the top of your public artist page.</div>
           </div>
           <div class="card-body">
             <div class="banner-preview" id="bannerPreview">
               <div class="banner-placeholder">
-                <div class="banner-placeholder-icon">🖼️</div>
+                <div class="banner-placeholder-icon"><i data-lucide="image"></i></div>
                 No banner set
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
               <button class="btn-img-upload" id="bannerUploadBtn" onclick="document.getElementById('bannerInput').click()">
-                📤 Change banner
+                <i data-lucide="share"></i> Change banner
               </button>
               <input type="file" id="bannerInput" class="img-upload-input" accept="image/jpeg,image/png,image/webp" onchange="uploadImage('banner', this)"/>
               <div class="upload-status" id="bannerStatus"></div>

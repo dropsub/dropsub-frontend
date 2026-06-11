@@ -268,10 +268,10 @@
           <div class="user-dropdown-name" id="dropdownName">Richard Frias</div>
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
-        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
+        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon"><i data-lucide="mic"></i></span>Artist Profile</div>
         <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
         <div class="user-dropdown-divider"></div>
-        <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon">🚪</span>Sign out</div>
+        <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon"><i data-lucide="log-out"></i></span>Sign out</div>
       </div>
     </div>
   </div>
@@ -318,24 +318,24 @@
 
     <div class="nav-section-label">Manage</div>
     <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
-    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon">📁</span>Content Folders<span class="nav-badge">12</span></a>
+    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon"><i data-lucide="folder"></i></span>Content Folders<span class="nav-badge">12</span></a>
     <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
     <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers<span class="nav-badge" id="navSubsBadge">—</span></a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
-    <a class="nav-item active"><span class="nav-icon">📈</span>Analytics</a>
-    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon">💳</span>Payouts<span class="nav-badge gold" id="navPayoutsBadge">—</span></a>
-    <a class="nav-item" onclick="showToast('Pricing settings coming soon')"><span class="nav-icon">🏷️</span>Pricing</a>
+    <a class="nav-item active"><span class="nav-icon"><i data-lucide="trending-up"></i></span>Analytics</a>
+    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon"><i data-lucide="credit-card"></i></span>Payouts<span class="nav-badge gold" id="navPayoutsBadge">—</span></a>
+    <a class="nav-item" onclick="showToast('Pricing settings coming soon')"><span class="nav-icon"><i data-lucide="tag"></i></span>Pricing</a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Settings</div>
-    <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon">🎸</span>Artist Profile</a>
-    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
+    <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon"><i data-lucide="mic"></i></span>Artist Profile</a>
+    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon"><i data-lucide="user"></i></span>Team Access</a>
     <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
-    <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
+    <a class="nav-item" onclick="signOut()"><span class="nav-icon"><i data-lucide="log-out"></i></span>Sign out</a>
   </div>
 
   <!-- ── MAIN ───────────────────────────────────────── -->
@@ -346,7 +346,7 @@
       <div class="analytics-header">
         <div class="analytics-header-left">
           <div class="analytics-title">
-            📈 Analytics
+            <i data-lucide="trending-up"></i> Analytics
             <span class="analytics-title-artist" id="artistNameTitle"></span>
           </div>
           <div class="analytics-sub" id="analyticsSubLabel">Loading data…</div>
@@ -393,7 +393,7 @@
             </div>
           </div>
           <div id="chartError" style="display:none;">
-            <div class="panel-error"><div class="panel-error-icon">⚠️</div>Could not load chart data.</div>
+            <div class="panel-error"><div class="panel-error-icon"><i data-lucide="alert-triangle"></i></div>Could not load chart data.</div>
           </div>
         </div>
       </div>
@@ -404,7 +404,7 @@
         <!-- Top performing folders -->
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">📁 Top Performing Folders</div>
+            <div class="panel-title"><i data-lucide="folder"></i> Top Performing Folders</div>
             <div class="panel-actions">
               <button class="panel-btn" onclick="window.location.href='dropsub-artist-dashboard.html'">Manage folders →</button>
             </div>
@@ -430,7 +430,7 @@
                 <tbody id="foldersTableBody"></tbody>
               </table>
             </div>
-            <div id="foldersError" style="display:none;"><div class="panel-error"><div class="panel-error-icon">⚠️</div>Could not load folder data.</div></div>
+            <div id="foldersError" style="display:none;"><div class="panel-error"><div class="panel-error-icon"><i data-lucide="alert-triangle"></i></div>Could not load folder data.</div></div>
             <div id="foldersEmpty" style="display:none;"><div class="panel-empty">No folder data for this period.</div></div>
           </div>
         </div>
@@ -438,7 +438,7 @@
         <!-- Recent activity -->
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">⚡ Recent Activity</div>
+            <div class="panel-title"><i data-lucide="zap"></i> Recent Activity</div>
             <div class="panel-actions">
               <button class="panel-btn" onclick="loadActivity()">↻ Refresh</button>
             </div>
@@ -452,7 +452,7 @@
               <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
             </div>
             <div id="activityList" class="activity-list" style="display:none;"></div>
-            <div id="activityError" style="display:none;"><div class="panel-error"><div class="panel-error-icon">⚠️</div>Could not load activity.</div></div>
+            <div id="activityError" style="display:none;"><div class="panel-error"><div class="panel-error-icon"><i data-lucide="alert-triangle"></i></div>Could not load activity.</div></div>
             <div id="activityEmpty" style="display:none;"><div class="panel-empty">No recent activity.</div></div>
           </div>
         </div>

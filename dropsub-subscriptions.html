@@ -437,7 +437,7 @@
 
       <!-- Error -->
       <div class="error-state" id="errorState">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><i data-lucide="alert-triangle"></i></div>
         <div class="error-title">Could not load subscriptions</div>
         <div class="error-desc">There was a problem connecting to the server. Please check your connection and try again.</div>
         <button class="btn-retry" onclick="loadSubscriptions()">Try again</button>
@@ -445,7 +445,7 @@
 
       <!-- Empty -->
       <div class="empty-state" id="emptyState">
-        <div class="empty-icon">📋</div>
+        <div class="empty-icon"><i data-lucide="clipboard"></i></div>
         <div class="empty-title">No active subscriptions</div>
         <div class="empty-desc">You haven't subscribed to any artist content yet. Browse artists to find exclusive folders and archives to unlock.</div>
         <a class="btn-browse" href="dropsub-fan-dashboard.html">Browse Artists</a>
@@ -462,14 +462,14 @@
 <div class="status-bar">
   <div class="status-item"><span class="status-dot"></span> Connected</div>
   <div class="status-item"><i data-lucide="link"></i> Blockchain sync: Active</div>
-  <div class="status-item">☁️ Cloud backup: On</div>
+  <div class="status-item"><i data-lucide="cloud"></i> Cloud backup: On</div>
   <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
 </div>
 
 <!-- ══ CANCEL CONFIRM MODAL ══════════════════════════════════ -->
 <div class="modal-overlay" id="cancelModal">
   <div class="modal">
-    <div class="modal-icon">🚫</div>
+    <div class="modal-icon"><i data-lucide="ban"></i></div>
     <h3>Cancel Subscription?</h3>
     <p>You'll keep access until the end of your current billing period. After that, you'll lose access to this content folder.</p>
     <div class="modal-highlight" id="cancelDetail">

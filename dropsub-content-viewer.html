@@ -573,7 +573,7 @@
       </select>
       <div class="view-toggle">
         <div class="view-btn active" id="gridViewBtn" title="Grid view" onclick="setView('grid')">⊞</div>
-        <div class="view-btn" id="listViewBtn" title="List view" onclick="setView('list')">☰</div>
+        <div class="view-btn" id="listViewBtn" title="List view" onclick="setView('list')"><i data-lucide="menu"></i></div>
       </div>
     </div>
 
@@ -602,7 +602,7 @@
 
       <!-- 404 / Error -->
       <div class="state-view" id="stateError">
-        <div class="state-icon error">⚠️</div>
+        <div class="state-icon error"><i data-lucide="alert-triangle"></i></div>
         <div class="state-title error" id="errorTitle">Something went wrong</div>
         <div class="state-desc" id="errorDesc">Could not load this folder. Please try again.</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
@@ -638,7 +638,7 @@
 <div class="status-bar">
   <div class="status-item"><span class="status-dot"></span> Connected</div>
   <div class="status-item"><i data-lucide="link"></i> Blockchain sync: Active</div>
-  <div class="status-item">☁️ Cloud backup: On</div>
+  <div class="status-item"><i data-lucide="cloud"></i> Cloud backup: On</div>
   <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
 </div>
 
@@ -648,7 +648,7 @@
     <div class="lightbox-filename" id="lbFilename">—</div>
     <div class="lb-topbar-right">
       <span class="lightbox-counter" id="lbCounter"></span>
-      <div class="lb-icon-btn" id="lbDownloadBtn" title="Download" onclick="lbDownload()" style="display:none">⬇</div>
+      <div class="lb-icon-btn" id="lbDownloadBtn" title="Download" onclick="lbDownload()" style="display:none"><i data-lucide="download"></i></div>
       <div class="lb-icon-btn" title="Close (Esc)" onclick="closeLightbox()">✕</div>
     </div>
   </div>

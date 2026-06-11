@@ -312,10 +312,10 @@
           <div class="user-dropdown-name" id="dropdownName">—</div>
           <div class="user-dropdown-email" id="dropdownEmail">—</div>
         </div>
-        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon">🎸</span>Artist Profile</div>
+        <div class="user-dropdown-item" onclick="showToast('Artist profile coming soon'); closeUserMenu()"><span class="dd-icon"><i data-lucide="mic"></i></span>Artist Profile</div>
         <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
         <div class="user-dropdown-divider"></div>
-        <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon">🚪</span>Sign out</div>
+        <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon"><i data-lucide="log-out"></i></span>Sign out</div>
       </div>
     </div>
   </div>
@@ -324,13 +324,13 @@
 <!-- ── UPLOAD CTA BAR ───────────────────────────── -->
 <div class="upload-cta-bar">
   <div class="upload-cta-left">
-    <div class="upload-cta-icon">💳</div>
+    <div class="upload-cta-icon"><i data-lucide="credit-card"></i></div>
     <div class="upload-cta-text">
       <strong>Payouts &amp; Banking.</strong> Connect your Stripe account to receive payments from your fans directly to your bank.
     </div>
   </div>
   <div class="upload-cta-right">
-    <a class="btn-cta-ghost" href="dropsub-artist-analytics.html">📈 View Analytics</a>
+    <a class="btn-cta-ghost" href="dropsub-artist-analytics.html"><i data-lucide="trending-up"></i> View Analytics</a>
     <a class="btn-upload-now" href="dropsub-artist-dashboard.html"><i data-lucide="upload"></i> Upload Content</a>
   </div>
 </div>
@@ -362,24 +362,24 @@
 
     <div class="nav-section-label">Manage</div>
     <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
-    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon">📁</span>Content Folders</a>
+    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon"><i data-lucide="folder"></i></span>Content Folders</a>
     <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
     <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers</a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Revenue</div>
-    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon">📈</span>Analytics</a>
-    <a class="nav-item active"><span class="nav-icon">💳</span>Payouts</a>
-    <a class="nav-item" onclick="showToast('Pricing settings coming soon')"><span class="nav-icon">🏷️</span>Pricing</a>
+    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon"><i data-lucide="trending-up"></i></span>Analytics</a>
+    <a class="nav-item active"><span class="nav-icon"><i data-lucide="credit-card"></i></span>Payouts</a>
+    <a class="nav-item" onclick="showToast('Pricing settings coming soon')"><span class="nav-icon"><i data-lucide="tag"></i></span>Pricing</a>
 
     <div class="nav-divider"></div>
     <div class="nav-section-label">Settings</div>
-    <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon">🎸</span>Artist Profile</a>
-    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon">👤</span>Team Access</a>
+    <a class="nav-item" onclick="showToast('Artist profile coming soon')"><span class="nav-icon"><i data-lucide="mic"></i></span>Artist Profile</a>
+    <a class="nav-item" onclick="showToast('Team settings coming soon')"><span class="nav-icon"><i data-lucide="user"></i></span>Team Access</a>
     <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
 
     <div class="nav-divider"></div>
-    <a class="nav-item" onclick="signOut()"><span class="nav-icon">🚪</span>Sign out</a>
+    <a class="nav-item" onclick="signOut()"><span class="nav-icon"><i data-lucide="log-out"></i></span>Sign out</a>
   </div>
 
   <!-- ── MAIN ───────────────────────────────────────── -->
@@ -387,7 +387,7 @@
     <div class="content-scroll">
 
       <div class="page-header">
-        <div class="page-title">💳 Payouts &amp; Banking</div>
+        <div class="page-title"><i data-lucide="credit-card"></i> Payouts &amp; Banking</div>
         <div class="page-sub" id="pageSubLabel">Loading your payout settings…</div>
       </div>
 
@@ -415,9 +415,9 @@
             <div class="connect-cta-headline">Connect your bank account to receive payouts</div>
             <div class="connect-cta-desc">DropSub uses Stripe Connect to securely transfer your earnings directly to your bank. Set up takes about 5 minutes.</div>
             <div class="connect-cta-points">
-              <div class="connect-cta-point"><span class="cp-icon">🏦</span> Direct deposits to your bank account</div>
+              <div class="connect-cta-point"><span class="cp-icon"><i data-lucide="landmark"></i></span> Direct deposits to your bank account</div>
               <div class="connect-cta-point"><span class="cp-icon"><i data-lucide="lock"></i></span> Bank-grade security — we never store your details</div>
-              <div class="connect-cta-point"><span class="cp-icon">💸</span> Automatic payouts on your schedule</div>
+              <div class="connect-cta-point"><span class="cp-icon"><i data-lucide="dollar-sign"></i></span> Automatic payouts on your schedule</div>
               <div class="connect-cta-point"><span class="cp-icon"><i data-lucide="bar-chart-2"></i></span> Full payout history and reporting</div>
             </div>
           </div>
@@ -437,7 +437,7 @@
             <div class="connect-status-desc">Your Stripe account is being reviewed. This usually takes 1–2 business days. You'll receive an email once your account is approved and payouts are enabled.</div>
             <div class="connect-status-chips">
               <span class="status-chip warn">⏳ Pending review</span>
-              <span class="status-chip warn" id="chipPayoutsStatus">💳 Payouts pending</span>
+              <span class="status-chip warn" id="chipPayoutsStatus"><i data-lucide="credit-card"></i> Payouts pending</span>
             </div>
             <div class="connect-status-actions">
               <a class="btn-stripe-sm" id="pendingDashboardBtn" href="#" target="_blank" rel="noopener">Open Stripe Dashboard ↗</a>
@@ -446,13 +446,13 @@
         </div>
         <!-- Restricted -->
         <div id="connectRestricted" class="connect-status" style="display:none;">
-          <div class="connect-status-icon restricted">⚠️</div>
+          <div class="connect-status-icon restricted"><i data-lucide="alert-triangle"></i></div>
           <div class="connect-status-body">
             <div class="connect-status-title restricted">Action required</div>
             <div class="connect-status-desc" id="restrictedDesc">Your Stripe account has restrictions that are preventing payouts. Please complete the required steps to continue receiving payments.</div>
             <div class="connect-status-chips">
-              <span class="status-chip fail">⚠️ Restricted</span>
-              <span class="status-chip fail">💳 Payouts disabled</span>
+              <span class="status-chip fail"><i data-lucide="alert-triangle"></i> Restricted</span>
+              <span class="status-chip fail"><i data-lucide="credit-card"></i> Payouts disabled</span>
             </div>
             <div class="connect-status-actions">
               <button class="btn-stripe-sm" id="btnCompleteSetup" onclick="continueStripeOnboarding()">Complete setup →</button>
@@ -507,7 +507,7 @@
         <!-- Recent payouts table -->
         <div class="panel">
           <div class="panel-header">
-            <div class="panel-title">📋 Recent Payouts</div>
+            <div class="panel-title"><i data-lucide="clipboard"></i> Recent Payouts</div>
             <div class="panel-actions">
               <button class="panel-btn" onclick="loadPayoutSettings()">↻ Refresh</button>
             </div>
@@ -534,12 +534,12 @@
             </div>
             <div id="payoutsEmpty" style="display:none;">
               <div class="panel-empty">
-                <div class="panel-empty-icon">📭</div>
+                <div class="panel-empty-icon"><i data-lucide="mail"></i></div>
                 No payouts yet. Connect your Stripe account and start earning.
               </div>
             </div>
             <div id="payoutsError" style="display:none;">
-              <div class="panel-error"><div class="panel-error-icon">⚠️</div>Could not load payout history.</div>
+              <div class="panel-error"><div class="panel-error-icon"><i data-lucide="alert-triangle"></i></div>Could not load payout history.</div>
             </div>
           </div>
         </div>
@@ -550,7 +550,7 @@
           <!-- Payout schedule -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">📅 Payout Schedule</div>
+              <div class="panel-title"><i data-lucide="calendar"></i> Payout Schedule</div>
               <div class="panel-actions">
                 <a class="panel-btn" id="editScheduleBtn" href="https://dashboard.stripe.com/settings/payouts" target="_blank" rel="noopener">Edit ↗</a>
               </div>
@@ -565,7 +565,7 @@
               <div class="schedule-interval" id="scheduleInterval">—</div>
               <div class="schedule-detail" id="scheduleDetail">—</div>
               <div class="schedule-next">
-                <div class="schedule-next-icon">📆</div>
+                <div class="schedule-next-icon"><i data-lucide="calendar"></i></div>
                 <div>
                   <div class="schedule-next-label">Next payout estimated</div>
                   <div class="schedule-next-val" id="scheduleNextDate">—</div>
@@ -586,7 +586,7 @@
           <!-- Bank account -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">🏦 Bank Account</div>
+              <div class="panel-title"><i data-lucide="landmark"></i> Bank Account</div>
               <div class="panel-actions">
                 <a class="panel-btn" id="updateBankBtn" href="https://dashboard.stripe.com/settings/payouts" target="_blank" rel="noopener">Update ↗</a>
               </div>
@@ -613,7 +613,7 @@
             </div>
             <div id="bankNoAccount" style="display:none;">
               <div class="bank-no-account">
-                <div class="bank-no-icon">🏦</div>
+                <div class="bank-no-icon"><i data-lucide="landmark"></i></div>
                 <div class="bank-no-text">No bank account connected yet.</div>
                 <button class="btn-stripe-sm" onclick="startStripeConnect()">
                   <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="white"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="#635BFF"/></svg>
