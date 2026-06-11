@@ -272,7 +272,7 @@
       border-radius: 14px; overflow: hidden; cursor: pointer; transition: all .2s;
     }
     .artist-card:hover { border-color: var(--border-bright); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.32); }
-    .ac-banner { height: 62px; position: relative; }
+    .ac-banner { height: 120px; position: relative; }
     .ac-category {
       position: absolute; top: 7px; right: 8px;
       background: rgba(8,15,28,.72); backdrop-filter: blur(4px);
@@ -287,7 +287,7 @@
       padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
     }
     .ac-body { padding: 0 13px 13px; }
-    .ac-avatar-wrap { margin-top: -20px; margin-bottom: 9px; }
+    .ac-avatar-wrap { margin-top: -21px; margin-bottom: 9px; }
     .ac-avatar {
       width: 42px; height: 42px; border-radius: 50%;
       border: 3px solid var(--bg-panel);
@@ -575,7 +575,7 @@
         '<div class="ac-name">' + a.displayName + '</div>' +
         '<div class="ac-genre">' + bio + '</div>' +
         '<div class="ac-stats">' +
-          '<div class="ac-stat">👥 <span class="ac-stat-val">' + a.followers + '</span></div>' +
+          '<div class="ac-stat"><i data-lucide="users"></i> <span class="ac-stat-val">' + a.followers + '</span></div>' +
         '</div>' +
         '<button class="ac-btn subscribe" onclick="event.stopPropagation();viewArtist(\'' + a.slug + '\')">View</button>' +
       '</div>' +
@@ -646,7 +646,8 @@
   function renderGrid(list) {
     var grid = document.getElementById('artistsGrid');
     if (!list.length) {
-      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">No artists found</div><div class="empty-state-sub">Try a different search term or filter.</div></div>';
+      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="search"></i></div><div class="empty-state-title">No artists found</div><div class="empty-state-sub">Try a different search term or filter.</div></div>';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
       return;
     }
     grid.innerHTML = list.map(function(a) {
@@ -664,13 +665,14 @@
           '<div class="ac-name">' + a.name + '</div>' +
           '<div class="ac-genre">' + a.genre + '</div>' +
           '<div class="ac-stats">' +
-            '<div class="ac-stat">👥 <span class="ac-stat-val">' + a.followers + '</span></div>' +
-            '<div class="ac-stat">📁 <span class="ac-stat-val">' + a.drops + '</span> drops</div>' +
+            '<div class="ac-stat"><i data-lucide="users"></i> <span class="ac-stat-val">' + a.followers + '</span></div>' +
+            '<div class="ac-stat"><i data-lucide="folder"></i> <span class="ac-stat-val">' + a.drops + '</span> drops</div>' +
           '</div>' +
           '<button class="ac-btn ' + btnCls + '" onclick="event.stopPropagation();toggleFollow(\'' + a.id + '\',\'' + a.name + '\',' + a.sub + ')">' + btnText + '</button>' +
         '</div>' +
       '</div>';
     }).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ── Full page render ──────────────────────────────────────────
@@ -684,13 +686,20 @@
 
     var titleEl = document.getElementById('gridTitle');
     if (_query) {
-      titleEl.innerHTML = '🔍 Results for "' + _query + '"';
+      titleEl.innerHTML = '<i data-lucide="search"></i> Results for "' + _query + '"';
     } else if (_filter !== 'all') {
-      var labels = { music:'🎵 Music', photography:'📸 Photography', film:'🎬 Film', art:'🎨 Art', sports:'🏆 Sports' };
-      titleEl.textContent = (labels[_filter] || _filter);
+      var labels = {
+        music:       '<i data-lucide="music"></i> Music',
+        photography: '<i data-lucide="camera"></i> Photography',
+        film:        '<i data-lucide="video"></i> Film',
+        art:         '<i data-lucide="palette"></i> Art',
+        sports:      '<i data-lucide="trophy"></i> Sports'
+      };
+      titleEl.innerHTML = (labels[_filter] || _filter);
     } else {
-      titleEl.textContent = '🔥 Trending Now';
+      titleEl.innerHTML = '<i data-lucide="flame"></i> Trending Now';
     }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
     var total = filtered.length;
     document.getElementById('resultCount').textContent = total + ' artist' + (total !== 1 ? 's' : '');
