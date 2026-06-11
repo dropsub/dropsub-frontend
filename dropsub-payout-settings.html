@@ -431,12 +431,12 @@
         </div>
         <!-- Pending -->
         <div id="connectPending" class="connect-status" style="display:none;">
-          <div class="connect-status-icon pending">⏳</div>
+          <div class="connect-status-icon pending"><i data-lucide="clock"></i></div>
           <div class="connect-status-body">
             <div class="connect-status-title pending">Verification in progress</div>
             <div class="connect-status-desc">Your Stripe account is being reviewed. This usually takes 1–2 business days. You'll receive an email once your account is approved and payouts are enabled.</div>
             <div class="connect-status-chips">
-              <span class="status-chip warn">⏳ Pending review</span>
+              <span class="status-chip warn"><i data-lucide="clock"></i> Pending review</span>
               <span class="status-chip warn" id="chipPayoutsStatus"><i data-lucide="credit-card"></i> Payouts pending</span>
             </div>
             <div class="connect-status-actions">
@@ -753,7 +753,7 @@
     if (status === 'enabled') {
       badge.innerHTML = '<span class="status-chip ok" style="font-size:.7rem;">✓ Connected</span>';
     } else if (status === 'pending') {
-      badge.innerHTML = '<span class="status-chip warn" style="font-size:.7rem;">⏳ Pending</span>';
+      badge.innerHTML = '<span class="status-chip warn" style="font-size:.7rem;"><i data-lucide="clock"></i> Pending</span>'; if (typeof lucide !== 'undefined') lucide.createIcons();
     } else if (status === 'restricted') {
       badge.innerHTML = '<span class="status-chip fail" style="font-size:.7rem;">⚠ Restricted</span>';
     } else {
@@ -789,9 +789,10 @@
   function renderStats(balance) {
     var b = balance || {};
     document.getElementById('statsRow').innerHTML =
-      statCard('Available Balance', '💰', fmtCurrency(b.available), 'gold', b.available > 0 ? 'Ready to pay out' : 'No balance available', b.available > 0 ? 'avail' : '') +
-      statCard('Pending Payouts', '⏳', fmtCurrency(b.pending), 'blue', 'In Stripe\'s rolling reserve', '') +
-      statCard('Total Earned', '📈', fmtCurrency(b.total_earned || b.total), '', 'All time gross revenue', '');
+      statCard('Available Balance', '<i data-lucide="dollar-sign"></i>', fmtCurrency(b.available), 'gold', b.available > 0 ? 'Ready to pay out' : 'No balance available', b.available > 0 ? 'avail' : '') +
+      statCard('Pending Payouts', '<i data-lucide="clock"></i>', fmtCurrency(b.pending), 'blue', 'In Stripe\'s rolling reserve', '') +
+      statCard('Total Earned', '<i data-lucide="trending-up"></i>', fmtCurrency(b.total_earned || b.total), '', 'All time gross revenue', '');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
     // Update sidebar
     document.getElementById('sidebarBalance').textContent = fmtCurrency(b.available);
