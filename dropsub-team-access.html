@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Team Access</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deepest:    #080f1c;
+      --bg-dark:       #0c1527;
+      --bg-panel:      #0f1d35;
+      --bg-sidebar:    #0d1a30;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --bg-row:        #0e1a2e;
+      --bg-row-alt:    #0b1525;
+      --blue-bright:   #2979ff;
+      --blue-mid:      #1a56d6;
+      --blue-glow:     #3d8bff;
+      --blue-dim:      #1c3a6e;
+      --accent-gold:   #f5a623;
+      --accent-amber:  #e8921a;
+      --success:       #3fa06a;
+      --error:         #ff4f6a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+    }
+
+    html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--bg-deepest); color: var(--text-white); display: flex; flex-direction: column; }
+
+    /* ── TOP NAV ────────────────────────────────────── */
+    .topnav { height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 50; }
+    .topnav-left { display: flex; align-items: center; gap: 16px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: .95rem; text-decoration: none; color: var(--text-white); }
+    .nav-tabs { display: flex; gap: 2px; }
+    .nav-tab { padding: 5px 12px; border-radius: 6px; font-size: .8rem; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .nav-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-tab.active { background: var(--bg-card); color: var(--text-white); }
+    .topnav-right { display: flex; align-items: center; gap: 10px; }
+    .notif-btn { width: 30px; height: 30px; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .85rem; cursor: pointer; position: relative; }
+    .notif-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; background: var(--blue-bright); border-radius: 50%; border: 1px solid var(--bg-panel); }
+    .user-menu-wrap { position: relative; }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--blue-bright); background: linear-gradient(135deg, #2979ff, #7c4dff); display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-panel); border: 1px solid var(--border-bright); border-radius: 12px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 100; overflow: hidden; animation: dropdownIn .15s cubic-bezier(.22,1,.36,1); }
+    .user-dropdown.open { display: block; }
+    @keyframes dropdownIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .user-dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; color: var(--text-white); }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .user-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .82rem; color: var(--text-light); cursor: pointer; transition: background .12s; }
+    .user-dropdown-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .user-dropdown-item .dd-icon { font-size: .9rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .user-dropdown-item.signout { color: var(--error); }
+    .user-dropdown-item.signout:hover { background: rgba(255,79,106,.08); }
+
+    /* ── CTA BAR ────────────────────────────────────── */
+    .upload-cta-bar { background: linear-gradient(90deg, rgba(41,121,255,.18), rgba(90,77,255,.12)); border-bottom: 1px solid rgba(41,121,255,.25); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 12px; }
+    .upload-cta-left { display: flex; align-items: center; gap: 12px; }
+    .upload-cta-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(41,121,255,.4); }
+    .upload-cta-text { font-size: .82rem; color: var(--text-light); }
+    .upload-cta-text strong { color: var(--text-white); }
+    .upload-cta-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-cta-ghost { display: flex; align-items: center; gap: 7px; background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 20px; padding: 7px 14px; font-size: .78rem; font-weight: 600; color: var(--text-light); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .btn-cta-ghost:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-upload-now { display: flex; align-items: center; gap: 7px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; border-radius: 20px; padding: 8px 16px; font-size: .78rem; font-weight: 700; color: #fff; cursor: pointer; transition: all .15s; font-family: inherit; box-shadow: 0 4px 14px rgba(41,121,255,.35); text-decoration: none; }
+    .btn-upload-now:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(41,121,255,.45); }
+
+    /* ── APP SHELL ──────────────────────────────────── */
+    .app-shell { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── LEFT NAV ───────────────────────────────────── */
+    .left-nav { width: 220px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px 0; flex-shrink: 0; overflow-y: auto; }
+    .left-nav::-webkit-scrollbar { width: 0; }
+    .nav-section-label { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); padding: 12px 16px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; transition: all .15s; font-size: .83rem; font-weight: 500; color: var(--text-mid); margin: 1px 8px; border-radius: 8px; text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-item.active { background: var(--bg-card); color: var(--text-white); }
+    .nav-item.active .nav-icon { color: var(--blue-bright); }
+    .nav-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--blue-bright); color: #fff; font-size: .6rem; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+    .nav-badge.gold { background: var(--accent-gold); color: #080f1c; }
+    .nav-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+    .artist-mini { margin: 0 8px 8px; padding: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+    .artist-mini-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .artist-mini-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid)); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 800; border: 2px solid var(--blue-bright); box-shadow: 0 0 10px rgba(41,121,255,.3); flex-shrink: 0; overflow: hidden; }
+    .artist-mini-name { font-size: .85rem; font-weight: 800; color: var(--text-white); }
+    .artist-mini-role { font-size: .68rem; color: var(--text-dim); }
+    .artist-mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mini-stat { text-align: center; }
+    .mini-stat-val { font-size: .85rem; font-weight: 800; color: var(--text-white); }
+    .mini-stat-val.gold { background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .mini-stat-val.blue { background: linear-gradient(135deg, var(--blue-bright), var(--blue-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .mini-stat-label { font-size: .6rem; color: var(--text-dim); }
+
+    /* ── MAIN ───────────────────────────────────────── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .content-scroll { flex: 1; overflow-y: auto; padding: 20px; }
+    .content-scroll::-webkit-scrollbar { width: 6px; }
+    .content-scroll::-webkit-scrollbar-track { background: transparent; }
+    .content-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+    /* ── PAGE HEADER ────────────────────────────────── */
+    .page-header { margin-bottom: 20px; }
+    .page-title { font-size: 1.2rem; font-weight: 900; letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+    .page-sub { font-size: .78rem; color: var(--text-dim); margin-top: 3px; }
+
+    /* ── PANELS ─────────────────────────────────────── */
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--bg-card); }
+    .panel-title { font-size: .88rem; font-weight: 700; color: var(--text-white); display: flex; align-items: center; gap: 8px; }
+    .panel-actions { display: flex; gap: 8px; align-items: center; }
+    .panel-btn { display: flex; align-items: center; gap: 5px; background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 6px; padding: 5px 10px; font-size: .73rem; font-weight: 600; color: var(--text-mid); cursor: pointer; transition: all .15s; font-family: inherit; text-decoration: none; }
+    .panel-btn:hover { color: var(--text-white); border-color: var(--blue-dim); }
+    .panel-btn.primary { background: var(--blue-dim); border-color: var(--blue-bright); color: var(--text-white); }
+    .panel-btn.primary:hover { background: var(--blue-mid); }
+
+    /* ── TEAM TABLE ─────────────────────────────────── */
+    .team-table { width: 100%; border-collapse: collapse; }
+    .team-table th { padding: 9px 16px; text-align: left; font-size: .68rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); background: var(--bg-card); }
+    .team-table td { padding: 12px 16px; font-size: .81rem; vertical-align: middle; border-bottom: 1px solid rgba(26,45,80,.4); }
+    .team-table tbody tr { transition: background .12s; }
+    .team-table tbody tr:hover { background: var(--bg-hover); }
+    .team-table tbody tr:last-child td { border-bottom: none; }
+
+    .member-cell { display: flex; align-items: center; gap: 10px; }
+    .member-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid)); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800; border: 1.5px solid var(--blue-bright); flex-shrink: 0; overflow: hidden; }
+    .member-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .member-name { font-size: .83rem; font-weight: 600; color: var(--text-white); }
+    .member-email { font-size: .7rem; color: var(--text-dim); margin-top: 1px; }
+
+    .role-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: .65rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+    .role-badge.artist { background: rgba(41,121,255,.18); color: var(--blue-glow); border: 1px solid rgba(41,121,255,.3); }
+    .role-badge.manager { background: rgba(122,156,200,.12); color: var(--text-mid); border: 1px solid rgba(122,156,200,.25); }
+    .role-badge.owner { background: rgba(41,121,255,.18); color: var(--blue-glow); border: 1px solid rgba(41,121,255,.3); }
+
+    .perm-select { background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 6px; padding: 5px 8px; font-size: .75rem; font-weight: 500; color: var(--text-light); font-family: inherit; cursor: pointer; transition: border-color .15s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a9cc8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 26px; }
+    .perm-select:focus { outline: none; border-color: var(--blue-bright); }
+    .perm-select:disabled { opacity: .5; cursor: default; }
+    .perm-text { font-size: .78rem; color: var(--text-mid); }
+
+    .date-cell { font-size: .76rem; color: var(--text-mid); white-space: nowrap; }
+
+    .btn-remove { display: inline-flex; align-items: center; gap: 5px; background: transparent; border: 1px solid rgba(255,79,106,.3); border-radius: 6px; padding: 4px 10px; font-size: .72rem; font-weight: 600; color: var(--error); cursor: pointer; transition: all .15s; font-family: inherit; }
+    .btn-remove:hover { background: rgba(255,79,106,.1); border-color: var(--error); }
+
+    /* Skeleton */
+    .skel-line { background: var(--bg-hover); border-radius: 4px; animation: shimmer 1.4s ease-in-out infinite; }
+    @keyframes shimmer { 0%,100% { opacity:.4; } 50% { opacity:.9; } }
+    .skel-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(26,45,80,.35); }
+    .skel-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; flex-shrink: 0; }
+    .skel-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .skel-line-a { height: 10px; border-radius: 3px; width: 60%; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; }
+    .skel-line-b { height: 8px; border-radius: 3px; width: 35%; background: var(--bg-hover); animation: shimmer 1.4s ease-in-out infinite; animation-delay: .1s; }
+
+    /* Empty / error */
+    .panel-empty { padding: 36px 20px; text-align: center; color: var(--text-dim); font-size: .82rem; }
+    .panel-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+    .panel-error { padding: 28px; text-align: center; color: var(--text-dim); font-size: .82rem; }
+
+    /* ── INVITE FORM ────────────────────────────────── */
+    .invite-form { padding: 20px 18px; }
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); }
+    .form-input { background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 8px; padding: 9px 12px; font-size: .83rem; color: var(--text-white); font-family: inherit; transition: border-color .15s; }
+    .form-input:focus { outline: none; border-color: var(--blue-bright); }
+    .form-input::placeholder { color: var(--text-dim); }
+    .form-select { background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 8px; padding: 9px 32px 9px 12px; font-size: .83rem; color: var(--text-white); font-family: inherit; cursor: pointer; transition: border-color .15s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a9cc8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-color: var(--bg-hover); }
+    .form-select:focus { outline: none; border-color: var(--blue-bright); }
+
+    .btn-invite { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--blue-bright), #5a4dff); border: none; border-radius: 8px; padding: 10px 22px; font-size: .83rem; font-weight: 700; color: #fff; cursor: pointer; transition: all .15s; font-family: inherit; box-shadow: 0 4px 14px rgba(41,121,255,.35); }
+    .btn-invite:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(41,121,255,.45); }
+    .btn-invite:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .invite-error { margin-top: 12px; padding: 10px 14px; background: rgba(255,79,106,.1); border: 1px solid rgba(255,79,106,.3); border-radius: 8px; font-size: .78rem; color: var(--error); display: none; }
+    .invite-error.show { display: block; }
+    .invite-success { margin-top: 12px; padding: 10px 14px; background: rgba(63,160,106,.1); border: 1px solid rgba(63,160,106,.3); border-radius: 8px; font-size: .78rem; color: var(--success); display: none; }
+    .invite-success.show { display: block; }
+
+    .form-hint { font-size: .72rem; color: var(--text-dim); margin-top: 4px; }
+
+    /* Readonly form for non-artists */
+    .form-readonly-notice { padding: 20px 18px; font-size: .81rem; color: var(--text-dim); display: flex; align-items: center; gap: 10px; }
+
+    /* ── CAPACITY BAR ───────────────────────────────── */
+    .capacity-bar-wrap { padding: 12px 18px; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .capacity-bar-track { flex: 1; height: 6px; background: var(--bg-hover); border-radius: 3px; overflow: hidden; }
+    .capacity-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue-bright), #5a4dff); border-radius: 3px; transition: width .4s ease; }
+    .capacity-label { font-size: .72rem; color: var(--text-mid); white-space: nowrap; }
+    .capacity-label strong { color: var(--text-white); }
+
+    /* ── TOAST ──────────────────────────────────────── */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px); background: var(--bg-hover); border: 1px solid var(--border-bright); border-radius: 24px; padding: 9px 18px; font-size: .81rem; color: var(--text-white); font-weight: 500; opacity: 0; transition: all .25s; z-index: 400; white-space: nowrap; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--error); }
+
+    /* Page-level loading */
+    .page-loading { position: fixed; inset: 0; background: var(--bg-deepest); display: flex; align-items: center; justify-content: center; z-index: 300; transition: opacity .3s; }
+    .page-loading.hidden { opacity: 0; pointer-events: none; }
+    .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--blue-bright); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
+
+<div class="page-loading" id="pageLoading"><div class="loading-spinner"></div></div>
+
+<!-- ── TOP NAV ─────────────────────────────────────── -->
+<div class="topnav">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+      <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png" alt="DropSub" style="height:28px; width:auto;">
+      <span style="font-size:18px; font-weight:500; color:#fff; letter-spacing:-0.3px;">Drop<span style="color:#2979ff;">Sub</span></span>
+    </a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="dropsub-fan-dashboard.html">Fan View</a>
+      <a class="nav-tab" href="dropsub-artist-dashboard.html">Artist Dashboard</a>
+      <a class="nav-tab active" href="#">Team Access</a>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <div class="notif-btn" onclick="showToast('No new notifications')"><i data-lucide="bell"></i><div class="notif-dot"></div></div>
+    <div class="user-menu-wrap">
+      <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">—</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="dropdownName">—</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-artist-profile.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="mic"></i></span>Artist Profile</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="signOut()"><span class="dd-icon"><i data-lucide="log-out"></i></span>Sign out</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CTA BAR ─────────────────────────────────────── -->
+<div class="upload-cta-bar">
+  <div class="upload-cta-left">
+    <div class="upload-cta-icon"><i data-lucide="users"></i></div>
+    <div class="upload-cta-text">
+      <strong>Team Access.</strong> Invite managers and collaborators to help run your DropSub account — up to 5 members total.
+    </div>
+  </div>
+  <div class="upload-cta-right">
+    <a class="btn-cta-ghost" href="dropsub-artist-dashboard.html"><i data-lucide="bar-chart-2"></i> Dashboard</a>
+    <a class="btn-upload-now" href="dropsub-artist-profile.html"><i data-lucide="mic"></i> Artist Profile</a>
+  </div>
+</div>
+
+<!-- ── APP SHELL ───────────────────────────────────── -->
+<div class="app-shell">
+
+  <!-- ── LEFT NAV ──────────────────────────────────── -->
+  <div class="left-nav">
+    <div class="artist-mini">
+      <div class="artist-mini-top">
+        <div class="artist-mini-avatar" id="sidebarAvatar">—</div>
+        <div>
+          <div class="artist-mini-name" id="sidebarName">—</div>
+          <div class="artist-mini-role" id="sidebarRole">Artist</div>
+        </div>
+      </div>
+      <div class="artist-mini-stats">
+        <div class="mini-stat">
+          <div class="mini-stat-val blue" id="sidebarMemberCount">—</div>
+          <div class="mini-stat-label">Members</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-val" id="sidebarSlotsLeft">—</div>
+          <div class="mini-stat-label">Slots Left</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Manage</div>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="folder-open"></i></span>Drops</a>
+    <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
+    <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon"><i data-lucide="search"></i></span>Discover</a>
+    <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers</a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Revenue</div>
+    <a class="nav-item" href="dropsub-artist-analytics.html"><span class="nav-icon"><i data-lucide="trending-up"></i></span>Analytics</a>
+    <a class="nav-item" href="dropsub-payout-settings.html"><span class="nav-icon"><i data-lucide="credit-card"></i></span>Payouts</a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item" href="dropsub-artist-profile.html"><span class="nav-icon"><i data-lucide="mic"></i></span>Artist Profile</a>
+    <a class="nav-item active" href="dropsub-team-access.html"><span class="nav-icon"><i data-lucide="user-plus"></i></span>Team Access</a>
+    <a class="nav-item" href="dropsub-account-settings.html"><span class="nav-icon"><i data-lucide="settings"></i></span>Settings</a>
+
+    <div class="nav-divider"></div>
+    <a class="nav-item" onclick="signOut()"><span class="nav-icon"><i data-lucide="log-out"></i></span>Sign out</a>
+  </div>
+
+  <!-- ── MAIN ──────────────────────────────────────── -->
+  <div class="main">
+    <div class="content-scroll">
+
+      <div class="page-header">
+        <div class="page-title"><i data-lucide="user-plus"></i> Team Access</div>
+        <div class="page-sub">Manage who has access to your artist account (up to 5 members).</div>
+      </div>
+
+      <!-- ── CURRENT TEAM ─────────────────────────── -->
+      <div class="panel" id="teamPanel">
+        <div class="panel-header">
+          <div class="panel-title"><i data-lucide="users"></i> Current Team Members</div>
+          <div class="panel-actions">
+            <button class="panel-btn" onclick="loadTeam()">↻ Refresh</button>
+          </div>
+        </div>
+
+        <!-- Skeleton -->
+        <div id="teamSkeleton">
+          <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
+          <div class="skel-row"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line-a"></div><div class="skel-line-b"></div></div></div>
+        </div>
+
+        <!-- Table -->
+        <div id="teamTableWrap" style="display:none; overflow-x:auto;">
+          <table class="team-table">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Role</th>
+                <th>Permissions</th>
+                <th>Added</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="teamTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Empty -->
+        <div id="teamEmpty" style="display:none;">
+          <div class="panel-empty">
+            <div class="panel-empty-icon"><i data-lucide="users"></i></div>
+            No team members yet.
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div id="teamError" style="display:none;">
+          <div class="panel-error"><i data-lucide="alert-triangle"></i> Could not load team members.</div>
+        </div>
+
+        <!-- Capacity bar -->
+        <div class="capacity-bar-wrap" id="capacityBar" style="display:none;">
+          <div class="capacity-bar-track">
+            <div class="capacity-bar-fill" id="capacityFill" style="width:0%"></div>
+          </div>
+          <div class="capacity-label"><strong id="capacityCount">0</strong> / 5 members</div>
+        </div>
+      </div>
+
+      <!-- ── ADD TEAM MEMBER ──────────────────────── -->
+      <div class="panel" id="invitePanel">
+        <div class="panel-header">
+          <div class="panel-title"><i data-lucide="user-plus"></i> Add Team Member</div>
+        </div>
+
+        <!-- Form (artist/owner only) -->
+        <div id="inviteForm" class="invite-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="inviteEmail">Email address</label>
+              <input class="form-input" type="email" id="inviteEmail" placeholder="colleague@example.com" autocomplete="off"/>
+              <div class="form-hint">They must already have a DropSub account.</div>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="inviteRole">Role</label>
+              <select class="form-select" id="inviteRole">
+                <option value="artist">Artist</option>
+                <option value="manager" selected>Manager</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="invitePermission">Permission</label>
+              <select class="form-select" id="invitePermission">
+                <option value="full_access">Full Access</option>
+                <option value="manage_content" selected>Manage Content</option>
+                <option value="read_only">Read Only</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-invite" id="btnInvite" onclick="sendInvite()">
+            <i data-lucide="user-plus"></i> Send Invite
+          </button>
+          <div class="invite-error" id="inviteError"></div>
+          <div class="invite-success" id="inviteSuccess"></div>
+        </div>
+
+        <!-- Read-only notice for managers -->
+        <div id="inviteReadonly" class="form-readonly-notice" style="display:none;">
+          <i data-lucide="lock"></i>
+          Only Artist-role members can add or remove team members.
+        </div>
+      </div>
+
+    </div><!-- /content-scroll -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var _artistId  = null;
+  var _myUserId  = null;
+  var _myRole    = null; // role in artist_team: owner, artist, manager
+  var _canEdit   = false;
+  var _teamData  = [];
+
+  var PERM_LABELS = { full_access: 'Full Access', manage_content: 'Manage Content', read_only: 'Read Only' };
+  var ROLE_LABELS = { owner: 'Artist', artist: 'Artist', manager: 'Manager' };
+
+  // ── Helpers ────────────────────────────────────────────────────
+  var _toastTimer;
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = 'toast show' + (type ? ' ' + type : '');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2800);
+  }
+
+  function token() {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  }
+
+  function handle401() {
+    localStorage.removeItem('access_token'); sessionStorage.removeItem('access_token');
+    window.location.replace('dropsub-login.html');
+  }
+
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function closeUserMenu() {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu-wrap')) closeUserMenu();
+  });
+
+  function signOut() {
+    localStorage.removeItem('access_token'); localStorage.removeItem('user');
+    sessionStorage.removeItem('access_token'); sessionStorage.removeItem('user');
+    window.location.replace('dropsub-login.html');
+  }
+
+  function fmtDate(str) {
+    if (!str) return '—';
+    var d = new Date(str);
+    if (isNaN(d)) return str;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function initials(name) {
+    if (!name) return '?';
+    return name.split(' ').filter(Boolean).map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '?';
+  }
+
+  // ── Render team table ───────────────────────────────────────────
+  function renderTeam(team, myRole, myUserId) {
+    document.getElementById('teamSkeleton').style.display = 'none';
+    document.getElementById('teamError').style.display    = 'none';
+
+    if (!team || team.length === 0) {
+      document.getElementById('teamEmpty').style.display = 'block';
+      setCapacity(0);
+      return;
+    }
+
+    var canEdit = ['owner', 'artist'].includes(myRole);
+    var tbody   = document.getElementById('teamTableBody');
+    tbody.innerHTML = team.map(function(m) {
+      var ini   = initials(m.name);
+      var avatarHtml = m.avatar_url
+        ? '<img src="' + m.avatar_url + '" alt="' + ini + '">'
+        : ini;
+      var roleLabel  = ROLE_LABELS[m.role]  || m.role;
+      var roleCls    = (m.role === 'manager') ? 'manager' : 'artist';
+      var permLabel  = PERM_LABELS[m.permission] || m.permission;
+      var isSelf     = (m.profile_id === myUserId);
+
+      var permCell;
+      if (canEdit && !isSelf) {
+        permCell =
+          '<select class="perm-select" onchange="updatePermission(\'' + m.profile_id + '\', this.value)">' +
+            '<option value="full_access"'    + (m.permission === 'full_access'    ? ' selected' : '') + '>Full Access</option>'    +
+            '<option value="manage_content"' + (m.permission === 'manage_content' ? ' selected' : '') + '>Manage Content</option>' +
+            '<option value="read_only"'      + (m.permission === 'read_only'      ? ' selected' : '') + '>Read Only</option>'      +
+          '</select>';
+      } else {
+        permCell = '<span class="perm-text">' + permLabel + '</span>';
+      }
+
+      var removeBtn = (canEdit && !isSelf)
+        ? '<button class="btn-remove" onclick="removeMember(\'' + m.profile_id + '\', \'' + m.name.replace(/'/g, "\\'") + '\')">' +
+            '<i data-lucide="user-minus"></i> Remove' +
+          '</button>'
+        : '';
+
+      return '<tr>' +
+        '<td><div class="member-cell">' +
+          '<div class="member-avatar">' + avatarHtml + '</div>' +
+          '<div><div class="member-name">' + (m.name || '—') + (isSelf ? ' <span style="font-size:.65rem;color:var(--text-dim);">(you)</span>' : '') + '</div>' +
+               '<div class="member-email">' + (m.email || '—') + '</div></div>' +
+        '</div></td>' +
+        '<td><span class="role-badge ' + roleCls + '">' + roleLabel + '</span></td>' +
+        '<td>' + permCell + '</td>' +
+        '<td class="date-cell">' + fmtDate(m.added_at) + '</td>' +
+        '<td>' + removeBtn + '</td>' +
+        '</tr>';
+    }).join('');
+
+    document.getElementById('teamTableWrap').style.display = 'block';
+    setCapacity(team.length);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  function setCapacity(count) {
+    var pct = Math.round((count / 5) * 100);
+    document.getElementById('capacityFill').style.width  = pct + '%';
+    document.getElementById('capacityCount').textContent = count;
+    document.getElementById('capacityBar').style.display = 'flex';
+    document.getElementById('sidebarMemberCount').textContent = count;
+    document.getElementById('sidebarSlotsLeft').textContent   = Math.max(0, 5 - count);
+  }
+
+  // ── Load team ───────────────────────────────────────────────────
+  function loadTeam() {
+    if (!_artistId) return;
+    document.getElementById('teamSkeleton').style.display  = 'flex';
+    document.getElementById('teamTableWrap').style.display = 'none';
+    document.getElementById('teamEmpty').style.display     = 'none';
+    document.getElementById('teamError').style.display     = 'none';
+    document.getElementById('capacityBar').style.display   = 'none';
+
+    fetch('https://api.dropsub.com/api/artists/' + _artistId + '/team', {
+      headers: { 'Authorization': 'Bearer ' + token() }
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+      })
+      .then(function(result) {
+        if (!result) return;
+        if (!result.ok) {
+          document.getElementById('teamSkeleton').style.display = 'none';
+          document.getElementById('teamError').style.display    = 'block';
+          return;
+        }
+        var team   = result.data.team    || [];
+        var myRole = result.data.my_role || 'manager';
+        _myRole  = myRole;
+        _teamData = team;
+        _canEdit  = ['owner', 'artist'].includes(myRole);
+
+        renderTeam(team, myRole, _myUserId);
+
+        // Show/hide invite form
+        if (_canEdit) {
+          document.getElementById('inviteForm').style.display    = 'block';
+          document.getElementById('inviteReadonly').style.display = 'none';
+        } else {
+          document.getElementById('inviteForm').style.display    = 'none';
+          document.getElementById('inviteReadonly').style.display = 'flex';
+        }
+      })
+      .catch(function() {
+        document.getElementById('teamSkeleton').style.display = 'none';
+        document.getElementById('teamError').style.display    = 'block';
+        showToast('Could not load team members.', 'error');
+      });
+  }
+
+  // ── Update permission ───────────────────────────────────────────
+  function updatePermission(profileId, permission) {
+    fetch('https://api.dropsub.com/api/artists/' + _artistId + '/team/' + profileId, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ permission: permission })
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+      })
+      .then(function(result) {
+        if (!result) return;
+        if (!result.ok) {
+          showToast((result.data && result.data.error) || 'Failed to update permission.', 'error');
+          loadTeam();
+          return;
+        }
+        showToast('Permission updated.', 'success');
+      })
+      .catch(function() {
+        showToast('Network error.', 'error');
+        loadTeam();
+      });
+  }
+
+  // ── Remove member ───────────────────────────────────────────────
+  function removeMember(profileId, name) {
+    if (!confirm('Remove ' + name + ' from your team?')) return;
+
+    fetch('https://api.dropsub.com/api/artists/' + _artistId + '/team/' + profileId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token() }
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+      })
+      .then(function(result) {
+        if (!result) return;
+        if (!result.ok) {
+          showToast((result.data && result.data.error) || 'Failed to remove member.', 'error');
+          return;
+        }
+        showToast(name + ' has been removed.', 'success');
+        loadTeam();
+      })
+      .catch(function() { showToast('Network error.', 'error'); });
+  }
+
+  // ── Send invite ─────────────────────────────────────────────────
+  function sendInvite() {
+    var email      = document.getElementById('inviteEmail').value.trim();
+    var role       = document.getElementById('inviteRole').value;
+    var permission = document.getElementById('invitePermission').value;
+    var errEl      = document.getElementById('inviteError');
+    var okEl       = document.getElementById('inviteSuccess');
+    var btn        = document.getElementById('btnInvite');
+
+    errEl.classList.remove('show');
+    okEl.classList.remove('show');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled  = true;
+    btn.innerHTML = '<i data-lucide="loader"></i> Adding…';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    fetch('https://api.dropsub.com/api/artists/' + _artistId + '/team', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, role: role, permission: permission })
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+      })
+      .then(function(result) {
+        btn.disabled  = false;
+        btn.innerHTML = '<i data-lucide="user-plus"></i> Send Invite';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (!result) return;
+        if (!result.ok) {
+          var msg = (result.data && result.data.error) || 'Failed to add team member.';
+          errEl.textContent = msg;
+          errEl.classList.add('show');
+          return;
+        }
+        var memberName = (result.data.member && result.data.member.name) || email;
+        okEl.textContent = memberName + ' has been added to your team.';
+        okEl.classList.add('show');
+        document.getElementById('inviteEmail').value = '';
+        loadTeam();
+      })
+      .catch(function() {
+        btn.disabled  = false;
+        btn.innerHTML = '<i data-lucide="user-plus"></i> Send Invite';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        errEl.textContent = 'Network error — please try again.';
+        errEl.classList.add('show');
+      });
+  }
+
+  // ── Fetch user profile ──────────────────────────────────────────
+  function fetchUserProfile() {
+    fetch('https://api.dropsub.com/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token() }
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.json();
+      })
+      .then(function(data) {
+        if (!data) return;
+        var user = data.user || data;
+        if (user.role === 'fan') { window.location.replace('dropsub-fan-dashboard.html'); return; }
+
+        _myUserId = user.id;
+
+        var name  = user.full_name || user.name || user.username || '';
+        var email = user.email || '';
+        var role  = user.role  || '';
+        var ini   = name.split(' ').filter(Boolean).map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '?';
+
+        document.getElementById('navAvatar').textContent     = ini;
+        document.getElementById('sidebarAvatar').textContent = ini;
+        if (name)  { document.getElementById('dropdownName').textContent = name; document.getElementById('sidebarName').textContent = name; }
+        if (email) document.getElementById('dropdownEmail').textContent = email;
+        if (role)  document.getElementById('sidebarRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+        var artist = user.artist;
+        if (artist && artist.id) {
+          _artistId = artist.id;
+          loadTeam();
+        } else {
+          // User is on a team but not the owner — try to find their artist via team membership
+          // For now, show an error state
+          document.getElementById('teamSkeleton').style.display = 'none';
+          document.getElementById('teamError').style.display    = 'block';
+          showToast('No artist account linked.', 'error');
+        }
+
+        document.getElementById('pageLoading').classList.add('hidden');
+      })
+      .catch(function() {
+        document.getElementById('pageLoading').classList.add('hidden');
+        showToast('Could not load profile.', 'error');
+      });
+  }
+
+  // ── Init ────────────────────────────────────────────────────────
+  fetchUserProfile();
+</script>
+<script>document.addEventListener('DOMContentLoaded', function() { if (typeof lucide !== 'undefined') lucide.createIcons(); });</script>
+</body>
+</html>
