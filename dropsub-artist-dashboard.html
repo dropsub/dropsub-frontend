@@ -732,21 +732,29 @@
     }
     .panel-highlight { animation: panelFlash .9s ease-out; }
 
-    /* ── COLLAB TOGGLE ───────────────────────── */
-    .collab-toggle {
+    /* ── COLLAB BADGE (read-only indicator on folder row) ── */
+    .collab-badge {
       display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 9px; border-radius: 20px; border: 1px solid rgba(61,90,138,.5);
-      background: rgba(61,90,138,.1); color: var(--text-dim);
-      font-size: .62rem; font-weight: 800; letter-spacing: .06em;
-      cursor: pointer; transition: all .2s; flex-shrink: 0;
-      font-family: inherit;
+      padding: 2px 9px; border-radius: 20px;
+      background: rgba(245,166,35,.14); border: 1px solid var(--accent-gold);
+      color: var(--accent-gold); font-size: .62rem; font-weight: 800;
+      letter-spacing: .06em; pointer-events: none; flex-shrink: 0;
     }
-    .collab-toggle:hover { border-color: rgba(245,166,35,.5); color: var(--accent-gold); }
-    .collab-toggle.on {
-      background: rgba(245,166,35,.14); border-color: var(--accent-gold);
-      color: var(--accent-gold);
+
+    /* ── COLLAB TOGGLE SWITCH (in edit modal) ───────────── */
+    .collab-switch { position: relative; display: inline-block; width: 42px; height: 24px; cursor: pointer; flex-shrink: 0; }
+    .collab-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .collab-switch-track {
+      position: absolute; inset: 0; border-radius: 12px;
+      background: var(--border-bright); transition: background .2s;
     }
-    .collab-toggle.on:hover { background: rgba(245,166,35,.22); }
+    .collab-switch-track::after {
+      content: ''; position: absolute; left: 3px; top: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
+    }
+    .collab-switch input:checked + .collab-switch-track { background: var(--accent-gold); }
+    .collab-switch input:checked + .collab-switch-track::after { transform: translateX(18px); }
     .privacy-toggle-btn {
       display: inline-flex; align-items: center; gap: 4px;
       padding: 3px 9px; border-radius: 20px; font-size: .65rem; font-weight: 700;
@@ -1407,6 +1415,19 @@
           </select>
         </div>
         <div class="mfield">
+          <label>FAN CONTRIBUTIONS</label>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1px solid var(--border-bright);border-radius:8px;padding:12px 14px;">
+            <div>
+              <div style="font-size:.82rem;font-weight:600;color:var(--text-white);">Enable Fan Contributions (Collab)</div>
+              <div style="font-size:.72rem;color:var(--text-dim);margin-top:3px;">Allow fans to upload content to this folder.</div>
+            </div>
+            <label class="collab-switch">
+              <input type="checkbox" id="editFolderCollab">
+              <span class="collab-switch-track"></span>
+            </label>
+          </div>
+        </div>
+        <div class="mfield">
           <label>COVER IMAGE</label>
           <div class="cover-preview" id="editCoverPreview">
             <span class="cover-preview-placeholder" id="editCoverPlaceholder">No cover set</span>
@@ -1625,7 +1646,7 @@
                 <div class="folder-name">${f.name}</div>
                 <div class="folder-meta">${fileCount.toLocaleString()} files · ${size}</div>
               </div>
-              <button class="collab-toggle${collabOn ? ' on' : ''}" onclick="event.stopPropagation();toggleCollab(${idx})" title="${collabOn ? 'Disable fan collaboration uploads' : 'Enable fan collaboration uploads'}">${collabOn ? '🤝 COLLAB ON' : 'COLLAB'}</button>
+              ${collabOn ? '<span class="collab-badge">🤝 COLLAB ON</span>' : ''}
             </div>
           </td>
           <td>${badge}</td>
@@ -1645,36 +1666,6 @@
         </tr>`;
     }).join('');
     if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
-
-  function toggleCollab(idx) {
-    var folder = _currentFolders[idx];
-    var newVal = !folder.is_collab;
-    var token  = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    console.log('[toggleCollab] idx:', idx, '| folder.id:', folder && folder.id, '| folder.is_collab:', folder && folder.is_collab, '| newVal:', newVal, '| token present:', !!token);
-    fetch('https://api.dropsub.com/api/folders/' + folder.id, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ is_collab: newVal }),
-    })
-      .then(function(r) {
-        console.log('[toggleCollab] PATCH status:', r.status);
-        return r.json();
-      })
-      .then(function(d) {
-        console.log('[toggleCollab] PATCH response:', JSON.stringify(d));
-        if (d.folder || d.id) {
-          _currentFolders[idx].is_collab = newVal;
-          renderFolders(_currentFolders);
-          showToast(newVal ? '🤝 Fan uploads enabled for "' + folder.name + '"' : 'Fan uploads disabled for "' + folder.name + '"');
-        } else {
-          showToast((d.error || 'Failed to update collab setting'));
-        }
-      })
-      .catch(function(err) {
-        console.error('[toggleCollab] fetch error:', err);
-        showToast('Failed to update collab setting');
-      });
   }
 
   // ── Earnings chart ───────────────────────────────
@@ -2101,6 +2092,7 @@
     document.getElementById('editFolderName').value = f.name || '';
     document.getElementById('editFolderDesc').value = f.description || '';
     document.getElementById('editFolderVisibility').value = f.is_public !== false ? 'true' : 'false';
+    document.getElementById('editFolderCollab').checked = f.is_collab === true;
     selectEditTier(_editTier);
     // Cover
     _editCoverUrl = f.cover_url || null;
@@ -2299,7 +2291,8 @@
       name: name,
       description: document.getElementById('editFolderDesc').value.trim(),
       access_type: _editTier,
-      is_public: document.getElementById('editFolderVisibility').value === 'true'
+      is_public: document.getElementById('editFolderVisibility').value === 'true',
+      is_collab: document.getElementById('editFolderCollab').checked
     };
     if (_editCoverChanged) patchBody.cover_url = _editCoverUrl;
     fetch('https://api.dropsub.com/api/folders/' + f.id, {

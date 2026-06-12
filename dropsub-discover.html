@@ -288,6 +288,13 @@
       font-size: .56rem; font-weight: 800; letter-spacing: .06em;
       padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
     }
+    .ac-collab-badge {
+      position: absolute; top: 7px; left: 8px;
+      background: rgba(245,166,35,.85); color: #080f1c;
+      font-size: .56rem; font-weight: 800; letter-spacing: .06em;
+      padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+    }
+    .ac-new-badge + .ac-collab-badge { left: auto; right: 36px; }
     .ac-body { padding: 8px 13px 13px; }
     .ac-avatar-wrap { margin-top: -21px; margin-bottom: 9px; padding-left: 12px; position: relative; z-index: 1; }
     .ac-avatar {
@@ -543,7 +550,8 @@
           bannerUrl:   a.banner_url  || null,
           verified:    a.is_verified || false,
           isNew:       false,
-          real:        true
+          real:        true,
+          hasCollab:   !!(a.folders && a.folders.some(function(f) { return f.is_collab; }))
         };
       });
       renderFeatured();
@@ -563,9 +571,11 @@
       ? 'background:url(\'' + a.bannerUrl + '\') center/cover no-repeat;'
       : 'background:linear-gradient(135deg,#132040,#0d1a30);';
     var bio = a.genre || '—';
+    var collabBadge = a.hasCollab ? '<span class="ac-collab-badge">🤝 Collab</span>' : '';
     return '<div class="artist-card" onclick="viewArtist(\'' + a.slug + '\')">' +
       '<div class="ac-banner" style="' + bannerStyle + '">' +
         '<span class="ac-new-badge" style="background:rgba(41,121,255,.85);">LIVE</span>' +
+        collabBadge +
         (a.verified ? '<span class="ac-category">✓ VERIFIED</span>' : '') +
       '</div>' +
       '<div class="ac-body">' +

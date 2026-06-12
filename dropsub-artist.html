@@ -111,10 +111,12 @@
     .fc-cover { height: 120px; background: linear-gradient(135deg, #132040, #0d1a30); position: relative; overflow: hidden; }
     .fc-cover img { width: 100%; height: 100%; object-fit: cover; }
     .fc-cover-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, rgba(8,15,28,.6) 100%); }
-    .fc-access-badge { position: absolute; top: 10px; left: 10px; font-size: .6rem; font-weight: 800; letter-spacing: .08em; padding: 3px 9px; border-radius: 4px; text-transform: uppercase; }
+    .fc-badge-group { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; flex-wrap: wrap; align-items: flex-start; }
+    .fc-access-badge { font-size: .6rem; font-weight: 800; letter-spacing: .08em; padding: 3px 9px; border-radius: 4px; text-transform: uppercase; }
     .badge-free         { background: rgba(74,222,128,.15); border: 1px solid rgba(74,222,128,.3); color: #4ade80; }
     .badge-subscription { background: rgba(41,121,255,.15); border: 1px solid rgba(41,121,255,.3); color: var(--blue-bright); }
     .badge-premium      { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.3); color: var(--accent-gold); }
+    .badge-collab       { background: rgba(245,166,35,.15); border: 1px solid rgba(245,166,35,.35); color: var(--accent-gold); }
     .badge-locked { position: absolute; top: 10px; right: 10px; font-size: .95rem; }
     .fc-body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .fc-name { font-size: .88rem; font-weight: 800; line-height: 1.3; }
@@ -457,10 +459,14 @@
         btnHtml = '<button class="fc-btn fc-btn-buy" onclick="event.stopPropagation();purchaseDrop(\'' + f.id + '\')">' + btnLabel + '</button>';
       }
 
+      var collabBadge = f.is_collab ? '<span class="fc-access-badge badge-collab">🤝 Collab</span>' : '';
       return '<div class="folder-card" onclick="viewFolder(\'' + f.id + '\')">' +
         '<div class="fc-cover" style="' + coverStyle + '">' +
           '<div class="fc-cover-overlay"></div>' +
-          '<span class="fc-access-badge ' + badgeCls + '">' + badgeLabel + '</span>' +
+          '<div class="fc-badge-group">' +
+            '<span class="fc-access-badge ' + badgeCls + '">' + badgeLabel + '</span>' +
+            collabBadge +
+          '</div>' +
           lockIcon +
         '</div>' +
         '<div class="fc-body">' +
