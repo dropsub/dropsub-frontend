@@ -437,7 +437,7 @@
                      : f.access_type === 'subscription' ? 'Subscription'
                      : 'Premium';
 
-      var lockIcon = (f.access_status === 'locked') ? '<span class="badge-locked">🔒</span>' : '';
+      var lockIcon = (f.access_status === 'locked') ? '<span class="badge-locked"><i data-lucide="lock"></i></span>' : '';
 
       var price = '';
       if (f.access_type === 'subscription' && f.sub_price)
@@ -460,7 +460,7 @@
         btnHtml = '<button class="fc-btn fc-btn-buy" onclick="event.stopPropagation();purchaseDrop(\'' + f.id + '\')">' + btnLabel + '</button>';
       }
 
-      var collabBadge = f.is_collab ? '<span class="fc-access-badge badge-collab">🤝 Collab</span>' : '';
+      var collabBadge = f.is_collab ? '<span class="fc-access-badge badge-collab">COLLAB</span>' : '';
       return '<div class="folder-card" onclick="viewFolder(\'' + f.id + '\')">' +
         '<div class="fc-cover" style="' + coverStyle + '">' +
           '<div class="fc-cover-overlay"></div>' +
@@ -481,6 +481,7 @@
         '<div class="fc-footer">' + btnHtml + '</div>' +
       '</div>';
     }).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function viewFolder(folderId) {
