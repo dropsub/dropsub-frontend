@@ -477,6 +477,149 @@
       box-shadow: 0 8px 32px rgba(41,121,255,.25); pointer-events: none;
     }
     #toast.show { opacity: 1; }
+
+    /* ── COLLAB BAR ──────────────────────────────────── */
+    .collab-bar {
+      display: none; align-items: center; justify-content: space-between;
+      background: rgba(41,121,255,.07); border: 1px solid rgba(41,121,255,.2);
+      border-radius: 10px; padding: 10px 16px; margin-bottom: 16px;
+    }
+    .collab-bar.show { display: flex; }
+    .collab-bar-label {
+      font-size: .8rem; color: var(--text-mid); display: flex; align-items: center; gap: 6px;
+    }
+    .collab-bar-label strong { color: var(--blue-glow); }
+    .btn-contribute {
+      padding: 7px 16px; border-radius: 7px;
+      background: var(--blue-bright); border: none;
+      color: #fff; font-family: inherit; font-size: .8rem; font-weight: 700;
+      cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-contribute:hover { background: var(--blue-mid); }
+
+    /* ── CONTRIBUTOR ATTRIBUTION ─────────────────────── */
+    .contributor-attr {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 8px; background: rgba(255,255,255,.04);
+      border-top: 1px solid var(--border);
+      font-size: .62rem; color: var(--text-dim);
+    }
+    .contributor-avatar {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: linear-gradient(135deg, #2979ff, #7c4dff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .48rem; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden;
+    }
+    .contributor-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .file-card.flagged { border-color: rgba(245,166,35,.6) !important; }
+    .flagged-badge {
+      position: absolute; top: 6px; left: 6px;
+      background: rgba(245,166,35,.9); border-radius: 4px;
+      padding: 2px 6px; font-size: .58rem; font-weight: 700;
+      color: #080f1c; letter-spacing: .05em; z-index: 2;
+    }
+
+    /* ── FLAG BUTTON ─────────────────────────────────── */
+    .card-actions {
+      position: absolute; top: 6px; right: 6px; z-index: 3;
+      display: flex; gap: 4px;
+    }
+    .card-action-btn {
+      width: 24px; height: 24px; border-radius: 5px;
+      background: rgba(8,15,28,.7); border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .72rem; color: var(--text-mid);
+      transition: all .12s; position: relative;
+    }
+    .card-action-btn:hover { background: rgba(41,121,255,.25); border-color: var(--blue-bright); color: #fff; }
+    .card-action-btn.danger:hover { background: rgba(239,68,68,.25); border-color: #ef4444; color: #f87171; }
+    .flag-dropdown {
+      position: absolute; top: 100%; right: 0; margin-top: 4px;
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 8px; overflow: hidden; min-width: 140px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4); z-index: 10; display: none;
+    }
+    .flag-dropdown.open { display: block; }
+    .flag-option {
+      padding: 9px 14px; font-size: .78rem; color: var(--text-light);
+      cursor: pointer; transition: background .12s;
+    }
+    .flag-option:hover { background: var(--bg-hover); }
+
+    /* ── COLLAB UPLOAD MODAL ─────────────────────────── */
+    .collab-upload-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(4,8,20,.88); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .collab-upload-overlay.open { display: flex; }
+    .collab-upload-modal {
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 16px; width: 100%; max-width: 500px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.5);
+      animation: collabIn .25s cubic-bezier(.22,1,.36,1);
+      display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes collabIn { from { opacity:0; transform:scale(.96) translateY(16px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .cu-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+    }
+    .cu-title { font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .cu-close {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--bg-card);
+      border: 1px solid var(--border-bright); display: flex; align-items: center;
+      justify-content: center; font-size: .85rem; cursor: pointer; color: var(--text-mid); transition: all .15s;
+    }
+    .cu-close:hover { background: var(--bg-hover); color: var(--text-white); }
+    .cu-body { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+    .cu-file-btns { display: flex; gap: 8px; }
+    .cu-file-btn {
+      flex: 1; padding: 10px 0; border-radius: 8px;
+      background: var(--bg-card); border: 1px solid var(--border-bright);
+      color: var(--text-mid); font-family: inherit; font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; display: flex; align-items: center;
+      justify-content: center; gap: 6px;
+    }
+    .cu-file-btn:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .cu-drop-zone {
+      border: 2px dashed var(--border-bright); border-radius: 10px;
+      padding: 24px 16px; text-align: center; color: var(--text-dim);
+      font-size: .82rem; transition: all .15s; cursor: pointer;
+    }
+    .cu-drop-zone.drag-over { border-color: var(--blue-bright); background: rgba(41,121,255,.06); color: var(--text-light); }
+    .cu-file-list { display: none; }
+    .cu-file-list.show { display: block; }
+    .cu-file-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; background: var(--bg-card); border-radius: 6px;
+      margin-bottom: 4px; font-size: .78rem; color: var(--text-light);
+    }
+    .cu-file-remove {
+      width: 18px; height: 18px; border-radius: 50%; background: rgba(239,68,68,.15);
+      border: none; color: #f87171; font-size: .7rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cu-checkboxes { display: flex; flex-direction: column; gap: 10px; }
+    .cu-checkbox-label {
+      display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+      font-size: .8rem; color: var(--text-mid); line-height: 1.5;
+    }
+    .cu-checkbox-label input[type=checkbox] { margin-top: 2px; flex-shrink: 0; accent-color: var(--blue-bright); }
+    .cu-progress { display: none; }
+    .cu-progress.show { display: block; }
+    .cu-progress-bar-track {
+      height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 6px;
+    }
+    .cu-progress-bar { height: 100%; background: var(--blue-bright); border-radius: 3px; width: 0%; transition: width .3s; }
+    .cu-progress-label { font-size: .75rem; color: var(--text-mid); text-align: center; }
+    .btn-submit-collab {
+      padding: 12px 0; border-radius: 10px; background: var(--blue-bright);
+      border: none; color: #fff; font-family: inherit; font-size: .88rem;
+      font-weight: 700; cursor: pointer; transition: all .15s; width: 100%;
+    }
+    .btn-submit-collab:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-submit-collab:not(:disabled):hover { background: var(--blue-mid); }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -623,6 +766,12 @@
         <button class="btn-back-link" onclick="setFilter('all')">Clear filter</button>
       </div>
 
+      <!-- Collab contribute bar -->
+      <div class="collab-bar" id="collabBar">
+        <div class="collab-bar-label"><i data-lucide="users"></i> <strong>Collab folder</strong> — fans can contribute content</div>
+        <button class="btn-contribute" onclick="openContributeModal()"><i data-lucide="upload"></i> + Contribute</button>
+      </div>
+
       <!-- File grid -->
       <div class="file-grid" id="fileGrid"></div>
 
@@ -656,6 +805,45 @@
   <div class="lightbox-footer" id="lbFooter"></div>
 </div>
 
+<!-- ══ COLLAB UPLOAD MODAL ════════════════════════════════════ -->
+<div class="collab-upload-overlay" id="contributeModal" onclick="if(event.target===this)closeContributeModal()">
+  <div class="collab-upload-modal">
+    <div class="cu-header">
+      <div class="cu-title"><i data-lucide="upload"></i> Contribute to This Folder</div>
+      <div class="cu-close" onclick="closeContributeModal()">✕</div>
+    </div>
+    <div class="cu-body">
+      <div class="cu-file-btns">
+        <button class="cu-file-btn" onclick="document.getElementById('cuInputPhoto').click()"><i data-lucide="image"></i> Photos</button>
+        <button class="cu-file-btn" onclick="document.getElementById('cuInputVideo').click()"><i data-lucide="video"></i> Video</button>
+        <button class="cu-file-btn" onclick="document.getElementById('cuInputAudio').click()"><i data-lucide="music"></i> Audio</button>
+      </div>
+      <input type="file" id="cuInputPhoto" accept="image/*" multiple style="display:none" onchange="addCollabFiles(this.files)">
+      <input type="file" id="cuInputVideo" accept="video/*" multiple style="display:none" onchange="addCollabFiles(this.files)">
+      <input type="file" id="cuInputAudio" accept="audio/*" multiple style="display:none" onchange="addCollabFiles(this.files)">
+      <div class="cu-drop-zone" id="cuDropZone">Drop files here or use the buttons above</div>
+      <div class="cu-file-list" id="cuFileList">
+        <div id="cuFileItems"></div>
+      </div>
+      <div class="cu-checkboxes">
+        <label class="cu-checkbox-label">
+          <input type="checkbox" id="cuCheckAdult" onchange="updateContributeBtn()">
+          I confirm this content does not contain nudity, sexual content, or graphic violence
+        </label>
+        <label class="cu-checkbox-label">
+          <input type="checkbox" id="cuCheckRelevant" onchange="updateContributeBtn()">
+          This content is relevant to this folder and I have the rights to share it
+        </label>
+      </div>
+      <div class="cu-progress" id="cuProgress">
+        <div class="cu-progress-bar-track"><div class="cu-progress-bar" id="cuProgressBar"></div></div>
+        <div class="cu-progress-label" id="cuProgressLabel">Uploading…</div>
+      </div>
+      <button class="btn-submit-collab" id="cuSubmitBtn" disabled onclick="submitContribution()">Upload Files</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ TOAST ═════════════════════════════════════════════════ -->
 <div id="toast"></div>
 
@@ -667,6 +855,15 @@
   var currentSort   = 'newest';
   var currentView   = 'grid';
   var lbIndex       = 0;
+
+  var _myUserId    = null;
+  var _myArtistId  = null;
+  var _folderId    = null;
+  var _folderArtistId = null;
+  var _isCollab    = false;
+  var _canModerate = false;
+  var _collabFiles = [];
+  var _openFlagMenu = null;
 
   // ── Toast ────────────────────────────────────────────────────
   var toastTimer;
@@ -693,6 +890,8 @@
     document.getElementById('fileGrid').style.display     = 'grid';
     document.getElementById('folderHeader').style.display = 'block';
     document.getElementById('toolbar').style.display      = 'flex';
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    document.getElementById('collabBar').classList.toggle('show', _isCollab && !!token);
   }
 
   // ── File type detection ──────────────────────────────────────
@@ -759,11 +958,12 @@
     files.forEach(function(file, idx) {
       var type = getFileType(file);
       var name = fileName(file);
-      var size = formatBytes(file.size || file.file_size);
+      var size = formatBytes(file.size || file.size_bytes || file.file_size);
       var date = formatDate(file.created_at || file.uploaded_at);
 
       var card = document.createElement('div');
-      card.className = 'file-card';
+      card.className = 'file-card' + (file.is_flagged ? ' flagged' : '');
+      card.dataset.fileId = file.id;
       card.onclick = function() { openLightbox(idx); };
 
       var mediaHtml = '';
@@ -813,9 +1013,38 @@
         '</div>' +
         '<div class="list-file-type">' + type.toUpperCase() + '</div>';
 
-      card.innerHTML = mediaHtml + listInfo;
+      // Contributor attribution
+      var contribHtml = '';
+      if (file.contributor && file.contributor.username) {
+        var avSrc = file.contributor.avatar_url
+          ? '<img src="' + file.contributor.avatar_url + '" onerror="this.style.display=\'none\'">'
+          : file.contributor.username.slice(0, 1).toUpperCase();
+        contribHtml = '<div class="contributor-attr"><div class="contributor-avatar">' + avSrc + '</div>@' + file.contributor.username + '</div>';
+      }
+
+      // Flagged badge
+      var flaggedBadgeHtml = file.is_flagged ? '<div class="flagged-badge">⚑ Flagged</div>' : '';
+
+      // Action buttons (flag + remove)
+      var actionsHtml = '';
+      if (_myUserId) {
+        var flagBtn = '<div class="card-action-btn" title="Flag" onclick="event.stopPropagation();toggleFlagMenu(\'' + file.id + '\',this)">' +
+          '<i data-lucide="flag"></i>' +
+          '<div class="flag-dropdown" id="flag-' + file.id + '">' +
+            '<div class="flag-option" onclick="event.stopPropagation();flagFile(\'' + file.id + '\',\'inappropriate\')">Inappropriate</div>' +
+            '<div class="flag-option" onclick="event.stopPropagation();flagFile(\'' + file.id + '\',\'off_topic\')">Off Topic</div>' +
+          '</div>' +
+        '</div>';
+        var removeBtn = (_canModerate && (file.is_flagged || file.contributor_id))
+          ? '<div class="card-action-btn danger" title="Remove" onclick="event.stopPropagation();removeCollabFile(\'' + file.id + '\')"><i data-lucide="trash-2"></i></div>'
+          : '';
+        actionsHtml = '<div class="card-actions">' + flagBtn + removeBtn + '</div>';
+      }
+
+      card.innerHTML = flaggedBadgeHtml + actionsHtml + mediaHtml + listInfo + contribHtml;
       grid.appendChild(card);
     });
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ── Filter & sort ────────────────────────────────────────────
@@ -930,6 +1159,7 @@
   function loadFolder() {
     var params   = new URLSearchParams(window.location.search);
     var folderId = params.get('folder_id');
+    _folderId    = folderId;
 
     if (!folderId) {
       window.location.replace('dropsub-fan-dashboard.html');
@@ -1011,13 +1241,28 @@
 
         if (!Array.isArray(files)) files = [];
 
+        _isCollab       = folder.is_collab === true;
+        _folderArtistId = folder.artist_id || (folder.artists && folder.artists.id) || null;
+        _canModerate    = (_myArtistId && _folderArtistId && _myArtistId === _folderArtistId);
+
+        // If collab and user has token, check if they're a designated moderator
+        if (_isCollab && !_canModerate && _myUserId) {
+          fetchCollabModerators(folderId).then(function(mods) {
+            if (mods.some(function(m) { return m.id === _myUserId; })) {
+              _canModerate = true;
+              renderGrid(filteredFiles.length ? filteredFiles : allFiles);
+            }
+          });
+        }
+
         allFiles = files;
         populateHeader(folder);
         populateCounts(files);
 
         if (files.length === 0) {
           document.getElementById('folderHeader').style.display = 'block';
-          showState('stateEmpty');
+          if (_isCollab) showGrid();
+          else showState('stateEmpty');
           return;
         }
 
@@ -1198,7 +1443,7 @@
   // ── User profile ─────────────────────────────────────────────
   function fetchUserProfile() {
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    if (!token) return; // no token — page may still load for free/public folders
+    if (!token) return;
     fetch('https://api.dropsub.com/api/auth/me', {
       headers: { 'Authorization': 'Bearer ' + token },
     })
@@ -1210,8 +1455,11 @@
         }
         return res.json();
       })
-      .then(function(user) {
-        if (!user) return;
+      .then(function(data) {
+        if (!data) return;
+        var user = data.user || data;
+        _myUserId   = user.id || null;
+        _myArtistId = (user.artist && user.artist.id) ? user.artist.id : null;
         var name     = user.full_name || user.name || user.username || '';
         var initials = name.split(' ').filter(Boolean)
           .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
@@ -1219,6 +1467,202 @@
         if (avatar && initials) { avatar.textContent = initials; avatar.title = name; }
       })
       .catch(function() {});
+  }
+
+  // ── Collab helpers ────────────────────────────────────────────
+  function fetchCollabModerators(folderId) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return Promise.resolve([]);
+    return fetch('https://api.dropsub.com/api/collab/' + folderId + '/moderators', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(r) { return r.ok ? r.json() : { moderators: [] }; })
+      .then(function(d) { return d.moderators || []; })
+      .catch(function() { return []; });
+  }
+
+  function openContributeModal() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) {
+      var returnUrl = encodeURIComponent(window.location.href);
+      window.location.replace('dropsub-login.html?return=' + returnUrl);
+      return;
+    }
+    _collabFiles = [];
+    document.getElementById('cuFileItems').innerHTML = '';
+    document.getElementById('cuFileList').classList.remove('show');
+    document.getElementById('cuCheckAdult').checked   = false;
+    document.getElementById('cuCheckRelevant').checked = false;
+    document.getElementById('cuProgress').classList.remove('show');
+    document.getElementById('cuSubmitBtn').disabled = true;
+    document.getElementById('contributeModal').classList.add('open');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  function closeContributeModal() {
+    document.getElementById('contributeModal').classList.remove('open');
+    _collabFiles = [];
+  }
+
+  function addCollabFiles(fileList) {
+    var added = Array.from(fileList);
+    _collabFiles = _collabFiles.concat(added).slice(0, 10);
+    renderCollabFileList();
+    updateContributeBtn();
+  }
+
+  function renderCollabFileList() {
+    var items = document.getElementById('cuFileItems');
+    items.innerHTML = _collabFiles.map(function(f, i) {
+      return '<div class="cu-file-item">' +
+        '<span>' + f.name.slice(0, 40) + (f.name.length > 40 ? '…' : '') + '</span>' +
+        '<button class="cu-file-remove" onclick="removeCollabLocalFile(' + i + ')">✕</button>' +
+      '</div>';
+    }).join('');
+    document.getElementById('cuFileList').classList.toggle('show', _collabFiles.length > 0);
+  }
+
+  function removeCollabLocalFile(idx) {
+    _collabFiles.splice(idx, 1);
+    renderCollabFileList();
+    updateContributeBtn();
+  }
+
+  function updateContributeBtn() {
+    var ok = _collabFiles.length > 0 &&
+      document.getElementById('cuCheckAdult').checked &&
+      document.getElementById('cuCheckRelevant').checked;
+    document.getElementById('cuSubmitBtn').disabled = !ok;
+  }
+
+  function submitContribution() {
+    if (!_folderId || _collabFiles.length === 0) return;
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return;
+
+    var btn = document.getElementById('cuSubmitBtn');
+    btn.disabled = true;
+    var progress = document.getElementById('cuProgress');
+    var bar      = document.getElementById('cuProgressBar');
+    var label    = document.getElementById('cuProgressLabel');
+    progress.classList.add('show');
+    bar.style.width = '0%';
+    label.textContent = 'Uploading…';
+
+    var formData = new FormData();
+    _collabFiles.forEach(function(f) { formData.append('files', f); });
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.dropsub.com/api/collab/' + _folderId + '/upload');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        var pct = Math.round((e.loaded / e.total) * 100);
+        bar.style.width = pct + '%';
+        label.textContent = 'Uploading… ' + pct + '%';
+      }
+    };
+
+    xhr.onload = function() {
+      if (xhr.status === 201) {
+        bar.style.width = '100%';
+        label.textContent = 'Upload complete!';
+        showToast('Files contributed successfully!');
+        setTimeout(function() {
+          closeContributeModal();
+          loadFolder();
+        }, 1200);
+      } else {
+        var msg = 'Upload failed';
+        try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) {}
+        label.textContent = msg;
+        label.style.color = '#f87171';
+        btn.disabled = false;
+      }
+    };
+
+    xhr.onerror = function() {
+      label.textContent = 'Connection error';
+      label.style.color = '#f87171';
+      btn.disabled = false;
+    };
+
+    xhr.send(formData);
+  }
+
+  // Drag-and-drop on the collab drop zone
+  document.addEventListener('DOMContentLoaded', function() {
+    var dz = document.getElementById('cuDropZone');
+    if (!dz) return;
+    dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
+    dz.addEventListener('drop', function(e) {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      addCollabFiles(e.dataTransfer.files);
+    });
+    dz.addEventListener('click', function() { document.getElementById('cuInputPhoto').click(); });
+  });
+
+  function toggleFlagMenu(fileId, btn) {
+    var dropdown = document.getElementById('flag-' + fileId);
+    if (!dropdown) return;
+    if (_openFlagMenu && _openFlagMenu !== dropdown) _openFlagMenu.classList.remove('open');
+    dropdown.classList.toggle('open');
+    _openFlagMenu = dropdown.classList.contains('open') ? dropdown : null;
+  }
+
+  document.addEventListener('click', function() {
+    if (_openFlagMenu) { _openFlagMenu.classList.remove('open'); _openFlagMenu = null; }
+  });
+
+  function flagFile(fileId, reason) {
+    if (_openFlagMenu) { _openFlagMenu.classList.remove('open'); _openFlagMenu = null; }
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) {
+      window.location.replace('dropsub-login.html?return=' + encodeURIComponent(window.location.href));
+      return;
+    }
+    fetch('https://api.dropsub.com/api/collab/' + fileId + '/flag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ reason: reason }),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.error) { showToast(d.error); return; }
+        showToast('File flagged. Thanks for helping keep the content relevant.');
+        var file = allFiles.find(function(f) { return f.id === fileId; });
+        if (file) { file.is_flagged = d.is_flagged; file.flag_count = d.flag_count; }
+        renderGrid(filteredFiles.length ? filteredFiles : allFiles);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      })
+      .catch(function() { showToast('Failed to flag file'); });
+  }
+
+  function removeCollabFile(fileId) {
+    if (!confirm('Remove this file? This cannot be undone.')) return;
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return;
+    fetch('https://api.dropsub.com/api/collab/' + fileId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.error) { showToast(d.error); return; }
+        allFiles = allFiles.filter(function(f) { return f.id !== fileId; });
+        filteredFiles = filteredFiles.filter(function(f) { return f.id !== fileId; });
+        showToast('File removed.');
+        if (allFiles.length === 0) {
+          if (_isCollab) showGrid();
+          else showState('stateEmpty');
+        } else {
+          renderGrid(filteredFiles.length ? filteredFiles : allFiles);
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+      })
+      .catch(function() { showToast('Failed to remove file'); });
   }
 
   // ── Init ─────────────────────────────────────────────────────

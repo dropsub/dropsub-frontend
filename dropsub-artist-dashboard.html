@@ -1480,6 +1480,7 @@
   <div class="more-menu-item" id="moreMenuRestore" onclick="restoreFolder()" style="display:none"><i data-lucide="rotate-ccw"></i> Restore to Drops</div>
   <div class="more-menu-sep"></div>
   <div class="more-menu-item" onclick="showToast('Coming soon'); closeMoreMenu()"><i data-lucide="key"></i> Manage permissions</div>
+  <div class="more-menu-item" onclick="openModeratorsModal(); closeMoreMenu()"><i data-lucide="shield"></i> Moderators</div>
   <div class="more-menu-sep"></div>
   <div class="more-menu-item danger" onclick="openDeleteConfirm(); closeMoreMenu()"><i data-lucide="trash-2"></i> Delete folder</div>
 </div>
@@ -1499,6 +1500,32 @@
       <div class="collab-feature"><span class="collab-feature-icon"><i data-lucide="lock"></i></span>Full moderation controls — approve, reject, or flag content instantly</div>
     </div>
     <button class="collab-modal-close" onclick="closeCollabModal()">Got it, notify me when it launches</button>
+  </div>
+</div>
+
+<!-- ══ MODERATORS MODAL ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="moderatorsModal" onclick="if(event.target===this)closeModeratorsModal()">
+  <div class="upload-modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title"><i data-lucide="shield"></i> Collab Moderators</div>
+      <div class="modal-close" onclick="closeModeratorsModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.82rem;color:var(--text-mid);margin-bottom:16px;">Moderators can remove flagged collab contributions from this folder.</p>
+      <div id="modListWrap" style="margin-bottom:18px;min-height:40px;">
+        <div id="modList" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div id="modListEmpty" style="font-size:.8rem;color:var(--text-dim);display:none;">No moderators yet.</div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;">
+        <div style="font-size:.8rem;font-weight:700;color:var(--text-light);margin-bottom:10px;">Add Moderator</div>
+        <div style="display:flex;gap:8px;">
+          <input id="modSearchInput" type="text" placeholder="Username or email…"
+            style="flex:1;background:var(--bg-card);border:1px solid var(--border-bright);border-radius:7px;padding:8px 12px;color:var(--text-white);font-family:inherit;font-size:.82rem;outline:none;">
+          <button onclick="addModerator()" style="padding:8px 16px;border-radius:7px;background:var(--blue-bright);border:none;color:#fff;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;">Add</button>
+        </div>
+        <div id="modAddMsg" style="font-size:.75rem;margin-top:6px;color:var(--text-mid);"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1584,7 +1611,7 @@
         : '<span class="access-badge premium"><i data-lucide="star"></i> PREMIUM</span>';
       const d = dateStr ? new Date(dateStr) : null;
       const date = d && !isNaN(d) ? d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—';
-      const collabOn = f.collab === true;
+      const collabOn = f.is_collab === true;
       const isPublic = f.is_public !== false;
       const trDragAttrs = _organizeMode
         ? `draggable="true" ondragstart="startFolderDrag(${idx},this)" ondragover="overFolderDrag(${idx},event,this)" ondragleave="leaveFolderDrag(this)" ondrop="dropFolderDrag(${idx},event)" ondragend="endFolderDrag()"`
@@ -1621,13 +1648,25 @@
   }
 
   function toggleCollab(idx) {
-    _currentFolders[idx].collab = !_currentFolders[idx].collab;
-    var name = _currentFolders[idx].name;
-    renderFolders(_currentFolders);
-    showToast(_currentFolders[idx].collab
-      ? '🤝 Fan uploads enabled for "' + name + '"'
-      : 'Fan uploads disabled for "' + name + '"'
-    );
+    var folder = _currentFolders[idx];
+    var newVal = !folder.is_collab;
+    var token  = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/folders/' + folder.id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ is_collab: newVal }),
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.folder || d.id) {
+          _currentFolders[idx].is_collab = newVal;
+          renderFolders(_currentFolders);
+          showToast(newVal ? '🤝 Fan uploads enabled for "' + folder.name + '"' : 'Fan uploads disabled for "' + folder.name + '"');
+        } else {
+          showToast((d.error || 'Failed to update collab setting'));
+        }
+      })
+      .catch(function() { showToast('Failed to update collab setting'); });
   }
 
   // ── Earnings chart ───────────────────────────────
@@ -1687,6 +1726,112 @@
   }
   function closeCollabModal() {
     document.getElementById('collabModal').classList.remove('open');
+  }
+
+  // ── Moderators modal ─────────────────────────────
+  var _modFolderIdx = -1;
+
+  function openModeratorsModal() {
+    _modFolderIdx = _moreMenuIdx;
+    if (_modFolderIdx < 0) return;
+    var folder = _currentFolders[_modFolderIdx];
+    document.getElementById('modAddMsg').textContent = '';
+    document.getElementById('modSearchInput').value  = '';
+    document.getElementById('moderatorsModal').classList.add('open');
+    loadModerators(folder.id);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  function closeModeratorsModal() {
+    document.getElementById('moderatorsModal').classList.remove('open');
+    _modFolderIdx = -1;
+  }
+
+  function loadModerators(folderId) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    document.getElementById('modList').innerHTML = '<div style="font-size:.78rem;color:var(--text-dim);">Loading…</div>';
+    document.getElementById('modListEmpty').style.display = 'none';
+    fetch('https://api.dropsub.com/api/collab/' + folderId + '/moderators', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var mods = d.moderators || [];
+        var list = document.getElementById('modList');
+        if (mods.length === 0) {
+          list.innerHTML = '';
+          document.getElementById('modListEmpty').style.display = 'block';
+          return;
+        }
+        document.getElementById('modListEmpty').style.display = 'none';
+        list.innerHTML = mods.map(function(m) {
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg-card);border-radius:7px;">' +
+            '<div style="font-size:.82rem;color:var(--text-light);">@' + (m.username || m.id) + (m.full_name ? ' · ' + m.full_name : '') + '</div>' +
+            '<button onclick="removeModerator(\'' + folderId + '\',\'' + m.id + '\')" style="padding:4px 10px;border-radius:5px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;font-family:inherit;font-size:.72rem;font-weight:700;cursor:pointer;">Remove</button>' +
+          '</div>';
+        }).join('');
+      })
+      .catch(function() {
+        document.getElementById('modList').innerHTML = '<div style="font-size:.78rem;color:#f87171;">Failed to load moderators</div>';
+      });
+  }
+
+  function addModerator() {
+    if (_modFolderIdx < 0) return;
+    var folder = _currentFolders[_modFolderIdx];
+    var query  = document.getElementById('modSearchInput').value.trim();
+    var msg    = document.getElementById('modAddMsg');
+    if (!query) { msg.textContent = 'Enter a username or email.'; return; }
+    var token  = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    msg.style.color = 'var(--text-mid)';
+    msg.textContent = 'Looking up user…';
+
+    fetch('https://api.dropsub.com/api/auth/lookup?q=' + encodeURIComponent(query), {
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (!d.profile || !d.profile.id) {
+          msg.style.color = '#f87171';
+          msg.textContent = d.error || 'User not found.';
+          return;
+        }
+        return fetch('https://api.dropsub.com/api/collab/' + folder.id + '/moderators', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ profile_id: d.profile.id }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(result) {
+            if (result.error) {
+              msg.style.color = '#f87171';
+              msg.textContent = result.error;
+            } else {
+              msg.style.color = '#4ade80';
+              msg.textContent = 'Moderator added!';
+              document.getElementById('modSearchInput').value = '';
+              loadModerators(folder.id);
+            }
+          });
+      })
+      .catch(function() {
+        msg.style.color = '#f87171';
+        msg.textContent = 'Error adding moderator.';
+      });
+  }
+
+  function removeModerator(folderId, profileId) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    fetch('https://api.dropsub.com/api/collab/' + folderId + '/moderators/' + profileId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token },
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.error) { showToast(d.error); return; }
+        loadModerators(folderId);
+      })
+      .catch(function() { showToast('Failed to remove moderator'); });
   }
 
   // ── Upload modal ─────────────────────────────────
