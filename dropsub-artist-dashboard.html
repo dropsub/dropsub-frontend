@@ -1058,7 +1058,7 @@
             <div class="earnings-chart">
               <div class="chart-row" id="earningsChart"></div>
               <div class="chart-total">
-                <span class="chart-total-val">$4,280</span>
+                <span class="chart-total-val">$0.00</span>
                 <span class="chart-total-label">earned this month</span>
               </div>
             </div>
@@ -1670,53 +1670,24 @@
 
   // ── Earnings chart ───────────────────────────────
   function renderChart() {
-    const data = [
-      { m: 'Jul', v: 1800 },
-      { m: 'Aug', v: 2200 },
-      { m: 'Sep', v: 1960 },
-      { m: 'Oct', v: 2800 },
-      { m: 'Nov', v: 3200 },
-      { m: 'Dec', v: 2900 },
-      { m: 'Jan', v: 3600 },
-      { m: 'Feb', v: 3100 },
-      { m: 'Mar', v: 3800 },
-      { m: 'Apr', v: 4100 },
-      { m: 'May', v: 3700 },
-      { m: 'Jun', v: 4280 },
-    ];
-    const max = Math.max(...data.map(d => d.v));
+    const months = ['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
     const chart = document.getElementById('earningsChart');
-    chart.innerHTML = data.map((d, i) => `
+    chart.innerHTML = months.map(m => `
       <div class="chart-bar-wrap">
-        <div class="chart-bar ${i === data.length - 1 ? 'active' : ''}"
-          style="height:${Math.round((d.v / max) * 56) + 4}px"
-          title="${d.m}: $${d.v.toLocaleString()}"></div>
-        <span class="chart-label">${d.m}</span>
+        <div class="chart-bar" style="height:4px" title="${m}: $0"></div>
+        <span class="chart-label">${m}</span>
       </div>
     `).join('');
   }
 
   // ── Recent activity ──────────────────────────────
   function renderActivity() {
-    const items = [
-      { icon: '<i data-lucide="users"></i>',       cls: 'blue', text: '<strong>43 new subscribers</strong> this week across all folders', time: '2 hours ago' },
-      { icon: '<i data-lucide="upload"></i>',       cls: 'blue', text: 'You uploaded <strong>12 files</strong> to Kiyomizu Temple 2021', time: '5 hours ago' },
-      { icon: '<i data-lucide="dollar-sign"></i>',  cls: 'gold', text: '<strong>$420</strong> payout processed to your bank account', time: 'Yesterday' },
-      { icon: '<i data-lucide="star"></i>',         cls: 'gold', text: '<strong>3 fans</strong> purchased 20th Anniversary Futurism', time: '2 days ago' },
-      { icon: '<i data-lucide="bell"></i>',         cls: 'green', text: 'Serbia 2022 Backstage hit <strong>180 subscribers</strong>', time: '3 days ago' },
-      { icon: '<i data-lucide="smartphone"></i>',   cls: 'blue', text: '8 files uploaded via <strong>mobile phone</strong> to NA Tour 2021', time: '4 days ago' },
-    ];
     const list = document.getElementById('activityList');
-    list.innerHTML = items.map(a => `
-      <div class="activity-item">
-        <div class="activity-icon ${a.cls}">${a.icon}</div>
-        <div class="activity-body">
-          <div class="activity-text">${a.text}</div>
-          <div class="activity-time">${a.time}</div>
-        </div>
+    list.innerHTML = `
+      <div style="padding:28px 0;text-align:center;color:var(--text-muted);font-size:.85rem;line-height:1.6;">
+        No recent activity yet — your uploads, earnings, and subscriber milestones will appear here.
       </div>
-    `).join('');
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    `;
   }
 
   // ── Collab modal ─────────────────────────────────
@@ -2587,6 +2558,7 @@
     window._currentArtistId = artistId;
     if (artistId) {
       fetchDashboardStats();
+      fetchTaxStatus();
       initQRCodes();
     }
   }
@@ -2606,6 +2578,8 @@
         ? '$' + (s.revenue_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         : '$0.00';
       document.getElementById('statRevValue').textContent = rev;
+      var chartTotal = document.getElementById('chart-total-val');
+      if (chartTotal) chartTotal.textContent = rev;
       var sideRev = document.getElementById('sidebarRevVal');
       if (sideRev) sideRev.textContent = rev;
       // Payouts nav badge — compact format
@@ -2808,7 +2782,7 @@
     formData.append('document', file);
     formData.append('type', 'w9');
 
-    fetch('https://api.dropsub.com/api/artists/tax-document', {
+    fetch('https://api.dropsub.com/api/artists/' + window._currentArtistId + '/tax-document', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       body: formData
@@ -2830,10 +2804,11 @@
       });
   }
 
-  // Load tax status from API on init
+  // Load tax status from API on init (called after _currentArtistId is set)
   function fetchTaxStatus() {
+    if (!window._currentArtistId) return;
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-    fetch('https://api.dropsub.com/api/artists/tax-document', {
+    fetch('https://api.dropsub.com/api/artists/' + window._currentArtistId + '/tax-document', {
       headers: { 'Authorization': 'Bearer ' + token }
     })
       .then(function(res) { return res.ok ? res.json() : null; })
@@ -2934,7 +2909,6 @@
   renderChart();
   renderActivity();
   fetchUserProfile();
-  fetchTaxStatus();
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
