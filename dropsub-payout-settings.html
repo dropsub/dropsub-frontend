@@ -938,9 +938,9 @@
           showToast((data.message || 'Error loading payout settings.'), 'error');
           document.getElementById('connectLoading').style.display = 'none';
           document.getElementById('connectNotConnected').style.display = 'flex';
-          renderStats({});
+          renderStats({ available: 0, pending: 0, total_earned: 0 });
           document.getElementById('payoutsSkeleton').style.display = 'none';
-          document.getElementById('payoutsError').style.display    = 'block';
+          document.getElementById('payoutsEmpty').style.display    = 'block';
           document.getElementById('scheduleSkeleton').style.display = 'none';
           document.getElementById('scheduleNoAccount').style.display = 'block';
           document.getElementById('bankSkeleton').style.display  = 'none';
@@ -965,7 +965,7 @@
       .catch(function() {
         document.getElementById('connectLoading').style.display = 'none';
         document.getElementById('connectNotConnected').style.display = 'flex';
-        renderStats({});
+        renderStats({ available: 0, pending: 0, total_earned: 0 });
         document.getElementById('payoutsSkeleton').style.display = 'none';
         document.getElementById('payoutsError').style.display    = 'block';
         document.getElementById('scheduleSkeleton').style.display = 'none';
@@ -1001,11 +1001,37 @@
         if (email) document.getElementById('dropdownEmail').textContent = email;
         if (role)  document.getElementById('sidebarRole').textContent = capitalise(role);
 
+        var actualUser = user.user || user;
+        window._artistId = (actualUser.artist && actualUser.artist.id) || null;
+        if (window._artistId) fetchStripeBalance();
+
         document.getElementById('pageLoading').classList.add('hidden');
       })
       .catch(function() {
         document.getElementById('pageLoading').classList.add('hidden');
       });
+  }
+
+  // ── Stripe balance cards ─────────────────────────────────────
+  function fetchStripeBalance() {
+    if (!window._artistId) return;
+    fetch('https://api.dropsub.com/api/artists/' + window._artistId + '/stripe-balance', {
+      headers: { 'Authorization': 'Bearer ' + token() },
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.ok ? res.json() : null;
+      })
+      .then(function(data) {
+        if (!data) return;
+        renderStats(data);
+        if (!data.connected) {
+          document.getElementById('payoutsSkeleton').style.display = 'none';
+          document.getElementById('payoutsEmpty').style.display    = 'block';
+          document.getElementById('payoutsError').style.display    = 'none';
+        }
+      })
+      .catch(function() {});
   }
 
   // ── Init ─────────────────────────────────────────────────────
