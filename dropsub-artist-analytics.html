@@ -317,7 +317,7 @@
 
     <div class="nav-section-label">Manage</div>
     <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
-    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon"><i data-lucide="folder"></i></span>Content Folders<span class="nav-badge">12</span></a>
+    <a class="nav-item" onclick="showToast('Folders manager coming soon')"><span class="nav-icon"><i data-lucide="folder"></i></span>Drops<span class="nav-badge" id="navFoldersBadge">—</span></a>
     <a class="nav-item" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
     <a class="nav-item" onclick="showToast('Subscriber list coming soon')"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers<span class="nav-badge" id="navSubsBadge">—</span></a>
 
@@ -393,6 +393,32 @@
           </div>
           <div id="chartError" style="display:none;">
             <div class="panel-error"><div class="panel-error-icon"><i data-lucide="alert-triangle"></i></div>Could not load chart data.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscriber Growth chart -->
+      <div class="panel" id="growthPanel" style="margin-top:16px;">
+        <div class="panel-header">
+          <div class="panel-title"><i data-lucide="users"></i> Subscriber Growth</div>
+          <div class="panel-actions">
+            <span style="font-size:.72rem;color:var(--text-dim);" id="growthRangeLabel">Last 30 days</span>
+          </div>
+        </div>
+        <div class="chart-wrap" id="growthWrap">
+          <div class="chart-skel" id="growthSkeleton"></div>
+          <div id="growthContent" style="display:none;">
+            <div class="chart-summary">
+              <span class="chart-total-val" id="growthTotalVal" style="background:linear-gradient(135deg,var(--blue-bright),var(--blue-glow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</span>
+              <span class="chart-total-label" id="growthTotalLabel">new subscribers</span>
+            </div>
+            <div class="chart-svg-wrap">
+              <svg id="growthSvg" viewBox="0 0 800 140" preserveAspectRatio="none"></svg>
+              <div class="chart-tooltip" id="growthTooltip">
+                <div class="chart-tooltip-label" id="growthTtLabel"></div>
+                <div class="chart-tooltip-value" id="growthTtValue" style="color:var(--blue-glow);"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -496,13 +522,22 @@
   });
 
   function fmtCurrency(val) {
-    if (val == null) return '—';
-    if (val >= 1000) return '$' + (val / 1000).toFixed(1) + 'K';
-    return '$' + parseFloat(val).toFixed(2);
+    var n = parseFloat(val);
+    if (isNaN(n)) return '$0.00';
+    if (n >= 1000) return '$' + (n / 1000).toFixed(1) + 'K';
+    return '$' + n.toFixed(2);
   }
   function fmtNum(val) {
-    if (val == null) return '—';
-    return Number(val).toLocaleString();
+    var n = parseInt(val, 10);
+    if (isNaN(n)) return '0';
+    return n.toLocaleString();
+  }
+  function fmtBytes(bytes) {
+    if (!bytes) return '0 B';
+    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + ' GB';
+    if (bytes >= 1048576)    return (bytes / 1048576).toFixed(1)    + ' MB';
+    if (bytes >= 1024)       return (bytes / 1024).toFixed(1)       + ' KB';
+    return bytes + ' B';
   }
   function fmtDate(str) {
     if (!str) return '';
@@ -530,45 +565,27 @@
     document.querySelectorAll('.range-tab').forEach(function(t) {
       t.classList.toggle('active', t.dataset.range === range);
     });
-    document.getElementById('chartRangeLabel').textContent = rangeLabelText(range);
+    document.getElementById('chartRangeLabel').textContent  = rangeLabelText(range);
+    document.getElementById('growthRangeLabel').textContent = rangeLabelText(range);
     document.getElementById('analyticsSubLabel').textContent = 'Loading data for ' + rangeLabelText(range).toLowerCase() + '…';
     loadAnalytics(range);
   }
 
   // ── Render stat cards ────────────────────────────────────────
   function renderStats(s) {
-    var revDelta = s.revenue_delta_pct != null
-      ? (s.revenue_delta_pct >= 0 ? '↑ +' : '↓ ') + Math.abs(s.revenue_delta_pct).toFixed(1) + '% vs prior period'
-      : '';
-    var subDelta = s.subscribers_delta != null
-      ? (s.subscribers_delta >= 0 ? '↑ +' : '↓ ') + Math.abs(s.subscribers_delta) + ' this period'
-      : '';
-    var fanDelta = s.fans_delta_pct != null
-      ? (s.fans_delta_pct >= 0 ? '↑ +' : '↓ ') + Math.abs(s.fans_delta_pct).toFixed(1) + '%'
-      : '';
-    var viewDelta = s.views_delta_pct != null
-      ? (s.views_delta_pct >= 0 ? '↑ +' : '↓ ') + Math.abs(s.views_delta_pct).toFixed(1) + '%'
-      : '';
-
-    function deltaClass(val) {
-      if (val == null) return 'neutral';
-      return val < 0 ? 'down' : '';
-    }
-
+    s = s || {};
     document.getElementById('statsRow').innerHTML =
-      card('Total Revenue', '💰', fmtCurrency(s.total_revenue), 'gold', revDelta, deltaClass(s.revenue_delta_pct)) +
-      card('Active Subscribers', '👥', fmtNum(s.active_subscribers), 'blue', subDelta, deltaClass(s.subscribers_delta)) +
-      card('Total Fans', '🌟', fmtNum(s.total_fans), '', fanDelta, deltaClass(s.fans_delta_pct)) +
-      card('Content Views', '👁', fmtNum(s.total_views), '', viewDelta, deltaClass(s.views_delta_pct));
+      card('Total Revenue',       '<i data-lucide="dollar-sign"></i>', fmtCurrency(s.total_revenue),                        'gold', '', '') +
+      card('Active Subscribers',  '<i data-lucide="users"></i>',       fmtNum(s.active_subscribers),                        'blue', '', '') +
+      card('Total Files',         '<i data-lucide="file"></i>',        fmtNum(s.total_files),                               '',     '', '') +
+      card('Storage Used',        '<i data-lucide="hard-drive"></i>',  fmtBytes(s.total_bytes),                             '',     '', '');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    // Update sidebar
-    if (s.total_revenue != null) {
-      document.getElementById('sidebarRevenue').textContent = fmtCurrency(s.total_revenue);
-    }
-    if (s.active_subscribers != null) {
-      document.getElementById('sidebarSubs').textContent = fmtNum(s.active_subscribers);
-      document.getElementById('navSubsBadge').textContent = fmtNum(s.active_subscribers);
-    }
+    // Sidebar
+    document.getElementById('sidebarRevenue').textContent   = fmtCurrency(s.total_revenue);
+    document.getElementById('sidebarSubs').textContent      = fmtNum(s.active_subscribers);
+    document.getElementById('navSubsBadge').textContent     = fmtNum(s.active_subscribers);
+    document.getElementById('navPayoutsBadge').textContent  = fmtCurrency(s.total_revenue);
   }
 
   function card(label, icon, value, colorClass, delta, deltaClass) {
@@ -582,19 +599,25 @@
       '</div>';
   }
 
+  // ── Generate zero-filled day array for a period ──────────────
+  function zeroChartData(range) {
+    var n = range === '7d' ? 7 : range === '30d' ? 30 : range === '90d' ? 90 : 30;
+    var result = [];
+    for (var di = n - 1; di >= 0; di--) {
+      var d = new Date(Date.now() - di * 86400000);
+      result.push({ label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: 0 });
+    }
+    return result;
+  }
+
   // ── Revenue SVG line chart ────────────────────────────────────
   function renderChart(data, summary) {
-    if (!data || data.length === 0) {
-      document.getElementById('chartSkeleton').style.display = 'none';
-      document.getElementById('chartContent').style.display  = 'none';
-      document.getElementById('chartError').style.display    = 'block';
-      return;
-    }
+    if (!data || data.length === 0) data = zeroChartData(currentRange);
 
     // Total
     var total = data.reduce(function(sum, d) { return sum + (d.value || 0); }, 0);
-    document.getElementById('chartTotalVal').textContent = fmtCurrency(total);
-    document.getElementById('chartTotalLabel').textContent = 'total revenue · ' + rangeLabelText(currentRange).toLowerCase();
+    document.getElementById('chartTotalVal').textContent   = fmtCurrency(total);
+    document.getElementById('chartTotalLabel').textContent = total > 0 ? 'total revenue · ' + rangeLabelText(currentRange).toLowerCase() : 'No revenue yet for this period';
 
     var delta = summary && summary.revenue_delta_pct != null ? summary.revenue_delta_pct : null;
     var deltaEl = document.getElementById('chartDelta');
@@ -713,6 +736,95 @@
     document.getElementById('chartContent').style.display  = 'block';
   }
 
+  // ── Subscriber growth SVG chart ───────────────────────────────
+  function renderGrowthChart(data) {
+    if (!data || data.length === 0) data = zeroChartData(currentRange);
+
+    var total = data.reduce(function(sum, d) { return sum + (d.value || 0); }, 0);
+    document.getElementById('growthTotalVal').textContent   = total.toLocaleString();
+    document.getElementById('growthTotalLabel').textContent = total > 0 ? 'new subscribers · ' + rangeLabelText(currentRange).toLowerCase() : 'No new subscribers for this period';
+
+    var W = 800, H = 140;
+    var padL = 40, padR = 16, padT = 12, padB = 28;
+    var cW = W - padL - padR, cH = H - padT - padB;
+    var values = data.map(function(d) { return d.value || 0; });
+    var maxVal  = Math.max.apply(null, values) || 1;
+    var n = data.length;
+
+    function xOf(i) { return padL + (n > 1 ? (i / (n - 1)) * cW : cW / 2); }
+    function yOf(v) { return padT + cH - (v / maxVal) * cH; }
+
+    var gridLines = '';
+    [0, 0.5, 1].forEach(function(pct) {
+      var y = padT + cH - pct * cH;
+      gridLines +=
+        '<line x1="' + padL + '" y1="' + y + '" x2="' + (W - padR) + '" y2="' + y + '" stroke="rgba(26,45,80,.5)" stroke-width="1"/>' +
+        '<text x="' + (padL - 5) + '" y="' + (y + 4) + '" text-anchor="end" font-size="9" fill="#3d5a8a">' + Math.round(maxVal * pct) + '</text>';
+    });
+
+    var pts = data.map(function(d, i) { return { x: xOf(i), y: yOf(d.value || 0) }; });
+    var linePath = 'M ' + pts[0].x + ' ' + pts[0].y;
+    var fillPath;
+    if (pts.length === 1) {
+      fillPath = 'M ' + pts[0].x + ' ' + pts[0].y + ' L ' + pts[0].x + ' ' + (padT + cH) + ' Z';
+    } else {
+      for (var i = 1; i < pts.length; i++) {
+        var cpx = (pts[i-1].x + pts[i].x) / 2;
+        linePath += ' C ' + cpx + ',' + pts[i-1].y + ' ' + cpx + ',' + pts[i].y + ' ' + pts[i].x + ',' + pts[i].y;
+      }
+      fillPath = linePath + ' L ' + pts[pts.length-1].x + ',' + (padT + cH) + ' L ' + pts[0].x + ',' + (padT + cH) + ' Z';
+    }
+
+    var xLabels = '';
+    var step = Math.max(1, Math.ceil(n / 8));
+    for (var i = 0; i < n; i += step) {
+      xLabels += '<text x="' + xOf(i) + '" y="' + (H - 4) + '" text-anchor="middle" font-size="9" fill="#3d5a8a">' + (data[i].label || '') + '</text>';
+    }
+
+    var dots = '';
+    pts.forEach(function(p, i) {
+      dots += '<circle cx="' + p.x + '" cy="' + p.y + '" r="14" fill="transparent" class="growth-hit" data-i="' + i + '"/>';
+      dots += '<circle cx="' + p.x + '" cy="' + p.y + '" r="3.5" fill="var(--blue-bright)" class="growth-dot"/>';
+    });
+
+    var svg = document.getElementById('growthSvg');
+    svg.innerHTML =
+      '<defs><linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="#2979ff" stop-opacity=".18"/>' +
+        '<stop offset="100%" stop-color="#2979ff" stop-opacity="0"/>' +
+      '</linearGradient></defs>' +
+      gridLines +
+      '<path d="' + fillPath + '" fill="url(#growthFill)"/>' +
+      '<path d="' + linePath + '" fill="none" stroke="var(--blue-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      dots + xLabels;
+
+    var tooltip = document.getElementById('growthTooltip');
+    var ttLabel  = document.getElementById('growthTtLabel');
+    var ttValue  = document.getElementById('growthTtValue');
+    var svgWrap  = svg.parentElement;
+
+    svg.querySelectorAll('.growth-hit').forEach(function(el) {
+      var idx = parseInt(el.getAttribute('data-i'));
+      el.addEventListener('mouseenter', function() {
+        var pt = pts[idx], d = data[idx];
+        var r  = svgWrap.getBoundingClientRect();
+        tooltip.style.left = (pt.x * r.width / W) + 'px';
+        tooltip.style.top  = (pt.y * r.height / H) + 'px';
+        ttLabel.textContent = d.label || '';
+        ttValue.textContent = (d.value || 0) + ' new subscribers';
+        tooltip.classList.add('show');
+        svg.querySelectorAll('.growth-dot').forEach(function(c, ci) { c.setAttribute('r', ci === idx ? '5' : '3.5'); });
+      });
+      el.addEventListener('mouseleave', function() {
+        tooltip.classList.remove('show');
+        svg.querySelectorAll('.growth-dot').forEach(function(c) { c.setAttribute('r', '3.5'); });
+      });
+    });
+
+    document.getElementById('growthSkeleton').style.display = 'none';
+    document.getElementById('growthContent').style.display  = 'block';
+  }
+
   // ── Render top folders table ─────────────────────────────────
   function renderFolders(folders) {
     if (!folders || folders.length === 0) {
@@ -803,18 +915,26 @@
 
   // ── Fetch analytics ──────────────────────────────────────────
   function loadAnalytics(range) {
-    // Reset chart + folders to skeleton
-    document.getElementById('chartSkeleton').style.display = 'block';
-    document.getElementById('chartContent').style.display  = 'none';
-    document.getElementById('chartError').style.display    = 'none';
+    if (!window._artistId) return;
+
+    // Reset all skeletons
+    document.getElementById('chartSkeleton').style.display   = 'block';
+    document.getElementById('chartContent').style.display    = 'none';
+    document.getElementById('chartError').style.display      = 'none';
+    document.getElementById('growthSkeleton').style.display  = 'block';
+    document.getElementById('growthContent').style.display   = 'none';
     document.getElementById('foldersSkeleton').style.display = 'block';
     document.getElementById('foldersContent').style.display  = 'none';
     document.getElementById('foldersError').style.display    = 'none';
     document.getElementById('foldersEmpty').style.display    = 'none';
+    document.getElementById('activitySkeleton').style.display = 'block';
+    document.getElementById('activityList').style.display     = 'none';
+    document.getElementById('activityEmpty').style.display    = 'none';
+    document.getElementById('activityError').style.display    = 'none';
     document.getElementById('statsRow').innerHTML =
       '<div class="stat-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>'.repeat(4);
 
-    fetch('https://api.dropsub.com/api/artists/analytics?range=' + range, {
+    fetch('https://api.dropsub.com/api/artists/' + window._artistId + '/analytics?period=' + range, {
       headers: { 'Authorization': 'Bearer ' + token() },
     })
       .then(function(res) {
@@ -826,79 +946,53 @@
       })
       .then(function(result) {
         if (!result) return;
-
         var data = result.data || {};
 
         if (!result.ok) {
           showToast('Analytics error: ' + ((data && data.message) || 'Unknown error'));
-          document.getElementById('statsRow').innerHTML =
-            '<div class="stat-skeleton" style="opacity:.4;"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>'.repeat(4);
-          document.getElementById('chartSkeleton').style.display = 'none';
-          document.getElementById('chartError').style.display = 'block';
-          document.getElementById('foldersSkeleton').style.display = 'none';
-          document.getElementById('foldersError').style.display = 'block';
+          renderStats({});
+          renderChart([], null);
+          renderGrowthChart([]);
+          renderFolders([]);
+          renderActivity([]);
           return;
         }
 
-        var summary  = data.summary   || data;
-        var chart    = data.revenue_chart || data.chart || data.revenue_over_time || [];
-        var folders  = data.top_folders  || data.folders || [];
+        var summary  = data.summary          || {};
+        var chart    = data.revenue_chart    || [];
+        var growth   = data.subscriber_growth || [];
+        var folders  = data.top_folders      || [];
+        var activity = data.recent_activity  || [];
 
         if (data.artist_name) {
           document.getElementById('artistNameTitle').textContent = '— ' + data.artist_name;
         }
-        document.getElementById('analyticsSubLabel').textContent =
-          rangeLabelText(range) + ' · Updated just now';
+        document.getElementById('analyticsSubLabel').textContent = rangeLabelText(range) + ' · Updated just now';
 
         renderStats(summary);
         renderChart(chart, summary);
+        renderGrowthChart(growth);
         renderFolders(folders);
+        renderActivity(activity);
 
-        // Update sidebar stat badges
-        if (summary.total_revenue != null) {
-          document.getElementById('navPayoutsBadge').textContent = fmtCurrency(summary.total_revenue);
+        // Wire sidebar Drops badge to folder count
+        if (data.top_folders) {
+          document.getElementById('navFoldersBadge').textContent = fmtNum(data.top_folders.length);
         }
       })
       .catch(function() {
-        document.getElementById('chartSkeleton').style.display = 'none';
-        document.getElementById('chartError').style.display    = 'block';
-        document.getElementById('foldersSkeleton').style.display = 'none';
-        document.getElementById('foldersError').style.display    = 'block';
+        renderStats({});
+        renderChart([], null);
+        renderGrowthChart([]);
+        renderFolders([]);
+        renderActivity([]);
         showToast('Network error — could not load analytics.');
       });
   }
 
-  // ── Fetch activity ───────────────────────────────────────────
+  // ── Refresh activity (re-runs full analytics) ────────────────
   function loadActivity() {
-    document.getElementById('activityList').style.display      = 'none';
-    document.getElementById('activityEmpty').style.display     = 'none';
-    document.getElementById('activityError').style.display     = 'none';
-    document.getElementById('activitySkeleton').style.display  = 'block';
-
-    fetch('https://api.dropsub.com/api/artists/activity?limit=12', {
-      headers: { 'Authorization': 'Bearer ' + token() },
-    })
-      .then(function(res) {
-        if (res.status === 401) {
-          localStorage.removeItem('access_token'); sessionStorage.removeItem('access_token');
-          window.location.replace('dropsub-login.html'); return null;
-        }
-        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
-      })
-      .then(function(result) {
-        if (!result) return;
-        document.getElementById('activitySkeleton').style.display = 'none';
-        if (!result.ok) {
-          document.getElementById('activityError').style.display = 'block'; return;
-        }
-        var items = Array.isArray(result.data) ? result.data
-          : (result.data && Array.isArray(result.data.activity) ? result.data.activity : []);
-        renderActivity(items);
-      })
-      .catch(function() {
-        document.getElementById('activitySkeleton').style.display = 'none';
-        document.getElementById('activityError').style.display    = 'block';
-      });
+    loadAnalytics(currentRange);
   }
 
   // ── User profile + role guard ────────────────────────────────
@@ -913,8 +1007,9 @@
         }
         return res.json();
       })
-      .then(function(user) {
-        if (!user) return;
+      .then(function(resp) {
+        if (!resp) return;
+        var user = resp.user || resp;
         if (user.role === 'fan') { window.location.replace('dropsub-fan-dashboard.html'); return; }
 
         var name  = user.full_name || user.name || user.username || '';
@@ -934,14 +1029,16 @@
         if (email) document.getElementById('dropdownEmail').textContent = email;
         if (role)  document.getElementById('sidebarRole').textContent =
           role.charAt(0).toUpperCase() + role.slice(1);
+
+        // Store artist ID and kick off analytics
+        window._artistId = (user.artist && user.artist.id) || null;
+        if (window._artistId) loadAnalytics(currentRange);
       })
       .catch(function() {});
   }
 
   // ── Init ─────────────────────────────────────────────────────
   fetchUserProfile();
-  loadAnalytics(currentRange);
-  loadActivity();
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
