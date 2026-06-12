@@ -551,7 +551,7 @@
           verified:    a.is_verified || false,
           isNew:       false,
           real:        true,
-          hasCollab:   !!(a.folders && a.folders.some(function(f) { return f.is_collab; }))
+          hasCollab:   !!a.has_collab
         };
       });
       renderFeatured();

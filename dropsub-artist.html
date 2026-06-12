@@ -426,6 +426,7 @@
       grid.innerHTML = '<div class="empty-drops"><div class="empty-drops-icon">🎁</div><div class="empty-drops-title">No drops yet — check back soon.</div></div>';
       return;
     }
+    console.log('[renderFolders] folder is_collab values:', folders.map(function(f) { return { id: f.id, name: f.name, is_collab: f.is_collab }; }));
     grid.innerHTML = folders.map(function(f) {
       var coverStyle = (f.cover_url && !f.cover_url.startsWith('undefined'))
         ? 'background:url(\'' + f.cover_url + '\') center/cover no-repeat;'
