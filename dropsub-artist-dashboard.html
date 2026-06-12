@@ -1651,13 +1651,18 @@
     var folder = _currentFolders[idx];
     var newVal = !folder.is_collab;
     var token  = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    console.log('[toggleCollab] idx:', idx, '| folder.id:', folder && folder.id, '| folder.is_collab:', folder && folder.is_collab, '| newVal:', newVal, '| token present:', !!token);
     fetch('https://api.dropsub.com/api/folders/' + folder.id, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ is_collab: newVal }),
     })
-      .then(function(r) { return r.json(); })
+      .then(function(r) {
+        console.log('[toggleCollab] PATCH status:', r.status);
+        return r.json();
+      })
       .then(function(d) {
+        console.log('[toggleCollab] PATCH response:', JSON.stringify(d));
         if (d.folder || d.id) {
           _currentFolders[idx].is_collab = newVal;
           renderFolders(_currentFolders);
@@ -1666,7 +1671,10 @@
           showToast((d.error || 'Failed to update collab setting'));
         }
       })
-      .catch(function() { showToast('Failed to update collab setting'); });
+      .catch(function(err) {
+        console.error('[toggleCollab] fetch error:', err);
+        showToast('Failed to update collab setting');
+      });
   }
 
   // ── Earnings chart ───────────────────────────────
