@@ -790,7 +790,7 @@
     document.getElementById('statsRow').innerHTML =
       statCard('Available Balance', '<i data-lucide="dollar-sign"></i>', fmtCurrency(b.available), 'gold', b.available > 0 ? 'Ready to pay out' : 'No balance available', b.available > 0 ? 'avail' : '') +
       statCard('Pending Payouts', '<i data-lucide="clock"></i>', fmtCurrency(b.pending), 'blue', 'In Stripe\'s rolling reserve', '') +
-      statCard('Total Earned', '<i data-lucide="trending-up"></i>', fmtCurrency(b.total_earned || b.total), '', 'All time gross revenue', '');
+      statCard('Total Earned', '<i data-lucide="trending-up"></i>', fmtCurrency(b.total_earned != null ? b.total_earned : b.total != null ? b.total : 0), '', 'All time gross revenue', '');
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
     // Update sidebar
