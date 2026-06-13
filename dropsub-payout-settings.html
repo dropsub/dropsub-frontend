@@ -727,6 +727,8 @@
         if (!data) return;
         var url = data.onboarding_url || data.url;
         if (url) {
+          var t = sessionStorage.getItem('access_token');
+          if (t) localStorage.setItem('access_token', t);
           window.location.href = url;
         } else {
           throw new Error('no URL returned');
@@ -739,7 +741,11 @@
   }
 
   function continueStripeOnboarding() {
-    if (_onboardingUrl) { window.location.href = _onboardingUrl; return; }
+    if (_onboardingUrl) {
+      var t = sessionStorage.getItem('access_token');
+      if (t) localStorage.setItem('access_token', t);
+      window.location.href = _onboardingUrl; return;
+    }
     showToast('Redirecting to Stripe…');
     startStripeConnect();
   }
