@@ -966,7 +966,10 @@
     })
       .then(function(res) { return res.ok ? res.json() : null; })
       .then(function(data) {
-        if (!data) return;
+        if (!data) {
+          document.getElementById('storageTierSkeleton').style.display = 'none';
+          return;
+        }
 
         var usedGb    = data.storage_used_gb   || 0;
         var usedBytes = data.storage_used_bytes || 0;
