@@ -662,9 +662,7 @@
     if (!e.target.closest('.user-menu-wrap')) closeUserMenu();
   });
 
-  function token() {
-    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-  }
+  var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
 
   function handle401() {
     localStorage.removeItem('access_token'); sessionStorage.removeItem('access_token');
@@ -704,7 +702,7 @@
     // Step 1: create Express account (idempotent — returns existing if already created)
     fetch('https://api.dropsub.com/api/stripe/connect/create', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
     })
       .then(function(res) {
         if (res.status === 401) { handle401(); return null; }
@@ -716,7 +714,7 @@
         // Step 2: get the onboarding URL
         return fetch('https://api.dropsub.com/api/stripe/connect/onboard', {
           method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
         });
       })
       .then(function(res) {
@@ -929,7 +927,7 @@
     document.getElementById('bankNoAccount').style.display = 'none';
 
     fetch('https://api.dropsub.com/api/artists/payout-settings', {
-      headers: { 'Authorization': 'Bearer ' + token() },
+      headers: { 'Authorization': 'Bearer ' + token },
     })
       .then(function(res) {
         if (res.status === 401) { handle401(); return null; }
@@ -979,7 +977,7 @@
   // ── User profile + role guard ────────────────────────────────
   function fetchUserProfile() {
     fetch('https://api.dropsub.com/api/auth/me', {
-      headers: { 'Authorization': 'Bearer ' + token() },
+      headers: { 'Authorization': 'Bearer ' + token },
     })
       .then(function(res) {
         if (res.status === 401) { handle401(); return null; }
@@ -1032,7 +1030,7 @@
     document.getElementById('connectEnabled').style.display       = 'none';
 
     fetch('https://api.dropsub.com/api/stripe/connect/status', {
-      headers: { 'Authorization': 'Bearer ' + token() },
+      headers: { 'Authorization': 'Bearer ' + token },
     })
       .then(function(res) {
         if (res.status === 401) { handle401(); return null; }
@@ -1050,7 +1048,7 @@
   function fetchStripeBalance() {
     if (!window._artistId) return;
     fetch('https://api.dropsub.com/api/artists/' + window._artistId + '/stripe-balance', {
-      headers: { 'Authorization': 'Bearer ' + token() },
+      headers: { 'Authorization': 'Bearer ' + token },
     })
       .then(function(res) {
         if (res.status === 401) { handle401(); return null; }
@@ -1072,7 +1070,7 @@
   function fetchSidebarStats() {
     if (!window._artistId) return;
     fetch('https://api.dropsub.com/api/artists/' + window._artistId + '/analytics?period=30d', {
-      headers: { 'Authorization': 'Bearer ' + token() },
+      headers: { 'Authorization': 'Bearer ' + token },
     })
       .then(function(res) { return res.ok ? res.json() : null; })
       .then(function(data) {
