@@ -699,32 +699,44 @@
   // ── Stripe Connect onboarding ────────────────────────────────
   function startStripeConnect() {
     var btn = document.getElementById('btnConnectStripe');
-    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Setting up…'; }
 
-    // If we already have an onboarding URL from the API response, use it directly
-    if (_onboardingUrl) { window.location.href = _onboardingUrl; return; }
-
-    fetch('https://api.dropsub.com/api/artists/stripe-connect/onboard', {
+    // Step 1: create Express account (idempotent — returns existing if already created)
+    fetch('https://api.dropsub.com/api/stripe/connect/create', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
     })
       .then(function(res) {
         if (res.status === 401) { handle401(); return null; }
+        if (!res.ok) throw new Error('create failed');
+        return res.json();
+      })
+      .then(function(data) {
+        if (!data) return null;
+        // Step 2: get the onboarding URL
+        return fetch('https://api.dropsub.com/api/stripe/connect/onboard', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token(), 'Content-Type': 'application/json' },
+        });
+      })
+      .then(function(res) {
+        if (!res) return null;
+        if (res.status === 401) { handle401(); return null; }
+        if (!res.ok) throw new Error('onboard failed');
         return res.json();
       })
       .then(function(data) {
         if (!data) return;
-        var url = data.onboarding_url || data.url || data.redirect_url;
+        var url = data.onboarding_url || data.url;
         if (url) {
           window.location.href = url;
         } else {
-          showToast('Could not start Stripe setup — please try again.', 'error');
-          if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 32 32" fill="none" style="width:18px;height:18px;flex-shrink:0"><rect width="32" height="32" rx="6" fill="white"/><path d="M13.3 12.8c0-.9.7-1.3 1.9-1.3 1.7 0 3.8.5 5.5 1.4V8.5c-1.8-.7-3.7-1-5.5-1-4.5 0-7.5 2.3-7.5 6.2 0 6.1 8.4 5.1 8.4 7.7 0 1.1-.9 1.4-2.2 1.4-1.9 0-4.3-.8-6.2-1.8v4.5c2.1.9 4.2 1.3 6.2 1.3 4.7 0 7.9-2.3 7.9-6.2-.1-6.5-8.5-5.4-8.5-7.8z" fill="#635BFF"/></svg>Connect with Stripe'; }
+          throw new Error('no URL returned');
         }
       })
       .catch(function() {
-        showToast('Network error — could not reach Stripe.', 'error');
-        if (btn) { btn.disabled = false; }
+        showToast('Could not start Stripe setup — please try again.', 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Connect with Stripe'; }
       });
   }
 
@@ -902,12 +914,7 @@
 
   // ── Main data fetch ──────────────────────────────────────────
   function loadPayoutSettings() {
-    // Reset to skeletons
-    document.getElementById('connectLoading').style.display = 'flex';
-    document.getElementById('connectNotConnected').style.display  = 'none';
-    document.getElementById('connectPending').style.display       = 'none';
-    document.getElementById('connectRestricted').style.display    = 'none';
-    document.getElementById('connectEnabled').style.display       = 'none';
+    // Reset to skeletons (connect panel managed separately by loadConnectStatus)
     document.getElementById('statsRow').innerHTML =
       '<div class="stat-skeleton"><div class="skel-line skel-sm"></div><div class="skel-line skel-lg"></div><div class="skel-line skel-xs"></div></div>'.repeat(3);
     document.getElementById('payoutsSkeleton').style.display = 'block';
@@ -935,8 +942,6 @@
 
         if (!result.ok) {
           showToast((data.message || 'Error loading payout settings.'), 'error');
-          document.getElementById('connectLoading').style.display = 'none';
-          document.getElementById('connectNotConnected').style.display = 'flex';
           renderStats({ available: 0, pending: 0, total_earned: 0 });
           document.getElementById('payoutsSkeleton').style.display = 'none';
           document.getElementById('payoutsEmpty').style.display    = 'block';
@@ -949,21 +954,17 @@
 
         document.getElementById('pageSubLabel').textContent = 'Updated just now';
 
-        var sc      = data.stripe_connect || data.stripe || null;
         var balance = data.balance || data.earnings || {};
         var sched   = data.payout_schedule || data.schedule || null;
         var bank    = data.bank_account || data.bank || null;
         var payouts = data.recent_payouts || data.payouts || [];
 
-        renderStripeConnect(sc);
         renderStats(balance);
         renderSchedule(sched);
         renderBank(bank);
         renderPayoutsTable(payouts);
       })
       .catch(function() {
-        document.getElementById('connectLoading').style.display = 'none';
-        document.getElementById('connectNotConnected').style.display = 'flex';
         renderStats({ available: 0, pending: 0, total_earned: 0 });
         document.getElementById('payoutsSkeleton').style.display = 'none';
         document.getElementById('payoutsError').style.display    = 'block';
@@ -1010,6 +1011,7 @@
 
         window._artistId = (user.artist && user.artist.id) || null;
         if (window._artistId) {
+          loadConnectStatus();
           fetchStripeBalance();
           fetchSidebarStats();
         }
@@ -1018,6 +1020,29 @@
       })
       .catch(function() {
         document.getElementById('pageLoading').classList.add('hidden');
+      });
+  }
+
+  // ── Stripe Connect status ─────────────────────────────────────
+  function loadConnectStatus() {
+    document.getElementById('connectLoading').style.display = 'flex';
+    document.getElementById('connectNotConnected').style.display  = 'none';
+    document.getElementById('connectPending').style.display       = 'none';
+    document.getElementById('connectRestricted').style.display    = 'none';
+    document.getElementById('connectEnabled').style.display       = 'none';
+
+    fetch('https://api.dropsub.com/api/stripe/connect/status', {
+      headers: { 'Authorization': 'Bearer ' + token() },
+    })
+      .then(function(res) {
+        if (res.status === 401) { handle401(); return null; }
+        return res.ok ? res.json() : null;
+      })
+      .then(function(data) {
+        renderStripeConnect(data || { connected: false });
+      })
+      .catch(function() {
+        renderStripeConnect({ connected: false });
       });
   }
 
@@ -1063,6 +1088,21 @@
   }
 
   // ── Init ─────────────────────────────────────────────────────
+  (function checkStripeReturn() {
+    var params = new URLSearchParams(window.location.search);
+    var stripeParam = params.get('stripe');
+    if (stripeParam === 'success') {
+      showToast('Bank account connected!', 'success');
+    } else if (stripeParam === 'refresh') {
+      showToast('Stripe setup incomplete — click Connect to try again.', 'warn');
+    }
+    if (stripeParam) {
+      params.delete('stripe');
+      var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      history.replaceState(null, '', newUrl);
+    }
+  })();
+
   fetchUserProfile();
   loadPayoutSettings();
 </script>
