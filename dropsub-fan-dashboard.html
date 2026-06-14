@@ -1123,7 +1123,9 @@
       .then(function(user) {
         if (!user) return;
         sessionStorage.setItem('ds_profile', JSON.stringify(user));
-        var name = user.full_name || user.name || user.username || '';
+        // Unwrap { user: { role, full_name, ... } } envelope from /api/auth/me
+        var u = user.user || user;
+        var name = u.full_name || u.name || u.username || '';
         var initials = name.split(' ').filter(Boolean)
           .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
         var avatar = document.getElementById('userAvatar');
@@ -1131,12 +1133,10 @@
           if (initials) avatar.textContent = initials;
           avatar.title = name;
         }
-        // Populate avatar dropdown (handle { user:{} } envelope or direct)
-        var u = user.user || user;
-        var displayName = u.full_name || u.name || u.username || '—';
+        // Populate avatar dropdown
         var dropName  = document.getElementById('dropdownName');
         var dropEmail = document.getElementById('dropdownEmail');
-        if (dropName)  dropName.textContent  = displayName;
+        if (dropName)  dropName.textContent  = name || '—';
         if (dropEmail) dropEmail.textContent = u.email || '—';
         // Inject Artist Dashboard tab for non-fan roles
         if (u.role && u.role !== 'fan') {
