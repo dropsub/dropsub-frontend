@@ -138,6 +138,12 @@
     .empty-drops-icon { font-size: 2.5rem; margin-bottom: 12px; }
     .empty-drops-title { font-size: .9rem; font-weight: 700; color: var(--text-mid); }
 
+    /* ── FOLLOW BUTTON ───────────────────────────── */
+    .follow-btn { margin-top: 12px; display: inline-block; padding: 7px 22px; border-radius: 20px; font-family: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .15s; border: 1px solid var(--border-bright); background: transparent; color: var(--text-mid); }
+    .follow-btn:hover { border-color: var(--blue-bright); color: var(--text-white); background: rgba(41,121,255,.08); }
+    .follow-btn.following { border-color: var(--success); color: var(--success); }
+    .follow-btn.following:hover { background: rgba(63,160,106,.08); }
+
     /* ── DIVIDER ─────────────────────────────────── */
     .section-divider { height: 1px; background: var(--border); max-width: 900px; margin: 0 auto 28px; }
 
@@ -186,6 +192,7 @@
       <div id="verifiedBadge" style="display:none" class="verified-badge">✓ VERIFIED</div>
       <div class="artist-name" id="artistName">—</div>
       <div class="artist-genre" id="artistGenre"></div>
+      <button id="followBtn" class="follow-btn" style="display:none" onclick="toggleFollowArtist()">Follow</button>
     </div>
   </div>
 
@@ -232,6 +239,8 @@
   try { _profile = JSON.parse(sessionStorage.getItem('ds_profile') || 'null'); } catch(e) {}
   var _folders      = [];
   var _activeFilter = 'newest';
+  var _artistId     = null;
+  var _isFollowing  = false;
 
   // ── Nav ────────────────────────────────────────────────────
   (function() {
@@ -308,6 +317,7 @@
   // ── Render ─────────────────────────────────────────────────
   function renderArtist(a) {
     document.title = 'DropSub — ' + a.name;
+    _artistId = a.id;
     document.getElementById('artistPage').style.display = 'block';
 
     // Banner
@@ -372,6 +382,49 @@
     document.getElementById('dropsCount').textContent = _folders.length;
     if (_folders.length) document.getElementById('filterBar').style.display = 'flex';
     applyFilter();
+
+    if (_token) fetchFollowStatus();
+  }
+
+  function fetchFollowStatus() {
+    fetch('https://api.dropsub.com/api/artists/' + _artistId + '/follow-status', {
+      headers: { 'Authorization': 'Bearer ' + _token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data) return;
+      _isFollowing = !!data.following;
+      renderFollowBtn();
+    })
+    .catch(function() {});
+  }
+
+  function renderFollowBtn() {
+    var btn = document.getElementById('followBtn');
+    if (!btn) return;
+    btn.style.display = 'inline-block';
+    btn.textContent   = _isFollowing ? '✓ Following' : 'Follow';
+    btn.className     = 'follow-btn' + (_isFollowing ? ' following' : '');
+  }
+
+  function toggleFollowArtist() {
+    if (!_token) {
+      showToast('Log in to follow this artist');
+      setTimeout(function() { window.location.href = 'dropsub-login.html'; }, 1000);
+      return;
+    }
+    var wasFollowing = _isFollowing;
+    _isFollowing = !_isFollowing;
+    renderFollowBtn();
+    showToast(_isFollowing ? '✓ Following this artist!' : 'Unfollowed');
+    fetch('https://api.dropsub.com/api/artists/' + _artistId + '/follow', {
+      method:  wasFollowing ? 'DELETE' : 'POST',
+      headers: { 'Authorization': 'Bearer ' + _token }
+    })
+    .then(function(r) {
+      if (!r.ok) { _isFollowing = wasFollowing; renderFollowBtn(); showToast('Something went wrong'); }
+    })
+    .catch(function() { _isFollowing = wasFollowing; renderFollowBtn(); });
   }
 
   function onFilterChange() {

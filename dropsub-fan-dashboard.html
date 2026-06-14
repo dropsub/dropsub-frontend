@@ -563,30 +563,7 @@
 
   <!-- LEFT SIDEBAR: Artist list -->
   <aside class="sidebar-left">
-    <div class="artist-item active" onclick="switchArtist(this,'BANGCHAN','#BANGCHAN #WOLFBOY #SKZ','K-Pop · Stray Kids')">
-      <div class="artist-ring"><i data-lucide="mic-2"></i></div>
-      <div class="artist-name">BANGCHAN</div>
-    </div>
-    <div class="artist-item" onclick="switchArtist(this,'DOECHII','#DOECHII #SWAMP #TDE','Hip-Hop · TDE')">
-      <div class="artist-ring"><i data-lucide="music"></i></div>
-      <div class="artist-name">DOECHII</div>
-    </div>
-    <div class="artist-item" onclick="switchArtist(this,'SABRINA CARPENTER','#SABRINA #ESPRESSO #POP','Pop · Island Records')">
-      <div class="artist-ring"><i data-lucide="star"></i></div>
-      <div class="artist-name">SABRINA CARPENTER</div>
-    </div>
-    <div class="artist-item" onclick="switchArtist(this,'KENDRICK LAMAR','#KENDRICK #PGDE #HIP-HOP','Hip-Hop · PG&amp;E')">
-      <div class="artist-ring"><i data-lucide="trophy"></i></div>
-      <div class="artist-name">KENDRICK LAMAR</div>
-    </div>
-    <div class="artist-item" onclick="switchArtist(this,'DEAD BOYZ','#DEADBOYZ #UNDERGROUND','Alternative · Indie')">
-      <div class="artist-ring"><i data-lucide="mic"></i></div>
-      <div class="artist-name">DEAD BOYZ</div>
-    </div>
-    <div class="artist-item" onclick="switchArtist(this,'MIYAVI','#MIYAVI #JROCK #GUITAR','Rock · J-Glam')">
-      <div class="artist-ring"><i data-lucide="zap"></i></div>
-      <div class="artist-name">MIYAVI</div>
-    </div>
+    <div id="followedArtistsList"></div>
     <div class="sidebar-divider"></div>
     <div class="add-artist-btn" onclick="showToast('Artist discovery coming soon!')">+</div>
   </aside>
@@ -1163,9 +1140,48 @@
     if (e.target === this) closeFanUploadModal();
   });
 
+  function fetchFollowing() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return;
+    fetch('https://api.dropsub.com/api/fans/following', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      renderFollowedSidebar(data && data.following ? data.following : []);
+    })
+    .catch(function() { renderFollowedSidebar([]); });
+  }
+
+  function renderFollowedSidebar(following) {
+    var list = document.getElementById('followedArtistsList');
+    if (!list) return;
+    if (!following.length) {
+      list.innerHTML =
+        '<div style="padding:8px 6px;text-align:center;font-size:.6rem;color:var(--text-dim);line-height:1.5;">' +
+          'Follow artists<br>on Discover' +
+        '</div>';
+      return;
+    }
+    list.innerHTML = following.map(function(a) {
+      var initials = (a.name || '').split(' ').filter(Boolean)
+        .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '♪';
+      var avatarHtml = a.avatar_url
+        ? '<img src="' + a.avatar_url + '" alt="' + (a.name || '') + '">'
+        : initials;
+      var shortName = (a.name || '').toUpperCase().slice(0, 10);
+      var href = 'dropsub-artist.html?slug=' + encodeURIComponent(a.slug);
+      return '<div class="artist-item" onclick="window.location.href=\'' + href + '\'">' +
+        '<div class="artist-ring">' + avatarHtml + '</div>' +
+        '<div class="artist-name">' + shortName + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
   // ── Init ────────────────────────────────────────────────────
   renderTable(artists['BANGCHAN'].folders);
   fetchUserProfile();
+  fetchFollowing();
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>

@@ -326,6 +326,9 @@
       background: transparent; border: 1px solid var(--success); color: var(--success);
     }
     .ac-btn.following:hover { background: rgba(63,160,106,.08); }
+    .ac-btn.subscribed {
+      background: transparent; border: 1px solid var(--success); color: var(--success); opacity: .8; cursor: default;
+    }
 
     /* ── EMPTY STATE ──────────────────────────────── */
     .empty-state {
@@ -517,6 +520,8 @@
   var _sort        = 'featured';
   var _query       = '';
   var _followed    = {};
+  var _followedIds   = new Set();
+  var _subscribedIds = new Set();
   var _realArtists = [];
 
   // ── Fetch real artists from API ───────────────────────────────
@@ -585,9 +590,41 @@
         '<div class="ac-stats">' +
           '<div class="ac-stat"><i data-lucide="users"></i> <span class="ac-stat-val">' + a.followers + '</span></div>' +
         '</div>' +
-        '<button class="ac-btn subscribe" onclick="event.stopPropagation();viewArtist(\'' + a.slug + '\')">View</button>' +
+        (function() {
+          var isSubbed  = _subscribedIds.has(a.id);
+          var isFollowed = _followedIds.has(a.id);
+          if (isSubbed)   return '<button class="ac-btn subscribed" onclick="event.stopPropagation()">✓ Subscribed</button>';
+          if (isFollowed) return '<button class="ac-btn following" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + a.displayName.replace(/'/g,"\\'") + '\')">✓ Following</button>';
+          return '<button class="ac-btn follow" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + a.displayName.replace(/'/g,"\\'") + '\')">Follow</button>';
+        })() +
       '</div>' +
     '</div>';
+  }
+
+  function fetchFollowData() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return;
+    fetch('https://api.dropsub.com/api/fans/following', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data) return;
+      _followedIds = new Set((data.following || []).map(function(f) { return f.artist_id; }));
+      renderPage();
+    })
+    .catch(function() {});
+
+    fetch('https://api.dropsub.com/api/payments/subscriptions', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data) return;
+      _subscribedIds = new Set((data.subscriptions || []).map(function(s) { return s.artist_id; }));
+      renderPage();
+    })
+    .catch(function() {});
   }
 
   function viewArtist(slug) {
@@ -755,6 +792,29 @@
     renderPage();
   }
 
+  function toggleFollowReal(artistId, artistName) {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { showToast('Sign in to follow artists'); return; }
+    var wasFollowing = _followedIds.has(artistId);
+    if (wasFollowing) { _followedIds.delete(artistId); showToast('Unfollowed ' + artistName); }
+    else              { _followedIds.add(artistId);    showToast('✓ Following ' + artistName + '!'); }
+    renderPage();
+    fetch('https://api.dropsub.com/api/artists/' + artistId + '/follow', {
+      method: wasFollowing ? 'DELETE' : 'POST',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) {
+      if (!r.ok) {
+        if (wasFollowing) _followedIds.add(artistId); else _followedIds.delete(artistId);
+        renderPage(); showToast('Something went wrong');
+      }
+    })
+    .catch(function() {
+      if (wasFollowing) _followedIds.add(artistId); else _followedIds.delete(artistId);
+      renderPage();
+    });
+  }
+
   function openProfile(id) {
     showToast('Opening artist profile…');
   }
@@ -813,6 +873,7 @@
   renderFeatured();
   renderPage();
   fetchRealArtists();
+  fetchFollowData();
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
