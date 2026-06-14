@@ -179,6 +179,7 @@
 </head>
 <body>
 <script src="dropsub-auth.js"></script>
+<script src="dropsub-notifications.js"></script>
 <script>
   (function() {
     var t = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
@@ -200,6 +201,7 @@
     </div>
   </div>
   <div class="topnav-right">
+    <div class="notif-btn"><i data-lucide="bell"></i></div>
     <div class="user-menu-wrap">
       <div class="user-avatar" id="navAvatar" onclick="toggleUserMenu(event)">—</div>
       <div class="user-dropdown" id="userDropdown">
