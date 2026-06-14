@@ -792,6 +792,9 @@
 
 <!-- ══ JAVASCRIPT ════════════════════════════════════════════ -->
 <script>
+  // ── Followed artist data (for inline sidebar loading) ───────
+  var _followingData = [];
+
   // ── Artist data ─────────────────────────────────────────────
   const artists = {
     'BANGCHAN': {
@@ -1156,6 +1159,7 @@
   function renderFollowedSidebar(following) {
     var list = document.getElementById('followedArtistsList');
     if (!list) return;
+    _followingData = following;
     if (!following.length) {
       list.innerHTML =
         '<div style="padding:8px 6px;text-align:center;font-size:.6rem;color:var(--text-dim);line-height:1.5;">' +
@@ -1163,19 +1167,269 @@
         '</div>';
       return;
     }
-    list.innerHTML = following.map(function(a) {
+    list.innerHTML = following.map(function(a, i) {
       var initials = (a.name || '').split(' ').filter(Boolean)
         .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '♪';
       var avatarHtml = a.avatar_url
         ? '<img src="' + a.avatar_url + '" alt="' + (a.name || '') + '">'
         : initials;
       var shortName = (a.name || '').toUpperCase().slice(0, 10);
-      var href = 'dropsub-artist.html?slug=' + encodeURIComponent(a.slug);
-      return '<div class="artist-item" onclick="window.location.href=\'' + href + '\'">' +
+      return '<div class="artist-item" onclick="loadArtistInline(' + i + ', this)">' +
         '<div class="artist-ring">' + avatarHtml + '</div>' +
         '<div class="artist-name">' + shortName + '</div>' +
       '</div>';
     }).join('');
+  }
+
+  function loadArtistInline(idx, el) {
+    var a = _followingData[idx];
+    if (!a) return;
+
+    // Sidebar active state
+    document.querySelectorAll('#followedArtistsList .artist-item').forEach(function(item) {
+      item.classList.remove('active');
+    });
+    el.classList.add('active');
+
+    var name  = a.name  || '';
+    var genre = a.genre || '';
+    currentArtist = name;
+
+    // Immediate banner update while loading
+    document.getElementById('artistTitle').textContent    = name.toUpperCase();
+    document.getElementById('artistSubtitle').textContent = genre + ' · Loading folders…';
+    document.getElementById('folderCount').textContent    = 'Loading…';
+    document.getElementById('featuredTags').innerHTML     = '';
+    document.getElementById('fileTableBody').innerHTML    =
+      '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Loading drops…</td></tr>';
+
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    fetch('https://api.dropsub.com/api/artists/' + encodeURIComponent(a.slug), { headers: headers })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.artist) {
+        document.getElementById('fileTableBody').innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Could not load folders.</td></tr>';
+        return;
+      }
+      var artist  = data.artist;
+      var folders = artist.folders || [];
+      currentArtist = artist.name || name;
+
+      var folderTxt = folders.length + ' drop' + (folders.length !== 1 ? 's' : '');
+      document.getElementById('artistTitle').textContent    = (artist.name || name).toUpperCase();
+      document.getElementById('artistSubtitle').textContent = (artist.genre || genre) + ' · ' + folderTxt;
+      document.getElementById('folderCount').textContent    = folderTxt;
+      document.getElementById('featuredTags').innerHTML     =
+        '<div class="featured-tag">FOLLOWING</div>' +
+        (folders.length ? '<div class="featured-tag">' + folders.length + ' DROPS</div>' : '');
+
+      // Update center banner column if artist has a banner image
+      if (artist.banner_url) {
+        var cols = document.querySelectorAll('#featuredMedia .media-col');
+        if (cols[1]) {
+          cols[1].innerHTML =
+            '<img src="' + artist.banner_url + '" style="width:100%;height:100%;object-fit:cover;filter:brightness(.85);" alt="">' +
+            '<div class="play-btn" onclick="showToast(\'Playing featured content…\')">▶</div>';
+          cols[1].style.background = '';
+        }
+      }
+
+      renderApiTable(folders);
+    })
+    .catch(function() {
+      document.getElementById('fileTableBody').innerHTML =
+        '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Failed to load. Check your connection.</td></tr>';
+    });
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '—';
+    var gb = bytes / (1024 * 1024 * 1024);
+    var mb = bytes / (1024 * 1024);
+    if (gb >= 1)  return gb.toFixed(1) + ' GB';
+    if (mb >= 1)  return Math.round(mb) + ' MB';
+    return Math.round(bytes / 1024) + ' KB';
+  }
+
+  function renderApiTable(apiFolders) {
+    var tbody = document.getElementById('fileTableBody');
+    tbody.innerHTML = '';
+
+    if (!apiFolders.length) {
+      var empty = document.createElement('tr');
+      var etd   = document.createElement('td');
+      etd.colSpan = 7;
+      etd.style.cssText = 'text-align:center;padding:40px 0;color:var(--text-dim);font-size:.82rem;';
+      etd.textContent = 'No drops yet — check back soon.';
+      empty.appendChild(etd);
+      tbody.appendChild(empty);
+      return;
+    }
+
+    apiFolders.forEach(function(f) {
+      var type      = f.access_type  || 'free';
+      var status    = f.access_status || 'free';
+      var isFree    = type === 'free';
+      var isSub     = type === 'subscription';
+      var isPrem    = type === 'premium';
+      var canAccess = status === 'free' || status === 'subscribed' || status === 'purchased';
+      var isPremLocked = isPrem && !canAccess;
+      var isPremOwned  = isPrem &&  canAccess;
+
+      var price = '';
+      if (isSub  && f.sub_price)     price = '$' + Number(f.sub_price).toFixed(2) + '/mo';
+      else if (isPrem && f.premium_price) price = '$' + Number(f.premium_price).toFixed(2);
+
+      var size  = formatBytes(f.size_bytes);
+      var files = f.file_count || 0;
+      var date  = (f.event_date || f.created_at || '').split('T')[0];
+
+      var tr = document.createElement('tr');
+      if (isPremLocked) tr.className = 'row-premium-locked';
+      if (isPremOwned)  tr.className = 'row-premium-purchased';
+
+      // ── Checkbox ──────────────────────────────────────────────
+      var tdCb = document.createElement('td');
+      var cb   = document.createElement('input');
+      cb.type  = 'checkbox';
+      if (isPremLocked) { cb.disabled = true; cb.style.opacity = '0.3'; }
+      else cb.style.accentColor = isPremOwned ? 'var(--accent-gold)' : 'var(--blue-bright)';
+      tdCb.appendChild(cb);
+      tr.appendChild(tdCb);
+
+      // ── Name cell ─────────────────────────────────────────────
+      var tdName = document.createElement('td');
+      var cell   = document.createElement('div');
+      cell.className = 'file-name-cell';
+
+      var icon = document.createElement('span');
+      if (isFree || (isSub && canAccess)) { icon.className = 'folder-icon gold'; icon.textContent = '📂'; }
+      else if (isSub)     { icon.className = 'folder-icon blue'; icon.textContent = '📁'; }
+      else if (isPremOwned) { icon.className = 'folder-icon gold'; icon.style.color = 'var(--accent-gold)'; icon.textContent = '⭐'; }
+      else { icon.className = 'folder-icon'; icon.style.cssText = 'opacity:.42;filter:grayscale(.7);'; icon.textContent = '⭐'; }
+
+      var info    = document.createElement('div');
+      var nameDiv = document.createElement('div');
+      nameDiv.className = 'file-name';
+      if (isPremLocked) {
+        nameDiv.style.cssText = 'color:var(--text-dim);display:flex;align-items:center;gap:6px;';
+        nameDiv.appendChild(document.createTextNode(f.name + ' '));
+        var chip = document.createElement('span');
+        chip.className   = 'lock-chip';
+        chip.textContent = '🔒 ' + price;
+        nameDiv.appendChild(chip);
+      } else if (isPremOwned) {
+        nameDiv.style.color = 'var(--accent-gold)';
+        nameDiv.textContent = f.name;
+      } else {
+        nameDiv.textContent = f.name;
+      }
+      info.appendChild(nameDiv);
+
+      var metaDiv = document.createElement('div');
+      metaDiv.className   = 'file-date';
+      if (isPremLocked) metaDiv.style.color = 'var(--text-dim)';
+      metaDiv.textContent = files + ' files · ' + size;
+      info.appendChild(metaDiv);
+
+      if (isPremLocked && f.description) {
+        var tDiv = document.createElement('div');
+        tDiv.className   = 'folder-teaser';
+        tDiv.textContent = f.description;
+        info.appendChild(tDiv);
+      }
+      cell.appendChild(icon);
+      cell.appendChild(info);
+
+      if (f.is_collab) {
+        var cb2 = document.createElement('span');
+        cb2.className   = 'fan-collab-badge';
+        cb2.textContent = '🤝 COLLAB';
+        cb2.title       = 'Fan collaboration folder — you can upload here!';
+        cb2.onclick     = function(e) { e.stopPropagation(); showToast('🤝 Upload your photos & videos to contribute!'); };
+        cell.appendChild(cb2);
+      }
+      tdName.appendChild(cell);
+      tr.appendChild(tdName);
+
+      // ── ACCESS column ─────────────────────────────────────────
+      var tdBadge = document.createElement('td');
+      if (canAccess && !isPremOwned) {
+        // Free or subscribed folder → View Drop button
+        var viewBtn = document.createElement('button');
+        viewBtn.style.cssText = 'background:linear-gradient(135deg,var(--blue-bright),#5a4dff);border:none;color:#fff;border-radius:16px;padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;';
+        viewBtn.textContent   = 'View Drop';
+        (function(fid) {
+          viewBtn.onclick = function(e) { e.stopPropagation(); window.location.href = 'dropsub-content-viewer.html?folder_id=' + fid; };
+        })(f.id);
+        tdBadge.appendChild(viewBtn);
+      } else if (isSub && !canAccess) {
+        // Locked subscription
+        var subBadge = document.createElement('span');
+        subBadge.className   = 'access-badge subscription';
+        subBadge.textContent = price ? 'Subscribe · ' + price : 'Subscribe';
+        tdBadge.appendChild(subBadge);
+      } else if (isPremOwned) {
+        var ownBadge = document.createElement('span');
+        ownBadge.className   = 'purchased-badge';
+        ownBadge.textContent = '⭐ PURCHASED';
+        tdBadge.appendChild(ownBadge);
+      } else {
+        // Premium locked → buy button
+        var buyBtn = document.createElement('button');
+        buyBtn.className   = 'purchase-cta';
+        buyBtn.textContent = '⭐ Buy ' + price;
+        (function(n, p, d) {
+          buyBtn.onclick = function(e) { e.stopPropagation(); handlePremiumData(n, p, d); };
+        })(f.name, price, f.description || '');
+        tdBadge.appendChild(buyBtn);
+      }
+      tr.appendChild(tdBadge);
+
+      // ── Date / Size / Files ───────────────────────────────────
+      [date ? formatDate(date) : '—', size, String(files)].forEach(function(val) {
+        var td = document.createElement('td');
+        td.className = 'date-cell';
+        if (isPremLocked) td.style.color = 'var(--text-dim)';
+        td.textContent = val;
+        tr.appendChild(td);
+      });
+
+      // ── Row actions ───────────────────────────────────────────
+      var tdAct = document.createElement('td');
+      if (canAccess) {
+        var w = document.createElement('div'); w.className = 'row-actions';
+        var shareBtn = document.createElement('div'); shareBtn.className = 'row-action-btn'; shareBtn.title = 'Share';
+        shareBtn.textContent = '🔗';
+        shareBtn.onclick = function(e) { e.stopPropagation(); showToast('Link copied!'); };
+        w.appendChild(shareBtn);
+        if (f.is_collab) {
+          var upBtn = document.createElement('div'); upBtn.className = 'row-action-btn'; upBtn.title = 'Upload to collab folder';
+          upBtn.textContent = '⬆️';
+          upBtn.style.cssText = 'background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.35);';
+          (function(n) { upBtn.onclick = function(e) { e.stopPropagation(); openFanUploadModal(n); }; })(f.name);
+          w.appendChild(upBtn);
+        }
+        tdAct.appendChild(w);
+      }
+      tr.appendChild(tdAct);
+
+      // ── Row click ─────────────────────────────────────────────
+      tr.style.cursor = 'pointer';
+      if (canAccess) {
+        (function(fid) { tr.onclick = function() { window.location.href = 'dropsub-content-viewer.html?folder_id=' + fid; }; })(f.id);
+      } else if (isSub) {
+        (function(n, p) { tr.onclick = function() { handleRowClick('subscription', n, p); }; })(f.name, price);
+      } else {
+        (function(n, p, d) { tr.onclick = function() { handlePremiumData(n, p, d); }; })(f.name, price, f.description || '');
+      }
+
+      tbody.appendChild(tr);
+    });
   }
 
   // ── Init ────────────────────────────────────────────────────
