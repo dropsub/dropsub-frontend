@@ -913,16 +913,24 @@
       ? (document.getElementById('artistRole').value || 'artist')
       : 'fan';
 
+    const signupBody = {
+      email,
+      password,
+      full_name: firstName + ' ' + lastName,
+      role,
+      username,
+    };
+    if (role !== 'fan') {
+      const artistNameVal = (document.getElementById('artistName').value || '').trim();
+      const genreVal      = (document.getElementById('genre').value || '').trim();
+      if (artistNameVal) signupBody.artist_name = artistNameVal;
+      if (genreVal)      signupBody.genre = genreVal;
+    }
+
     fetch('https://api.dropsub.com/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        password,
-        full_name: firstName + ' ' + lastName,
-        role,
-        username,
-      }),
+      body: JSON.stringify(signupBody),
     })
       .then(function(res) {
         return res.json().then(function(data) {
