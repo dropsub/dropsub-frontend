@@ -1156,6 +1156,20 @@
     .catch(function() { renderFollowedSidebar([]); });
   }
 
+  function showMainEmptyState() {
+    document.getElementById('artistTitle').textContent    = 'My Artists';
+    document.getElementById('artistSubtitle').textContent = '';
+    document.getElementById('folderCount').textContent    = '';
+    document.getElementById('featuredTags').innerHTML     = '';
+    document.getElementById('fileTableBody').innerHTML    =
+      '<tr><td colspan="7" style="text-align:center;padding:60px 24px;">' +
+        '<div style="font-size:2.4rem;margin-bottom:14px;">🎵</div>' +
+        '<div style="font-size:.9rem;font-weight:700;color:var(--text-mid);margin-bottom:8px;">No artists followed yet</div>' +
+        '<div style="font-size:.78rem;color:var(--text-dim);margin-bottom:18px;">Follow artists on Discover to see their drops here</div>' +
+        '<a href="dropsub-discover.html" style="background:linear-gradient(135deg,var(--blue-bright),#5a4dff);color:#fff;border-radius:16px;padding:8px 22px;font-size:.78rem;font-weight:700;text-decoration:none;display:inline-block;">Go to Discover</a>' +
+      '</td></tr>';
+  }
+
   function renderFollowedSidebar(following) {
     var list = document.getElementById('followedArtistsList');
     if (!list) return;
@@ -1165,6 +1179,7 @@
         '<div style="padding:8px 6px;text-align:center;font-size:.6rem;color:var(--text-dim);line-height:1.5;">' +
           'Follow artists<br>on Discover' +
         '</div>';
+      showMainEmptyState();
       return;
     }
     list.innerHTML = following.map(function(a, i) {
@@ -1179,6 +1194,9 @@
         '<div class="artist-name">' + shortName + '</div>' +
       '</div>';
     }).join('');
+    // Auto-load first followed artist as the default view
+    var firstItem = list.querySelector('.artist-item');
+    if (firstItem) loadArtistInline(0, firstItem);
   }
 
   function loadArtistInline(idx, el) {
@@ -1433,7 +1451,12 @@
   }
 
   // ── Init ────────────────────────────────────────────────────
-  renderTable(artists['BANGCHAN'].folders);
+  document.getElementById('artistTitle').textContent    = 'My Artists';
+  document.getElementById('artistSubtitle').textContent = '';
+  document.getElementById('folderCount').textContent    = '';
+  document.getElementById('featuredTags').innerHTML     = '';
+  document.getElementById('fileTableBody').innerHTML    =
+    '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Loading your artists…</td></tr>';
   fetchUserProfile();
   fetchFollowing();
 </script>
