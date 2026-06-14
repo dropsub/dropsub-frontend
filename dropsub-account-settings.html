@@ -430,7 +430,7 @@
         <!-- ── 2. EMAIL (read-only) ── -->
         <div class="settings-card" id="emailCard" style="display:none;">
           <div class="card-header">
-            <div class="card-title"><span class="card-icon"><i data-lucide="mail"></i></span> Email address</div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="mail"></i></span> Email Address</div>
             <div class="card-desc">Your login email. Contact support to change it.</div>
           </div>
           <div class="card-body">
@@ -615,8 +615,9 @@
         }
         return res.json();
       })
-      .then(function(user) {
-        if (!user) return;
+      .then(function(data) {
+        if (!data) return;
+        var user = data.user || data;
         currentUser = user;
 
         var name     = user.full_name || user.name || '';
