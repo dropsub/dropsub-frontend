@@ -155,6 +155,16 @@
     .nav-badge.gold { background: var(--accent-gold); color: #080f1c; }
 
     .nav-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+    .following-panel { display: none; padding: 2px 8px 4px 16px; }
+    .following-panel.open { display: block; }
+    .following-panel-list { padding: 2px 0; }
+    .following-panel-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 7px; cursor: pointer; transition: background .12s; }
+    .following-panel-item:hover { background: var(--bg-hover); }
+    .following-panel-avatar { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg,#2979ff,#7c4dff); display: flex; align-items: center; justify-content: center; font-size: .57rem; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border-bright); }
+    .following-panel-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .following-panel-name { font-size: .77rem; color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+    .following-panel-item:hover .following-panel-name { color: var(--text-white); }
+    .following-panel-empty { font-size: .72rem; color: var(--text-dim); padding: 6px 8px; line-height: 1.5; }
 
     /* Artist profile mini card in sidebar */
     .artist-mini {
@@ -860,6 +870,7 @@
     <div class="nav-tabs">
       <a class="nav-tab" href="dropsub-fan-dashboard.html">Fan View</a>
       <a class="nav-tab active" href="#">Artist Dashboard</a>
+      <a class="nav-tab" href="dropsub-discover.html">Discover</a>
     </div>
   </div>
   <div class="topnav-right">
@@ -930,7 +941,11 @@
     <a class="nav-item active" href="dropsub-artist-dashboard.html"><span class="nav-icon"><i data-lucide="bar-chart-2"></i></span>Dashboard</a>
     <a class="nav-item" onclick="document.getElementById('dropsSection').scrollIntoView({behavior:'smooth'});document.getElementById('dropsSection').classList.add('panel-highlight');setTimeout(function(){document.getElementById('dropsSection').classList.remove('panel-highlight');},1200)"><span class="nav-icon"><i data-lucide="folder-open"></i></span>Drops<span class="nav-badge" id="dropsBadge">0</span></a>
     <a class="nav-item" onclick="openUploadModal()"><span class="nav-icon"><i data-lucide="upload"></i></span>Upload Content</a>
-    <a class="nav-item" href="dropsub-discover.html"><span class="nav-icon"><i data-lucide="search"></i></span>Discover</a>
+    <a class="nav-item" href="dropsub-fan-dashboard.html"><span class="nav-icon"><i data-lucide="users"></i></span>Fan View</a>
+    <div class="nav-item" id="followingNavBtn" onclick="toggleFollowingPanel(this)"><span class="nav-icon"><i data-lucide="heart"></i></span>Following</div>
+    <div id="followingPanel" class="following-panel">
+      <div id="followingPanelList" class="following-panel-list"></div>
+    </div>
     <a class="nav-item" href="dropsub-subscriptions.html"><span class="nav-icon"><i data-lucide="users"></i></span>Subscribers<span class="nav-badge" id="navSubsBadge">0</span></a>
 
     <div class="nav-divider"></div>
@@ -2525,6 +2540,53 @@
     t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // ── Following panel (sidebar) ─────────────────────
+  var _followingPanelLoaded = false;
+  var _followingPanelData   = [];
+
+  function toggleFollowingPanel(btn) {
+    var panel = document.getElementById('followingPanel');
+    var isOpen = panel.classList.contains('open');
+    panel.classList.toggle('open', !isOpen);
+    btn.classList.toggle('active', !isOpen);
+    if (!isOpen && !_followingPanelLoaded) {
+      loadFollowingPanel();
+    }
+  }
+
+  function loadFollowingPanel() {
+    var tok = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var listEl = document.getElementById('followingPanelList');
+    listEl.innerHTML = '<div class="following-panel-empty">Loading…</div>';
+    fetch('https://api.dropsub.com/api/fans/following', {
+      headers: { 'Authorization': 'Bearer ' + tok }
+    })
+    .then(function(r) { return r.ok ? r.json() : { following: [] }; })
+    .then(function(data) {
+      _followingPanelData = data.following || [];
+      _followingPanelLoaded = true;
+      if (!_followingPanelData.length) {
+        listEl.innerHTML = '<div class="following-panel-empty">Not following anyone yet.<br>Discover artists to follow.</div>';
+        return;
+      }
+      listEl.innerHTML = _followingPanelData.map(function(a) {
+        var initials = (a.name || '').split(' ').filter(Boolean)
+          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '♪';
+        var avatarInner = a.avatar_url
+          ? '<img src="' + a.avatar_url + '" alt="">'
+          : initials;
+        var href = 'dropsub-artist.html?slug=' + encodeURIComponent(a.slug || '');
+        return '<div class="following-panel-item" onclick="window.location.href=\'' + href + '\'">' +
+          '<div class="following-panel-avatar">' + avatarInner + '</div>' +
+          '<div class="following-panel-name">' + (a.name || '') + '</div>' +
+        '</div>';
+      }).join('');
+    })
+    .catch(function() {
+      listEl.innerHTML = '<div class="following-panel-empty">Failed to load.</div>';
+    });
   }
 
   // ── User menu ────────────────────────────────────

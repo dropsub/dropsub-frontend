@@ -100,12 +100,19 @@
       width: 7px; height: 7px; background: var(--blue-bright);
       border-radius: 50%; border: 1px solid var(--bg-panel);
     }
-    .btn-upgrade {
-      background: linear-gradient(135deg, var(--blue-bright), #7c4dff);
-      color: #fff; border: none; border-radius: 16px;
-      padding: 5px 14px; font-size: .78rem; font-weight: 700;
-      cursor: pointer; letter-spacing: .03em;
-    }
+    .user-menu-wrap { position: relative; }
+    .user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-panel); border: 1px solid var(--border-bright); border-radius: 12px; min-width: 200px; box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 200; overflow: hidden; }
+    .user-dropdown.open { display: block; animation: fanDdIn .15s cubic-bezier(.22,1,.36,1); }
+    @keyframes fanDdIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .user-dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; color: var(--text-white); }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .user-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .82rem; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: background .12s, color .12s; }
+    .user-dropdown-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .user-dropdown-item .dd-icon { font-size: .9rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .user-dropdown-item.signout { color: #ff4f6a; }
+    .user-dropdown-item.signout:hover { background: rgba(255,79,106,.08); }
 
     /* ── APP SHELL ───────────────────────────────────── */
     .app-shell {
@@ -542,11 +549,8 @@
   <span style="font-size:18px; font-weight:500; color:#fff; letter-spacing:-0.3px;">Drop<span style="color:#2979ff;">Sub</span></span>
 </a>
     <nav class="nav-links">
-      <div class="nav-link active">My Artists</div>
+      <div class="nav-link active">Following</div>
       <a class="nav-link" href="dropsub-discover.html">Discover</a>
-      <a class="nav-link" href="dropsub-subscriptions.html">Subscriptions</a>
-      <div class="nav-link" onclick="var a=document.getElementById('fanDropsArea');a.classList.add('drops-flash');setTimeout(function(){a.classList.remove('drops-flash');},700)">Drops</div>
-      <a class="nav-link" href="dropsub-account-settings.html">Settings</a>
     </nav>
   </div>
   <div class="topnav-right">
@@ -555,8 +559,18 @@
       <input type="text" placeholder="Search artists, folders, tags…"/>
     </div>
     <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
-    <div class="user-avatar" id="userAvatar">RF</div>
-    <button class="btn-upgrade">PRO</button>
+    <div class="user-menu-wrap">
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu(event)">RF</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="dropdownName">—</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'; closeUserMenu()"><span class="dd-icon"><i data-lucide="settings"></i></span>Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="window.location.href='dropsub-login.html'"><span class="dd-icon"><i data-lucide="log-out"></i></span>Sign out</div>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1129,9 +1143,27 @@
           if (initials) avatar.textContent = initials;
           avatar.title = name;
         }
+        // Populate avatar dropdown (handle { user:{} } envelope or direct)
+        var u = user.user || user;
+        var displayName = u.full_name || u.name || u.username || '—';
+        var dropName  = document.getElementById('dropdownName');
+        var dropEmail = document.getElementById('dropdownEmail');
+        if (dropName)  dropName.textContent  = displayName;
+        if (dropEmail) dropEmail.textContent = u.email || '—';
       })
       .catch(function() { /* network error — stay on page, keep default initials */ });
   }
+
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function closeUserMenu() {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu-wrap')) closeUserMenu();
+  });
 
   // ── Fan upload modal ─────────────────────────────────────────
   function openFanUploadModal(folderName) {
