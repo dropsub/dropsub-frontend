@@ -476,218 +476,190 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Artist data ──────────────────────────────────────────────
-  var ARTISTS = [
-    // ── Featured ──
-    { id: 'miyavi',    name: 'MIYAVI',            emoji: '⚡', genre: 'Rock · J-Glam',         cat: 'music',       followers: '48.2K',  fNum: 48200,  drops: 24, featured: true,  sub: true,  bg: ['#1a0d3e','#0a1428'], av: 'linear-gradient(135deg,#2979ff,#7c4dff)', verified: true,  isNew: false },
-    { id: 'bangchan',  name: 'BANGCHAN',           emoji: '🎤', genre: 'K-Pop · Stray Kids',    cat: 'music',       followers: '2.1M',   fNum: 2100000, drops: 31, featured: true,  sub: true,  bg: ['#0a1e3a','#163560'], av: 'linear-gradient(135deg,#1565c0,#00bcd4)', verified: true,  isNew: false },
-    { id: 'kendrick',  name: 'KENDRICK LAMAR',     emoji: '🏆', genre: 'Hip-Hop · PG&E',        cat: 'music',       followers: '5.4M',   fNum: 5400000, drops: 18, featured: true,  sub: true,  bg: ['#1a0a08','#3d1a10'], av: 'linear-gradient(135deg,#b71c1c,#e53935)', verified: true,  isNew: false },
-
-    // ── Music ──
-    { id: 'doechii',   name: 'DOECHII',            emoji: '🎵', genre: 'Hip-Hop · TDE',         cat: 'music',       followers: '1.8M',   fNum: 1800000, drops: 12, featured: false, sub: true,  bg: ['#1a0030','#3d007a'], av: 'linear-gradient(135deg,#7b1fa2,#e040fb)', verified: true,  isNew: false },
-    { id: 'sabrina',   name: 'SABRINA CARPENTER',  emoji: '🌟', genre: 'Pop · Island Records',   cat: 'music',       followers: '3.2M',   fNum: 3200000, drops: 15, featured: false, sub: true,  bg: ['#2a0a18','#5a1a38'], av: 'linear-gradient(135deg,#c62828,#e91e63)', verified: true,  isNew: false },
-    { id: 'deadboyz',  name: 'DEAD BOYZ',           emoji: '🎸', genre: 'Alternative · Indie',    cat: 'music',       followers: '82.4K',  fNum: 82400,  drops: 8,  featured: false, sub: false, bg: ['#0a140a','#182818'], av: 'linear-gradient(135deg,#1b5e20,#43a047)', verified: false, isNew: false },
-    { id: 'rosalia',   name: 'ROSALÍA',             emoji: '🌹', genre: 'Flamenco Pop',           cat: 'music',       followers: '4.1M',   fNum: 4100000, drops: 9,  featured: false, sub: true,  bg: ['#2a0814','#4a1030'], av: 'linear-gradient(135deg,#880e4f,#e91e63)', verified: true,  isNew: false },
-    { id: 'fredagain', name: 'FRED AGAIN..',        emoji: '🎛', genre: 'Electronic · Dance',     cat: 'music',       followers: '620K',   fNum: 620000, drops: 22, featured: false, sub: false, bg: ['#00141a','#003040'], av: 'linear-gradient(135deg,#006064,#00bcd4)', verified: true,  isNew: false },
-    { id: 'mitski',    name: 'MITSKI',              emoji: '🌙', genre: 'Indie Rock · Alt-Pop',   cat: 'music',       followers: '940K',   fNum: 940000, drops: 11, featured: false, sub: true,  bg: ['#0a0a20','#16163a'], av: 'linear-gradient(135deg,#4527a0,#7c4dff)', verified: true,  isNew: false },
-    { id: 'charli',    name: 'CHARLI XCX',          emoji: '💿', genre: 'Hyperpop · PC Music',    cat: 'music',       followers: '2.8M',   fNum: 2800000, drops: 17, featured: false, sub: true,  bg: ['#1a001a','#2d0030'], av: 'linear-gradient(135deg,#880e4f,#e91e63)', verified: true,  isNew: false },
-    { id: 'caroline',  name: 'CAROLINE POLACHEK',   emoji: '🎼', genre: 'Art Pop · Avant-Pop',    cat: 'music',       followers: '380K',   fNum: 380000, drops: 14, featured: false, sub: false, bg: ['#1a1500','#2e2500'], av: 'linear-gradient(135deg,#e65100,#ff6d00)', verified: false, isNew: true  },
-    { id: 'jpegmafia', name: 'JPEGMAFIA',           emoji: '🔊', genre: 'Alt Hip-Hop',            cat: 'music',       followers: '210K',   fNum: 210000, drops: 19, featured: false, sub: false, bg: ['#0a0a0a','#181818'], av: 'linear-gradient(135deg,#37474f,#78909c)', verified: false, isNew: false },
-    { id: 'aurora_m',  name: 'AURORA',              emoji: '🌌', genre: 'Nordic Folk · Art Pop',  cat: 'music',       followers: '1.4M',   fNum: 1400000, drops: 10, featured: false, sub: true,  bg: ['#00080a','#001a20'], av: 'linear-gradient(135deg,#00695c,#4db6ac)', verified: true,  isNew: true  },
-    { id: 'jpbloom',   name: 'JAPANESE BREAKFAST', emoji: '🌸', genre: 'Indie Pop · Experimental',cat: 'music',       followers: '520K',   fNum: 520000, drops: 13, featured: false, sub: false, bg: ['#1a080a','#300814'], av: 'linear-gradient(135deg,#ad1457,#e91e63)', verified: false, isNew: false },
-
-    // ── Photography ──
-    { id: 'auroralens',name: 'AURORA LENS',         emoji: '📸', genre: 'Concert Photography',   cat: 'photography', followers: '128K',   fNum: 128000, drops: 42, featured: false, sub: true,  bg: ['#001428','#001e3a'], av: 'linear-gradient(135deg,#0d47a1,#1976d2)', verified: false, isNew: true  },
-    { id: 'shotbykai', name: 'SHOT BY KAI',         emoji: '🎞', genre: 'Documentary · Portrait', cat: 'photography', followers: '74K',    fNum: 74000,  drops: 28, featured: false, sub: false, bg: ['#141414','#202020'], av: 'linear-gradient(135deg,#37474f,#607d8b)', verified: false, isNew: false },
-    { id: 'darklens',  name: 'DARK ROOM STUDIO',    emoji: '🔬', genre: 'Analog · Fine Art',      cat: 'photography', followers: '41K',    fNum: 41000,  drops: 18, featured: false, sub: false, bg: ['#0a0a0a','#1a0a10'], av: 'linear-gradient(135deg,#4a148c,#7b1fa2)', verified: false, isNew: false },
-
-    // ── Film ──
-    { id: 'lenawint',  name: 'LENA WINTERS',        emoji: '🎬', genre: 'Music Video · Short Film',cat: 'film',       followers: '58K',    fNum: 58000,  drops: 7,  featured: false, sub: true,  bg: ['#1a0a00','#2e1400'], av: 'linear-gradient(135deg,#bf360c,#e64a19)', verified: false, isNew: false },
-    { id: 'neonframe', name: 'NEON FRAME',          emoji: '🎥', genre: 'Experimental Film',      cat: 'film',       followers: '32K',    fNum: 32000,  drops: 5,  featured: false, sub: false, bg: ['#001a10','#002a18'], av: 'linear-gradient(135deg,#1b5e20,#4caf50)', verified: false, isNew: true  },
-
-    // ── Art ──
-    { id: 'diegohern', name: 'DIEGO HERNANDEZ',     emoji: '🎨', genre: 'Visual Art · Digital',   cat: 'art',         followers: '241K',   fNum: 241000, drops: 33, featured: false, sub: true,  bg: ['#0a0020','#14003a'], av: 'linear-gradient(135deg,#4527a0,#9c27b0)', verified: true,  isNew: false },
-    { id: 'xrayink',   name: 'XRAY INK',            emoji: '✏️', genre: 'Illustration · Tattoo',  cat: 'art',         followers: '91K',    fNum: 91000,  drops: 16, featured: false, sub: false, bg: ['#080808','#141428'], av: 'linear-gradient(135deg,#263238,#455a64)', verified: false, isNew: false },
-    { id: 'voidpixel', name: 'VOID PIXEL',          emoji: '🖥', genre: 'Generative · NFT Art',   cat: 'art',         followers: '167K',   fNum: 167000, drops: 29, featured: false, sub: true,  bg: ['#000a14','#001428'], av: 'linear-gradient(135deg,#1565c0,#42a5f5)', verified: false, isNew: true  },
-
-    // ── Sports ──
-    { id: 'kairun',    name: 'KAI RUN',             emoji: '🏃', genre: 'Track & Field · Marathon',cat: 'sports',     followers: '186K',   fNum: 186000, drops: 12, featured: false, sub: false, bg: ['#001a10','#002a18'], av: 'linear-gradient(135deg,#1b5e20,#4caf50)', verified: true,  isNew: false },
-    { id: 'zarawaves', name: 'ZARA WAVES',          emoji: '🏄', genre: 'Surfing · Extreme Sports',cat: 'sports',     followers: '312K',   fNum: 312000, drops: 20, featured: false, sub: true,  bg: ['#001420','#002038'], av: 'linear-gradient(135deg,#01579b,#0288d1)', verified: false, isNew: true  },
-  ];
-
   // ── State ─────────────────────────────────────────────────────
-  var _filter      = 'all';
-  var _sort        = 'featured';
-  var _query       = '';
-  var _followed    = {};
+  var _filter        = 'all';
+  var _sort          = 'featured';
+  var _query         = '';
   var _followedIds   = new Set();
   var _subscribedIds = new Set();
-  var _realArtists = [];
+  var _featuredArtists = [];
+  var _allArtists      = [];
 
-  // ── Fetch real artists from API ───────────────────────────────
-  function fetchRealArtists() {
-    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  // ── Helpers ───────────────────────────────────────────────────
+  function getToken() {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || '';
+  }
+
+  function formatCount(n) {
+    n = n || 0;
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000)    return (n / 1000).toFixed(1) + 'K';
+    return n.toString();
+  }
+
+  // ── Fetch featured artists ────────────────────────────────────
+  function fetchFeatured() {
     var headers = {};
+    var token = getToken();
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    fetch('https://api.dropsub.com/api/artists', { headers: headers })
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(data) {
-      if (!data || !data.artists || !data.artists.length) return;
-      _realArtists = data.artists.map(function(a) {
-        var n = a.subscriber_count || 0;
-        var subsTxt = n >= 1000000 ? (n / 1000000).toFixed(1) + 'M'
-                    : n >= 1000    ? (n / 1000).toFixed(1)    + 'K'
-                    : n.toString();
-        return {
-          id:          a.id,
-          slug:        a.slug,
-          displayName: a.name || '—',
-          name:        (a.name || '').toUpperCase(),
-          genre:       a.genre || '',
-          bio:         a.bio   || '',
-          cat:         'music',
-          followers:   subsTxt,
-          fNum:        n,
-          drops:       0,
-          featured:    false,
-          sub:         true,
-          avatarUrl:   a.avatar_url  || null,
-          bannerUrl:   a.banner_url  || null,
-          verified:    a.is_verified || false,
-          isNew:       false,
-          real:        true,
-          hasCollab:   !!a.has_collab
-        };
-      });
-      renderFeatured();
-      renderPage();
-    })
-    .catch(function() {});
+    fetch('https://api.dropsub.com/api/artists?featured=true', { headers: headers })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        _featuredArtists = (data && data.artists) || [];
+        renderFeatured();
+      })
+      .catch(function() { _featuredArtists = []; renderFeatured(); });
   }
 
-  // ── Render a single real-artist card ──────────────────────────
-  function renderRealCard(a) {
-    var initials = a.displayName.split(' ').filter(Boolean)
-      .map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase() || '?';
-    var avatarHtml = a.avatarUrl
-      ? '<img src="' + a.avatarUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt=""/>'
-      : '<img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png" alt="DropSub" style="width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:0.5;">';
-    var bannerStyle = a.bannerUrl
-      ? 'background:url(\'' + a.bannerUrl + '\') center/cover no-repeat;'
-      : 'background:linear-gradient(135deg,#132040,#0d1a30);';
-    var bio = a.genre || '—';
-    var collabBadge = a.hasCollab ? '<span class="ac-collab-badge">COLLAB</span>' : '';
-    return '<div class="artist-card" onclick="viewArtist(\'' + a.slug + '\')">' +
-      '<div class="ac-banner" style="' + bannerStyle + '">' +
-        '<span class="ac-new-badge" style="background:rgba(41,121,255,.85);">LIVE</span>' +
-        collabBadge +
-        (a.verified ? '<span class="ac-category">✓ VERIFIED</span>' : '') +
-      '</div>' +
-      '<div class="ac-body">' +
-        '<div class="ac-avatar-wrap"><div class="ac-avatar" style="background:var(--bg-card);overflow:hidden;">' + avatarHtml + '</div></div>' +
-        '<div class="ac-name">' + a.displayName + '</div>' +
-        '<div class="ac-genre">' + bio + '</div>' +
-        '<div class="ac-stats">' +
-          '<div class="ac-stat"><i data-lucide="users"></i> <span class="ac-stat-val">' + a.followers + '</span></div>' +
-        '</div>' +
-        (function() {
-          var isSubbed  = _subscribedIds.has(a.id);
-          var isFollowed = _followedIds.has(a.id);
-          if (isSubbed)   return '<button class="ac-btn subscribed" onclick="event.stopPropagation()">✓ Subscribed</button>';
-          if (isFollowed) return '<button class="ac-btn following" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + a.displayName.replace(/'/g,"\\'") + '\')">✓ Following</button>';
-          return '<button class="ac-btn follow" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + a.displayName.replace(/'/g,"\\'") + '\')">Follow</button>';
-        })() +
-      '</div>' +
-    '</div>';
+  // ── Fetch main artist grid ────────────────────────────────────
+  function fetchArtists(genre) {
+    var headers = {};
+    var token = getToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var url = 'https://api.dropsub.com/api/artists?trending=true';
+    if (genre && genre !== 'all') url += '&genre=' + encodeURIComponent(genre);
+    fetch(url, { headers: headers })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        _allArtists = (data && data.artists) || [];
+        renderPage();
+      })
+      .catch(function() { _allArtists = []; renderPage(); });
   }
 
+  // ── Follow / subscription state ───────────────────────────────
   function fetchFollowData() {
-    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var token = getToken();
     if (!token) return;
     fetch('https://api.dropsub.com/api/fans/following', {
       headers: { 'Authorization': 'Bearer ' + token }
     })
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(data) {
-      if (!data) return;
-      _followedIds = new Set((data.following || []).map(function(f) { return f.artist_id; }));
-      renderPage();
-    })
-    .catch(function() {});
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (!data) return;
+        _followedIds = new Set((data.following || []).map(function(f) { return f.artist_id; }));
+        renderFeatured();
+        renderPage();
+      })
+      .catch(function() {});
 
     fetch('https://api.dropsub.com/api/payments/subscriptions', {
       headers: { 'Authorization': 'Bearer ' + token }
     })
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(data) {
-      if (!data) return;
-      _subscribedIds = new Set((data.subscriptions || []).map(function(s) { return s.artist_id; }));
-      renderPage();
-    })
-    .catch(function() {});
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (!data) return;
+        _subscribedIds = new Set((data.subscriptions || []).map(function(s) { return s.artist_id; }));
+        renderFeatured();
+        renderPage();
+      })
+      .catch(function() {});
   }
 
-  function viewArtist(slug) {
-    window.location.href = 'dropsub-artist.html?slug=' + encodeURIComponent(slug);
+  // ── Render one featured card ──────────────────────────────────
+  function renderFeaturedCard(a) {
+    var followersTxt = formatCount(a.follower_count || 0);
+    var isFollowed   = _followedIds.has(a.id);
+    var isSubbed     = _subscribedIds.has(a.id);
+    var btnCls  = (isSubbed || isFollowed) ? ' following' : '';
+    var btnText = isSubbed ? '✓ Subscribed' : (isFollowed ? '✓ Following' : 'Follow');
+    var safeName    = (a.name || '').replace(/'/g, "\\'");
+    var bannerStyle = a.banner_url
+      ? 'background:url(\'' + a.banner_url.replace(/'/g, '%27') + '\') center/cover no-repeat;'
+      : 'background:linear-gradient(135deg,#132040,#0d1a30);';
+    var initials = (a.name || '').split(' ').filter(Boolean)
+      .map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase() || '?';
+    var avatarInner = a.avatar_url
+      ? '<img src="' + a.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">'
+      : '<span style="font-size:1.1rem;font-weight:700;">' + initials + '</span>';
+    return '<div class="featured-card" onclick="viewArtist(\'' + a.slug + '\')">' +
+      '<div class="fc-banner" style="' + bannerStyle + '">' +
+        '<span class="fc-banner-badge">FEATURED</span>' +
+        (a.is_verified ? '<span class="fc-verified">✓</span>' : '') +
+      '</div>' +
+      '<div class="fc-body">' +
+        '<div class="fc-avatar-wrap"><div class="fc-avatar" style="background:var(--bg-card);overflow:hidden;display:flex;align-items:center;justify-content:center;">' + avatarInner + '</div></div>' +
+        '<div class="fc-name">' + (a.name || '') + '</div>' +
+        '<div class="fc-genre">' + (a.genre || '') + '</div>' +
+        '<div class="fc-stats">' +
+          '<div class="fc-stat">👥 <span class="fc-stat-val">' + followersTxt + '</span> followers</div>' +
+        '</div>' +
+        '<button class="fc-btn' + btnCls + '" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + safeName + '\')">' + btnText + '</button>' +
+      '</div>' +
+    '</div>';
   }
 
-  // ── Filter + sort helpers ─────────────────────────────────────
-  function getFiltered() {
-    var realFiltered = _realArtists.filter(function(a) {
-      if (_filter !== 'all' && _filter !== 'music') return false;
-      if (_query) {
-        var q = _query.toLowerCase();
-        return a.displayName.toLowerCase().indexOf(q) !== -1 ||
-               a.bio.toLowerCase().indexOf(q) !== -1;
-      }
-      return true;
-    });
-
-    var staticFiltered = ARTISTS.filter(function(a) {
-      if (_filter !== 'all' && a.cat !== _filter) return false;
-      if (_query) {
-        var q = _query.toLowerCase();
-        return a.name.toLowerCase().indexOf(q) !== -1 || a.genre.toLowerCase().indexOf(q) !== -1;
-      }
-      return true;
-    }).sort(function(a, b) {
-      if (_sort === 'popular')  return b.fNum - a.fNum;
-      if (_sort === 'new')      return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || b.fNum - a.fNum;
-      if (_sort === 'alpha')    return a.name.localeCompare(b.name);
-      if (a.featured !== b.featured) return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
-      return b.fNum - a.fNum;
-    });
-
-    return realFiltered.concat(staticFiltered);
-  }
-
-  // ── Render featured ───────────────────────────────────────────
+  // ── Render featured section ───────────────────────────────────
   function renderFeatured() {
-    var featured = ARTISTS.filter(function(a) { return a.featured; });
-    document.getElementById('featuredGrid').innerHTML = featured.map(function(a) {
-      var following = !!_followed[a.id];
-      return '<div class="featured-card" onclick="openProfile(\'' + a.id + '\')">' +
-        '<div class="fc-banner" style="background:linear-gradient(135deg,' + a.bg[0] + ',' + a.bg[1] + ');">' +
-          '<span class="fc-banner-badge">FEATURED</span>' +
-          (a.verified ? '<span class="fc-verified">✓</span>' : '') +
-        '</div>' +
-        '<div class="fc-body">' +
-          '<div class="fc-avatar-wrap"><div class="fc-avatar" style="background:' + a.av + ';">' + a.emoji + '</div></div>' +
-          '<div class="fc-name">' + a.name + '</div>' +
-          '<div class="fc-genre">' + a.genre + '</div>' +
-          '<div class="fc-stats">' +
-            '<div class="fc-stat">👥 <span class="fc-stat-val">' + a.followers + '</span> followers</div>' +
-            '<div class="fc-stat">📁 <span class="fc-stat-val">' + a.drops + '</span> drops</div>' +
-          '</div>' +
-          '<button class="fc-btn' + (following ? ' following' : '') + '" onclick="event.stopPropagation();toggleFollow(\'' + a.id + '\',\'' + a.name + '\',true)">' +
-            (following ? '✓ Following' : 'Subscribe') +
-          '</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+    var sec  = document.getElementById('featuredSection');
+    var grid = document.getElementById('featuredGrid');
+    if (!_featuredArtists.length) { sec.style.display = 'none'; return; }
+    sec.style.display  = 'block';
+    grid.innerHTML = _featuredArtists.map(renderFeaturedCard).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
-  // ── Render artist cards ───────────────────────────────────────
+  // ── Render one artist card (main grid) ────────────────────────
+  function renderArtistCard(a) {
+    var followersTxt = formatCount(a.follower_count || a.subscriber_count || 0);
+    var initials = (a.name || '').split(' ').filter(Boolean)
+      .map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase() || '?';
+    var avatarHtml = a.avatar_url
+      ? '<img src="' + a.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">'
+      : '<img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png" alt="DropSub" style="width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:0.5;">';
+    var bannerStyle = a.banner_url
+      ? 'background:url(\'' + a.banner_url.replace(/'/g, '%27') + '\') center/cover no-repeat;'
+      : 'background:linear-gradient(135deg,#132040,#0d1a30);';
+    var collabBadge = a.has_collab ? '<span class="ac-collab-badge">COLLAB</span>' : '';
+    var safeName    = (a.name || '').replace(/'/g, "\\'");
+    var isSubbed    = _subscribedIds.has(a.id);
+    var isFollowed  = _followedIds.has(a.id);
+    var btnHtml;
+    if (isSubbed) {
+      btnHtml = '<button class="ac-btn subscribed" onclick="event.stopPropagation()">✓ Subscribed</button>';
+    } else if (isFollowed) {
+      btnHtml = '<button class="ac-btn following" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + safeName + '\')">✓ Following</button>';
+    } else {
+      btnHtml = '<button class="ac-btn follow" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + safeName + '\')">Follow</button>';
+    }
+    return '<div class="artist-card" onclick="viewArtist(\'' + a.slug + '\')">' +
+      '<div class="ac-banner" style="' + bannerStyle + '">' +
+        '<span class="ac-new-badge" style="background:rgba(41,121,255,.85);">LIVE</span>' +
+        collabBadge +
+        (a.is_verified ? '<span class="ac-category">✓ VERIFIED</span>' : '') +
+      '</div>' +
+      '<div class="ac-body">' +
+        '<div class="ac-avatar-wrap"><div class="ac-avatar" style="background:var(--bg-card);overflow:hidden;">' + avatarHtml + '</div></div>' +
+        '<div class="ac-name">' + (a.name || '') + '</div>' +
+        '<div class="ac-genre">' + (a.genre || '') + '</div>' +
+        '<div class="ac-stats">' +
+          '<div class="ac-stat"><i data-lucide="users"></i> <span class="ac-stat-val">' + followersTxt + '</span></div>' +
+        '</div>' +
+        btnHtml +
+      '</div>' +
+    '</div>';
+  }
+
+  // ── Filter / sort ─────────────────────────────────────────────
+  function getFiltered() {
+    var list = _allArtists.slice();
+    if (_query) {
+      var q = _query.toLowerCase();
+      list = list.filter(function(a) {
+        return (a.name  || '').toLowerCase().indexOf(q) !== -1 ||
+               (a.genre || '').toLowerCase().indexOf(q) !== -1 ||
+               (a.bio   || '').toLowerCase().indexOf(q) !== -1;
+      });
+    }
+    if (_sort === 'popular') {
+      list.sort(function(a, b) { return (b.subscriber_count || 0) - (a.subscriber_count || 0); });
+    } else if (_sort === 'alpha') {
+      list.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
+    }
+    return list;
+  }
+
+  // ── Render main grid ──────────────────────────────────────────
   function renderGrid(list) {
     var grid = document.getElementById('artistsGrid');
     if (!list.length) {
@@ -695,39 +667,15 @@
       if (typeof lucide !== 'undefined') lucide.createIcons();
       return;
     }
-    grid.innerHTML = list.map(function(a) {
-      if (a.real) return renderRealCard(a);
-      var following = !!_followed[a.id];
-      var btnCls  = following ? 'following' : (a.sub ? 'subscribe' : 'follow');
-      var btnText = following ? '✓ Following' : (a.sub ? 'Subscribe' : 'Follow');
-      return '<div class="artist-card" onclick="openProfile(\'' + a.id + '\')">' +
-        '<div class="ac-banner" style="background:linear-gradient(135deg,' + a.bg[0] + ',' + a.bg[1] + ');">' +
-          (a.isNew ? '<span class="ac-new-badge">NEW</span>' : '') +
-          '<span class="ac-category">' + a.cat.toUpperCase() + '</span>' +
-        '</div>' +
-        '<div class="ac-body">' +
-          '<div class="ac-avatar-wrap"><div class="ac-avatar" style="background:' + a.av + ';">' + a.emoji + '</div></div>' +
-          '<div class="ac-name">' + a.name + '</div>' +
-          '<div class="ac-genre">' + a.genre + '</div>' +
-          '<div class="ac-stats">' +
-            '<div class="ac-stat"><i data-lucide="users"></i> <span class="ac-stat-val">' + a.followers + '</span></div>' +
-            '<div class="ac-stat"><i data-lucide="folder"></i> <span class="ac-stat-val">' + a.drops + '</span> drops</div>' +
-          '</div>' +
-          '<button class="ac-btn ' + btnCls + '" onclick="event.stopPropagation();toggleFollow(\'' + a.id + '\',\'' + a.name + '\',' + a.sub + ')">' + btnText + '</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+    grid.innerHTML = list.map(renderArtistCard).join('');
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ── Full page render ──────────────────────────────────────────
   function renderPage() {
-    var filtered = getFiltered();
-    var showFeatured = (_filter === 'all' && !_query);
-
+    var filtered     = getFiltered();
+    var showFeatured = (_filter === 'all' && !_query && _featuredArtists.length > 0);
     document.getElementById('featuredSection').style.display = showFeatured ? 'block' : 'none';
-
-    var gridList = showFeatured ? filtered.filter(function(a) { return !a.featured; }) : filtered;
 
     var titleEl = document.getElementById('gridTitle');
     if (_query) {
@@ -746,10 +694,8 @@
     }
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    var total = filtered.length;
-    document.getElementById('resultCount').textContent = total + ' artist' + (total !== 1 ? 's' : '');
-
-    renderGrid(gridList);
+    document.getElementById('resultCount').textContent = filtered.length + ' artist' + (filtered.length !== 1 ? 's' : '');
+    renderGrid(filtered);
   }
 
   // ── Interactions ──────────────────────────────────────────────
@@ -758,7 +704,8 @@
     document.querySelectorAll('.filter-tab').forEach(function(t) {
       t.classList.toggle('active', t.dataset.cat === cat);
     });
-    renderPage();
+    if (cat !== 'all') document.getElementById('featuredSection').style.display = 'none';
+    fetchArtists(cat === 'all' ? null : cat);
   }
 
   function setSort(val) {
@@ -781,42 +728,32 @@
     renderPage();
   }
 
-  function toggleFollow(id, name, isSub) {
-    _followed[id] = !_followed[id];
-    if (_followed[id]) {
-      showToast(isSub ? '✓ Subscribed to ' + name + '!' : '✓ Following ' + name + '!');
-    } else {
-      showToast('Unfollowed ' + name);
-    }
-    renderFeatured();
-    renderPage();
+  function viewArtist(slug) {
+    window.location.href = 'dropsub-artist.html?slug=' + encodeURIComponent(slug);
   }
 
   function toggleFollowReal(artistId, artistName) {
-    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var token = getToken();
     if (!token) { showToast('Sign in to follow artists'); return; }
     var wasFollowing = _followedIds.has(artistId);
     if (wasFollowing) { _followedIds.delete(artistId); showToast('Unfollowed ' + artistName); }
     else              { _followedIds.add(artistId);    showToast('✓ Following ' + artistName + '!'); }
+    renderFeatured();
     renderPage();
     fetch('https://api.dropsub.com/api/artists/' + artistId + '/follow', {
       method: wasFollowing ? 'DELETE' : 'POST',
       headers: { 'Authorization': 'Bearer ' + token }
     })
-    .then(function(r) {
-      if (!r.ok) {
+      .then(function(r) {
+        if (!r.ok) {
+          if (wasFollowing) _followedIds.add(artistId); else _followedIds.delete(artistId);
+          renderFeatured(); renderPage(); showToast('Something went wrong');
+        }
+      })
+      .catch(function() {
         if (wasFollowing) _followedIds.add(artistId); else _followedIds.delete(artistId);
-        renderPage(); showToast('Something went wrong');
-      }
-    })
-    .catch(function() {
-      if (wasFollowing) _followedIds.add(artistId); else _followedIds.delete(artistId);
-      renderPage();
-    });
-  }
-
-  function openProfile(id) {
-    showToast('Opening artist profile…');
+        renderFeatured(); renderPage();
+      });
   }
 
   // ── Toast ─────────────────────────────────────────────────────
@@ -829,7 +766,7 @@
     _toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2400);
   }
 
-  // ── User menu (artist nav) ────────────────────────────────────
+  // ── User menu ─────────────────────────────────────────────────
   function toggleUserMenu(e) {
     e.stopPropagation();
     document.getElementById('userDropdown').classList.toggle('open');
@@ -839,40 +776,35 @@
     if (dd && !e.target.closest('.user-menu-wrap')) dd.classList.remove('open');
   });
 
-  // ── Role detection + nav init ─────────────────────────────────
+  // ── Nav / role init ───────────────────────────────────────────
   (function() {
-    var role = 'fan';
-    var initials = 'RF';
-    var name = '';
-    var email = '';
+    var role     = 'fan';
+    var initials = '';
+    var name     = '';
+    var email    = '';
     try {
       var p = JSON.parse(sessionStorage.getItem('ds_profile') || '{}');
-      role    = p.role || 'fan';
-      name    = p.full_name || p.name || '';
-      email   = p.email || '';
+      role  = p.role || 'fan';
+      name  = p.full_name || p.name || '';
+      email = p.email || '';
       var parts = name.trim().split(/\s+/).filter(Boolean);
-      if (parts.length >= 2)      initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      if (parts.length >= 2)       initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
       else if (parts.length === 1) initials = parts[0].slice(0, 2).toUpperCase();
     } catch(e) {}
 
-    var isArtist = (role === 'artist' || role === 'manager');
+    var isArtist = role !== 'fan';
     document.getElementById(isArtist ? 'artistNav' : 'fanNav').style.display = 'flex';
-
-    document.querySelectorAll('.nav-avatar').forEach(function(el) { el.textContent = initials; });
-    if (name) {
-      var dn = document.getElementById('dropdownName');
-      if (dn) dn.textContent = name;
-    }
-    if (email) {
-      var de = document.getElementById('dropdownEmail');
-      if (de) de.textContent = email;
-    }
+    document.querySelectorAll('.nav-avatar').forEach(function(el) { el.textContent = initials || '?'; });
+    if (name)  { var dn = document.getElementById('dropdownName');  if (dn) dn.textContent = name; }
+    if (email) { var de = document.getElementById('dropdownEmail'); if (de) de.textContent = email; }
   })();
 
   // ── Init ─────────────────────────────────────────────────────
-  renderFeatured();
-  renderPage();
-  fetchRealArtists();
+  document.getElementById('artistsGrid').innerHTML  = '<div style="text-align:center;padding:3rem 0;color:var(--text-dim);">Loading artists…</div>';
+  document.getElementById('featuredGrid').innerHTML = '';
+
+  fetchFeatured();
+  fetchArtists(null);
   fetchFollowData();
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
