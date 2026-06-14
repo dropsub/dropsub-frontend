@@ -532,12 +532,6 @@
   (function() {
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     if (!token) { window.location.replace('dropsub-login.html'); return; }
-    try {
-      var p = JSON.parse(sessionStorage.getItem('ds_profile') || '{}');
-      if (p.role === 'artist' || p.role === 'manager') {
-        window.location.replace('dropsub-artist-dashboard.html');
-      }
-    } catch(e) {}
   })();
 </script>
 
@@ -1128,12 +1122,6 @@
       })
       .then(function(user) {
         if (!user) return;
-        var role = user.role || '';
-        if (role === 'artist' || role === 'manager') {
-          sessionStorage.setItem('ds_profile', JSON.stringify(user));
-          window.location.replace('dropsub-artist-dashboard.html');
-          return;
-        }
         sessionStorage.setItem('ds_profile', JSON.stringify(user));
         var name = user.full_name || user.name || user.username || '';
         var initials = name.split(' ').filter(Boolean)
