@@ -486,6 +486,13 @@
   var _subscribedIds = new Set();
   var _featuredArtists = [];
   var _allArtists      = [];
+  var _myArtistId      = null;
+  (function() {
+    try {
+      var p = JSON.parse(sessionStorage.getItem('ds_profile') || 'null');
+      if (p && p.artist && p.artist.id) _myArtistId = p.artist.id;
+    } catch(e) {}
+  })();
 
   // ── Helpers ───────────────────────────────────────────────────
   function getToken() {
@@ -586,7 +593,7 @@
         '<div class="fc-stats">' +
           '<div class="fc-stat">👥 <span class="fc-stat-val">' + followersTxt + '</span> followers</div>' +
         '</div>' +
-        '<button class="fc-btn' + btnCls + '" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + safeName + '\')">' + btnText + '</button>' +
+        (a.id === _myArtistId ? '' : '<button class="fc-btn' + btnCls + '" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + safeName + '\')">' + btnText + '</button>') +
       '</div>' +
     '</div>';
   }
@@ -617,7 +624,9 @@
     var isSubbed    = _subscribedIds.has(a.id);
     var isFollowed  = _followedIds.has(a.id);
     var btnHtml;
-    if (isSubbed) {
+    if (a.id === _myArtistId) {
+      btnHtml = '';
+    } else if (isSubbed) {
       btnHtml = '<button class="ac-btn subscribed" onclick="event.stopPropagation()">✓ Subscribed</button>';
     } else if (isFollowed) {
       btnHtml = '<button class="ac-btn following" onclick="event.stopPropagation();toggleFollowReal(\'' + a.id + '\',\'' + safeName + '\')">✓ Following</button>';

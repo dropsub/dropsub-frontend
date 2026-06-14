@@ -403,6 +403,8 @@
   function renderFollowBtn() {
     var btn = document.getElementById('followBtn');
     if (!btn) return;
+    var ownArtistId = _profile && _profile.artist && _profile.artist.id;
+    if (ownArtistId && _artistId === ownArtistId) { btn.style.display = 'none'; return; }
     btn.style.display = 'inline-block';
     btn.textContent   = _isFollowing ? '✓ Following' : 'Follow';
     btn.className     = 'follow-btn' + (_isFollowing ? ' following' : '');
