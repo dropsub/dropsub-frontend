@@ -1138,6 +1138,23 @@
         var dropEmail = document.getElementById('dropdownEmail');
         if (dropName)  dropName.textContent  = displayName;
         if (dropEmail) dropEmail.textContent = u.email || '—';
+        // Inject Artist Dashboard tab for non-fan roles
+        if (u.role && u.role !== 'fan') {
+          var navLinks = document.querySelector('nav.nav-links');
+          if (navLinks && !document.getElementById('artistDashTab')) {
+            var tab = document.createElement('a');
+            tab.className = 'nav-link';
+            tab.id = 'artistDashTab';
+            tab.href = 'dropsub-artist-dashboard.html';
+            tab.textContent = 'Artist Dashboard';
+            var discoverLink = navLinks.querySelector('a[href="dropsub-discover.html"]');
+            if (discoverLink) {
+              navLinks.insertBefore(tab, discoverLink);
+            } else {
+              navLinks.appendChild(tab);
+            }
+          }
+        }
       })
       .catch(function() { /* network error — stay on page, keep default initials */ });
   }
