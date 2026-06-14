@@ -1324,11 +1324,26 @@
       var cell   = document.createElement('div');
       cell.className = 'file-name-cell';
 
-      var icon = document.createElement('span');
-      if (isFree || (isSub && canAccess)) { icon.className = 'folder-icon gold'; icon.textContent = '📂'; }
-      else if (isSub)     { icon.className = 'folder-icon blue'; icon.textContent = '📁'; }
-      else if (isPremOwned) { icon.className = 'folder-icon gold'; icon.style.color = 'var(--accent-gold)'; icon.textContent = '⭐'; }
-      else { icon.className = 'folder-icon'; icon.style.cssText = 'opacity:.42;filter:grayscale(.7);'; icon.textContent = '⭐'; }
+      var icon;
+      if (isFree || (isSub && canAccess)) {
+        icon = document.createElement('i');
+        icon.setAttribute('data-lucide', 'folder-open');
+        icon.style.cssText = 'width:18px;height:18px;flex-shrink:0;color:var(--text-mid);';
+      } else if (isSub) {
+        icon = document.createElement('i');
+        icon.setAttribute('data-lucide', 'folder');
+        icon.style.cssText = 'width:18px;height:18px;flex-shrink:0;color:var(--text-dim);';
+      } else if (isPremOwned) {
+        icon = document.createElement('span');
+        icon.className = 'folder-icon gold';
+        icon.style.color = 'var(--accent-gold)';
+        icon.textContent = '⭐';
+      } else {
+        icon = document.createElement('span');
+        icon.className = 'folder-icon';
+        icon.style.cssText = 'opacity:.42;filter:grayscale(.7);';
+        icon.textContent = '⭐';
+      }
 
       var info    = document.createElement('div');
       var nameDiv = document.createElement('div');
@@ -1448,6 +1463,7 @@
 
       tbody.appendChild(tr);
     });
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ── Init ────────────────────────────────────────────────────
