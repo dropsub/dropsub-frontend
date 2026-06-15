@@ -633,8 +633,17 @@
           .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
         var avatar = document.getElementById('userAvatar');
         if (avatar) {
-          avatar.textContent = initials || '?';
-          avatar.title       = name;
+          if (user.avatar_url) {
+            avatar.textContent = '';
+            var avatarImg = document.createElement('img');
+            avatarImg.src = user.avatar_url;
+            avatarImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+            avatarImg.onerror = function() { avatarImg.remove(); avatar.textContent = initials || '?'; };
+            avatar.appendChild(avatarImg);
+          } else {
+            avatar.textContent = initials || '?';
+          }
+          avatar.title = name;
         }
 
         showCards();
@@ -690,7 +699,12 @@
           var initials = fullName.split(' ').filter(Boolean)
             .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
           var avatar = document.getElementById('userAvatar');
-          if (avatar && initials) { avatar.textContent = initials; avatar.title = fullName; }
+          if (avatar) {
+            avatar.title = fullName;
+            if (!currentUser || !currentUser.avatar_url) {
+              if (initials) avatar.textContent = initials;
+            }
+          }
           setTimeout(function() { hideBanner('profileBanner'); }, 3500);
         } else {
           var msg = (result.data && result.data.message) || 'Could not save changes. Please try again.';
