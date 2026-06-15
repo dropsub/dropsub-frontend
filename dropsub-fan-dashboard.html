@@ -1125,6 +1125,7 @@
         // Unwrap { user: { role, full_name, ... } } envelope from /api/auth/me
         var u = user.user || user;
         try { sessionStorage.setItem('ds_profile', JSON.stringify(u)); } catch(e) {}
+        console.log('[dropsub] fan-dashboard avatar_url:', u.avatar_url || null);
         var name = u.full_name || u.name || u.username || '';
         var email = u.email || '';
         var parts = name.trim().split(/\s+/).filter(Boolean);

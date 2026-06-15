@@ -89,7 +89,7 @@
     .notif-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; background: var(--blue-bright); border-radius: 50%; border: 1px solid var(--bg-panel); }
     .user-avatar {
       width: 30px; height: 30px; border-radius: 50%;
-      border: 2px solid var(--blue-bright);
+      border: 2px solid var(--blue-bright); overflow: hidden;
       background: linear-gradient(135deg, #2979ff, #7c4dff);
       display: flex; align-items: center; justify-content: center;
       font-size: .68rem; font-weight: 700; cursor: pointer;
@@ -802,6 +802,7 @@
         if (!data) return;
         var u = data.user || data;
         try { sessionStorage.setItem('ds_profile', JSON.stringify(u)); } catch(e) {}
+        console.log('[dropsub] discover avatar_url:', u.avatar_url || null);
         var name  = u.full_name || u.name || u.username || '';
         var email = u.email || '';
         var parts = name.trim().split(/\s+/).filter(Boolean);
