@@ -620,8 +620,24 @@
     }
     .btn-submit-collab:disabled { opacity: .4; cursor: not-allowed; }
     .btn-submit-collab:not(:disabled):hover { background: var(--blue-mid); }
+    .user-menu-wrap { position: relative; }
+    .user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-panel); border: 1px solid var(--border-bright); border-radius: 12px; min-width: 190px; box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 100; overflow: hidden; }
+    .user-dropdown.open { display: block; }
+    .user-dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .user-dropdown-name { font-size: .85rem; font-weight: 700; }
+    .user-dropdown-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .user-dropdown-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: .82rem; color: var(--text-mid); cursor: pointer; text-decoration: none; transition: background .12s; }
+    .user-dropdown-item:hover { background: var(--bg-hover); color: var(--text-white); }
+    .user-dropdown-item.signout { color: #f87171; }
+    .user-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .nav-tabs { display: flex; gap: 4px; }
+    .nav-tab { padding: 5px 12px; border-radius: 6px; font-size: .82rem; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s; text-decoration: none; }
+    .nav-tab:hover { background: var(--bg-hover); color: var(--text-white); }
+    .nav-tab.active { background: var(--bg-card); color: var(--text-white); }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="dropsub-auth.js"></script>
+  <script src="dropsub-notifications.js"></script>
 </head>
 <body>
 <script>
@@ -629,18 +645,16 @@
   // loadFolder() handles 401/403 and redirects to login only when the content requires it.
 </script>
 
-<!-- ══ TOP NAV ══════════════════════════════════════════════ -->
-<nav class="topnav">
+<!-- ══ FAN NAV ══════════════════════════════════════════════ -->
+<nav class="topnav" id="fanNav" style="display:none">
   <div class="topnav-left">
-    <a class="logo" href="dropsub-fan-dashboard.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+    <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png" alt="DropSub" style="height:28px; width:auto;">
   <span style="font-size:18px; font-weight:500; color:#fff; letter-spacing:-0.3px;">Drop<span style="color:#2979ff;">Sub</span></span>
 </a>
     <nav class="nav-links">
-      <a class="nav-link" href="dropsub-fan-dashboard.html">My Artists</a>
-      <a class="nav-link" href="#">Discover</a>
-      <a class="nav-link" href="dropsub-subscriptions.html">Subscriptions</a>
-      <a class="nav-link" href="#">Drops</a>
+      <a class="nav-link" href="dropsub-fan-dashboard.html">Following</a>
+      <a class="nav-link" href="dropsub-discover.html">Discover</a>
     </nav>
   </div>
   <div class="topnav-right">
@@ -649,9 +663,51 @@
       <input type="text" placeholder="Search artists, folders, tags…"/>
     </div>
     <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
-    <div class="user-avatar" id="userAvatar">—</div>
+    <div class="user-menu-wrap">
+      <div class="user-avatar nav-avatar" onclick="toggleFanUserMenu(event)">?</div>
+      <div class="user-dropdown" id="fanUserDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="fanDropdownName">—</div>
+          <div class="user-dropdown-email" id="fanDropdownEmail">—</div>
+        </div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'"><i data-lucide="settings"></i> Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="dsLogout()"><i data-lucide="log-out"></i> Sign out</div>
+      </div>
+    </div>
   </div>
 </nav>
+
+<!-- ══ ARTIST NAV ══════════════════════════════════════════════ -->
+<div class="topnav" id="artistNav" style="display:none">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+  <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png" alt="DropSub" style="height:28px; width:auto;">
+  <span style="font-size:18px; font-weight:500; color:#fff; letter-spacing:-0.3px;">Drop<span style="color:#2979ff;">Sub</span></span>
+</a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="dropsub-fan-dashboard.html">Following</a>
+      <a class="nav-tab" href="dropsub-discover.html">Discover</a>
+      <a class="nav-tab" href="dropsub-artist-dashboard.html">Dashboard</a>
+    </div>
+  </div>
+  <div class="topnav-right">
+    <div class="notif-btn"><i data-lucide="bell"></i><div class="notif-dot"></div></div>
+    <div class="user-menu-wrap">
+      <div class="user-avatar nav-avatar" onclick="toggleUserMenu(event)">?</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+          <div class="user-dropdown-name" id="dropdownName">—</div>
+          <div class="user-dropdown-email" id="dropdownEmail">—</div>
+        </div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-artist-dashboard.html'"><i data-lucide="bar-chart-2"></i> Dashboard</div>
+        <div class="user-dropdown-item" onclick="window.location.href='dropsub-account-settings.html'"><i data-lucide="settings"></i> Settings</div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-item signout" onclick="dsLogout()"><i data-lucide="log-out"></i> Sign out</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ APP SHELL ═════════════════════════════════════════════ -->
 <div class="app-shell">
@@ -864,6 +920,40 @@
   var _canModerate = false;
   var _collabFiles = [];
   var _openFlagMenu = null;
+
+  // ── Nav init (optimistic from cached profile) ────────────────
+  (function() {
+    var role = 'fan', initials = '';
+    try {
+      var p = JSON.parse(sessionStorage.getItem('ds_profile') || '{}');
+      role = p.role || 'fan';
+      var name = p.full_name || p.name || '';
+      var parts = name.trim().split(/\s+/).filter(Boolean);
+      if (parts.length >= 2)       initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      else if (parts.length === 1) initials = parts[0].slice(0, 2).toUpperCase();
+    } catch(e) {}
+    var isArtist = role !== 'fan';
+    document.getElementById(isArtist ? 'artistNav' : 'fanNav').style.display = 'flex';
+    document.querySelectorAll('.nav-avatar').forEach(function(el) { el.textContent = initials || '?'; });
+  })();
+
+  // ── Dropdown toggles ─────────────────────────────────────────
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function toggleFanUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('fanUserDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu-wrap')) {
+      var dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('open');
+      var fdd = document.getElementById('fanUserDropdown');
+      if (fdd) fdd.classList.remove('open');
+    }
+  });
 
   // ── Toast ────────────────────────────────────────────────────
   var toastTimer;
@@ -1447,24 +1537,42 @@
     fetch('https://api.dropsub.com/api/auth/me', {
       headers: { 'Authorization': 'Bearer ' + token },
     })
-      .then(function(res) {
-        if (res.status === 401) {
-          localStorage.removeItem('access_token');
-          sessionStorage.removeItem('access_token');
-          return null;
-        }
-        return res.json();
-      })
+      .then(function(res) { return res.ok ? res.json() : null; })
       .then(function(data) {
         if (!data) return;
         var user = data.user || data;
         _myUserId   = user.id || null;
         _myArtistId = (user.artist && user.artist.id) ? user.artist.id : null;
-        var name     = user.full_name || user.name || user.username || '';
-        var initials = name.split(' ').filter(Boolean)
-          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
-        var avatar = document.getElementById('userAvatar');
-        if (avatar && initials) { avatar.textContent = initials; avatar.title = name; }
+        try { sessionStorage.setItem('ds_profile', JSON.stringify(user)); } catch(e) {}
+        var name  = user.full_name || user.name || user.username || '';
+        var email = user.email || '';
+        var parts = name.trim().split(/\s+/).filter(Boolean);
+        var initials = '';
+        if (parts.length >= 2)       initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        else if (parts.length === 1) initials = parts[0].slice(0, 2).toUpperCase();
+        document.querySelectorAll('.nav-avatar').forEach(function(el) {
+          if (user.avatar_url) {
+            el.textContent = '';
+            var img = document.createElement('img');
+            img.src = user.avatar_url;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+            img.onerror = function() { img.remove(); el.textContent = initials || '?'; };
+            el.appendChild(img);
+          } else {
+            el.textContent = initials || '?';
+          }
+        });
+        var dn  = document.getElementById('dropdownName');
+        var de  = document.getElementById('dropdownEmail');
+        var fdn = document.getElementById('fanDropdownName');
+        var fde = document.getElementById('fanDropdownEmail');
+        if (dn)  dn.textContent  = name  || '—';
+        if (de)  de.textContent  = email || '—';
+        if (fdn) fdn.textContent = name  || '—';
+        if (fde) fde.textContent = email || '—';
+        var isArtist = user.role && user.role !== 'fan';
+        document.getElementById('fanNav').style.display    = isArtist ? 'none' : 'flex';
+        document.getElementById('artistNav').style.display = isArtist ? 'flex' : 'none';
       })
       .catch(function() {});
   }
