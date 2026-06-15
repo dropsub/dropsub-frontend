@@ -95,12 +95,31 @@
       width: 7px; height: 7px; background: var(--blue-bright);
       border-radius: 50%; border: 1px solid var(--bg-panel);
     }
-    .btn-upgrade {
-      background: linear-gradient(135deg, var(--blue-bright), #7c4dff);
-      color: #fff; border: none; border-radius: 16px;
-      padding: 5px 14px; font-size: .78rem; font-weight: 700;
-      cursor: pointer; letter-spacing: .03em;
+    /* ── PHOTO UPLOAD ────────────────────────────────── */
+    .img-upload-row { display: flex; align-items: center; gap: 20px; }
+    .avatar-preview {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dim), var(--blue-mid));
+      border: 3px solid var(--border-bright);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 800; flex-shrink: 0; overflow: hidden;
     }
+    .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .img-upload-info { display: flex; flex-direction: column; gap: 8px; }
+    .img-upload-info p { font-size: .78rem; color: var(--text-mid); line-height: 1.5; }
+    .btn-img-upload {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 8px;
+      background: var(--bg-hover); border: 1px solid var(--border-bright);
+      color: var(--text-light); font-family: inherit; font-size: .8rem;
+      font-weight: 600; cursor: pointer; transition: all .15s;
+    }
+    .btn-img-upload:hover { border-color: var(--blue-bright); color: var(--text-white); }
+    .btn-img-upload:disabled { opacity: .45; cursor: not-allowed; }
+    .img-upload-input { display: none; }
+    .upload-status { font-size: .75rem; color: var(--text-dim); min-height: 16px; }
+    .upload-status.ok  { color: #4ade80; }
+    .upload-status.err { color: #f87171; }
 
     /* ── APP SHELL ───────────────────────────────────── */
     .app-shell { flex: 1; display: flex; overflow: hidden; }
@@ -378,7 +397,6 @@
     </div>
     <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
     <div class="user-avatar" id="userAvatar">—</div>
-    <button class="btn-upgrade">PRO</button>
   </div>
 </nav>
 
@@ -398,6 +416,29 @@
         <div class="page-loading" id="pageLoading">
           <div class="spinner"></div>
           Loading your account…
+        </div>
+
+        <!-- ── 0. PROFILE PHOTO ── -->
+        <div class="settings-card" id="photoCard" style="display:none;">
+          <div class="card-header">
+            <div class="card-title"><span class="card-icon"><i data-lucide="camera"></i></span> Profile Photo</div>
+            <div class="card-desc">Your avatar shown next to your name across DropSub.</div>
+          </div>
+          <div class="card-body">
+            <div class="img-upload-row">
+              <div class="avatar-preview" id="avatarPreview">
+                <span id="avatarInitials">—</span>
+              </div>
+              <div class="img-upload-info">
+                <p>JPG, PNG or WebP · max 10 MB · recommended 400×400 px</p>
+                <button class="btn-img-upload" id="avatarUploadBtn" onclick="document.getElementById('avatarFileInput').click()">
+                  <i data-lucide="camera"></i> Change photo
+                </button>
+                <input type="file" id="avatarFileInput" class="img-upload-input" accept="image/jpeg,image/png,image/webp" onchange="uploadProfileAvatar(this)"/>
+                <div class="upload-status" id="avatarUploadStatus"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ── 1. PROFILE SETTINGS ── -->
@@ -596,7 +637,7 @@
   // ── Reveal cards after profile load ─────────────────────────
   function showCards() {
     document.getElementById('pageLoading').style.display  = 'none';
-    ['profileCard','emailCard','passwordCard','dangerCard'].forEach(function(id) {
+    ['photoCard','profileCard','emailCard','passwordCard','dangerCard'].forEach(function(id) {
       document.getElementById(id).style.display = 'block';
     });
   }
@@ -646,12 +687,100 @@
           avatar.title = name;
         }
 
+        // Populate profile photo card preview
+        var preview    = document.getElementById('avatarPreview');
+        var initialsEl = document.getElementById('avatarInitials');
+        if (preview) {
+          var prevImg = preview.querySelector('img');
+          if (prevImg) prevImg.remove();
+          if (user.avatar_url) {
+            if (initialsEl) initialsEl.style.display = 'none';
+            var previewImg = document.createElement('img');
+            previewImg.src = user.avatar_url;
+            previewImg.alt = 'Avatar';
+            previewImg.onerror = function() {
+              previewImg.remove();
+              if (initialsEl) { initialsEl.textContent = initials || '?'; initialsEl.style.display = ''; }
+            };
+            preview.appendChild(previewImg);
+          } else {
+            if (initialsEl) { initialsEl.textContent = initials || '?'; initialsEl.style.display = ''; }
+          }
+        }
+
         showCards();
       })
       .catch(function() {
         document.getElementById('pageLoading').innerHTML =
           '<span style="color:var(--text-dim);">Could not load account data. <a href="" style="color:var(--blue-glow);">Reload</a></span>';
       });
+  }
+
+  // ── Upload profile avatar ─────────────────────────────────────
+  function uploadProfileAvatar(input) {
+    if (!input.files || !input.files[0]) return;
+    var file  = input.files[0];
+    var btn   = document.getElementById('avatarUploadBtn');
+    var stat  = document.getElementById('avatarUploadStatus');
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+
+    btn.disabled = true;
+    stat.className = 'upload-status';
+    stat.textContent = 'Uploading…';
+
+    // Show local preview immediately
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var preview    = document.getElementById('avatarPreview');
+      var initialsEl = document.getElementById('avatarInitials');
+      if (preview) {
+        var old = preview.querySelector('img');
+        if (old) old.remove();
+        if (initialsEl) initialsEl.style.display = 'none';
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.alt = 'Avatar';
+        preview.appendChild(img);
+      }
+      var navAvatar = document.getElementById('userAvatar');
+      if (navAvatar) {
+        navAvatar.textContent = '';
+        var navImg = document.createElement('img');
+        navImg.src = e.target.result;
+        navImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+        navAvatar.appendChild(navImg);
+      }
+    };
+    reader.readAsDataURL(file);
+
+    var form = new FormData();
+    form.append('image', file);
+
+    fetch('https://api.dropsub.com/api/profile/avatar', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: form,
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      btn.disabled = false;
+      if (result.ok) {
+        if (currentUser) currentUser.avatar_url = result.data.avatar_url;
+        stat.className = 'upload-status ok';
+        stat.textContent = '✓ Photo updated';
+        setTimeout(function() { stat.textContent = ''; }, 3000);
+      } else {
+        stat.className = 'upload-status err';
+        stat.textContent = result.data.error || 'Upload failed';
+      }
+    })
+    .catch(function() {
+      btn.disabled = false;
+      stat.className = 'upload-status err';
+      stat.textContent = 'Network error — try again';
+    });
+
+    input.value = '';
   }
 
   // ── Save profile ─────────────────────────────────────────────
