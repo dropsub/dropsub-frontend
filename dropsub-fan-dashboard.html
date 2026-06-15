@@ -1147,12 +1147,7 @@
             tab.id = 'artistDashTab';
             tab.href = 'dropsub-artist-dashboard.html';
             tab.textContent = 'Dashboard';
-            var discoverLink = navLinks.querySelector('a[href="dropsub-discover.html"]');
-            if (discoverLink) {
-              navLinks.insertBefore(tab, discoverLink);
-            } else {
-              navLinks.appendChild(tab);
-            }
+            navLinks.appendChild(tab);
           }
         }
       })
