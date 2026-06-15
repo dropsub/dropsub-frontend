@@ -436,6 +436,7 @@
       <div class="filter-tab"        data-cat="pop"     onclick="setFilter('pop')">Pop</div>
       <div class="filter-tab"        data-cat="rock"    onclick="setFilter('rock')">Rock</div>
       <div class="filter-tab"        data-cat="hip-hop" onclick="setFilter('hip-hop')">Hip-Hop</div>
+      <div class="filter-tab"        data-cat="r&b"     onclick="setFilter('r&b')">R&amp;B</div>
       <div class="filter-tab"        data-cat="latin"   onclick="setFilter('latin')">Latin</div>
       <div class="filter-tab"        data-cat="edm"     onclick="setFilter('edm')">EDM</div>
       <div class="filter-tab"        data-cat="country" onclick="setFilter('country')">Country</div>
@@ -634,7 +635,6 @@
     }
     return '<div class="artist-card" onclick="viewArtist(\'' + a.slug + '\')">' +
       '<div class="ac-banner" style="' + bannerStyle + '">' +
-        '<span class="ac-new-badge" style="background:rgba(41,121,255,.85);">LIVE</span>' +
         collabBadge +
         (a.is_verified ? '<span class="ac-category">✓ VERIFIED</span>' : '') +
       '</div>' +
@@ -690,15 +690,6 @@
     var titleEl = document.getElementById('gridTitle');
     if (_query) {
       titleEl.innerHTML = '<i data-lucide="search"></i> Results for "' + _query + '"';
-    } else if (_filter !== 'all') {
-      var labels = {
-        music:       '<i data-lucide="music"></i> Music',
-        photography: '<i data-lucide="camera"></i> Photography',
-        film:        '<i data-lucide="video"></i> Film',
-        art:         '<i data-lucide="palette"></i> Art',
-        sports:      '<i data-lucide="trophy"></i> Sports'
-      };
-      titleEl.innerHTML = (labels[_filter] || _filter);
     } else {
       titleEl.innerHTML = '<i data-lucide="flame"></i> Trending Now';
     }
