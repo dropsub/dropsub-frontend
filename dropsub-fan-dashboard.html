@@ -659,67 +659,26 @@
 
     <!-- Date thumbnails -->
     <div class="rs-section">
-      <div class="date-header">DATE: JUNE 29, 2023</div>
-      <div class="thumb-grid">
-        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="camera"></i></div>
-        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="video"></i></div>
-        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="camera"></i></div>
-        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="video"></i></div>
-        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="camera"></i></div>
-        <div class="thumb" onclick="showToast('Opening photo…')"><i data-lucide="film"></i></div>
-      </div>
+      <div class="date-header" id="sidebarDateHeader">—</div>
+      <div class="thumb-grid" id="sidebarThumbGrid"></div>
     </div>
 
     <!-- Tags -->
-    <div class="rs-section">
+    <div class="rs-section" id="sidebarTagsSection" style="display:none;">
       <div class="rs-label">TAGS</div>
-      <div class="tags-row" id="sidebarTags">
-        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#BANGCHAN</div>
-        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#WOLFBOY</div>
-        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#SKZ</div>
-        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#KPOP</div>
-        <div class="tag-pill" onclick="showToast('Filtering by tag…')">#TOUR2023</div>
-      </div>
+      <div class="tags-row" id="sidebarTags"></div>
     </div>
 
     <!-- Pinned Items -->
-    <div class="rs-section">
+    <div class="rs-section" id="sidebarPinnedSection" style="display:none;">
       <div class="rs-label"><i data-lucide="map-pin"></i> PINNED ITEMS</div>
-      <div class="pinned-list">
-        <div class="pinned-item" onclick="showToast('Opening pinned item…')">
-          <div class="pinned-icon"><i data-lucide="folder"></i></div>
-          <div>
-            <div class="pinned-name">Wolf Era BTS</div>
-            <div class="pinned-meta">Subscription · 34 files</div>
-          </div>
-        </div>
-        <div class="pinned-item" onclick="showToast('Opening pinned item…')">
-          <div class="pinned-icon"><i data-lucide="music"></i></div>
-          <div>
-            <div class="pinned-name">Unreleased Demos</div>
-            <div class="pinned-meta">Premium · $7.99</div>
-          </div>
-        </div>
-      </div>
+      <div class="pinned-list" id="sidebarPinnedList"></div>
     </div>
 
     <!-- Recommended Drops -->
     <div class="rs-section">
       <div class="rs-label">RECOMMENDED DROPS</div>
-      <div class="rec-grid">
-        <div class="rec-artist" onclick="showToast('Opening artist profile…')">
-          <div class="rec-ring"><i data-lucide="mic-2"></i></div>
-          <div class="rec-name">ATEEZ</div>
-        </div>
-        <div class="rec-artist" onclick="showToast('Opening artist profile…')">
-          <div class="rec-ring"><i data-lucide="star"></i></div>
-          <div class="rec-name">DOJA CAT</div>
-        </div>
-        <div class="rec-artist" onclick="showToast('Opening artist profile…')">
-          <div class="rec-ring"><i data-lucide="mic"></i></div>
-          <div class="rec-name">TAYLOR S.</div>
-        </div>
-      </div>
+      <div class="rec-grid" id="recGrid"></div>
     </div>
 
     <!-- Storage info -->
@@ -804,6 +763,152 @@
 <script>
   // ── Followed artist data (for inline sidebar loading) ───────
   var _followingData = [];
+  var _currentFolderList = [];
+  var _currentArtistSlug = null;
+
+  // ── Right-sidebar helpers ────────────────────────────────────
+
+  function selectFolder(folder, trEl) {
+    document.querySelectorAll('#fileTableBody tr').forEach(function(r) { r.classList.remove('selected'); });
+    if (trEl) trEl.classList.add('selected');
+
+    // Fix 1: Real folder date
+    var raw = folder.created_at || folder.event_date || '';
+    var d = raw ? new Date(raw) : null;
+    var dateStr = (d && !isNaN(d))
+      ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+      : '—';
+    var dateHdr = document.getElementById('sidebarDateHeader');
+    if (dateHdr) dateHdr.textContent = 'DATE: ' + dateStr;
+
+    // Fix 2: Folder thumbnails
+    loadFolderThumbnails(folder.id);
+
+    // Fix 3: Real tags
+    var tagsSection = document.getElementById('sidebarTagsSection');
+    var tagsRow     = document.getElementById('sidebarTags');
+    var tags = Array.isArray(folder.tags) ? folder.tags.filter(Boolean) : [];
+    if (tagsSection && tagsRow) {
+      if (!tags.length) {
+        tagsSection.style.display = 'none';
+      } else {
+        tagsSection.style.display = '';
+        tagsRow.innerHTML = tags.map(function(t) {
+          var tag = String(t).startsWith('#') ? t : '#' + t;
+          return '<div class="tag-pill" onclick="showToast(\'Filtering by tag…\')">' + tag + '</div>';
+        }).join('');
+      }
+    }
+  }
+
+  function loadFolderThumbnails(folderId) {
+    var grid = document.getElementById('sidebarThumbGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    fetch('https://api.dropsub.com/api/folders/' + folderId + '/files', { headers: headers })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.folder || !data.folder.files || !data.folder.files.length) {
+        grid.innerHTML = '<div style="color:var(--text-dim);font-size:.68rem;padding:2px 0;grid-column:1/-1;">No preview available</div>';
+        return;
+      }
+      var files = data.folder.files.slice(0, 6);
+      files.forEach(function(file) {
+        var div = document.createElement('div');
+        div.className = 'thumb';
+        var mt = (file.mime_type || '').toLowerCase();
+        var ft = (file.file_type || '').toLowerCase();
+        if (file.thumbnail_url) {
+          var img = document.createElement('img');
+          img.src     = file.thumbnail_url;
+          img.alt     = file.name || '';
+          img.loading = 'lazy';
+          img.onerror = function() {
+            img.remove();
+            div.innerHTML = '<i data-lucide="image"></i>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+          };
+          div.appendChild(img);
+        } else if (ft.includes('video') || mt.includes('video')) {
+          div.innerHTML = '<i data-lucide="video"></i>';
+        } else if (ft.includes('audio') || mt.includes('audio')) {
+          div.innerHTML = '<i data-lucide="music"></i>';
+        } else {
+          div.innerHTML = '<i data-lucide="image"></i>';
+        }
+        div.title   = file.name || '';
+        div.onclick = function() { showToast('Opening ' + (file.name || 'file') + '…'); };
+        grid.appendChild(div);
+      });
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    })
+    .catch(function() {
+      grid.innerHTML = '';
+    });
+  }
+
+  function updateSidebarPinned(folders) {
+    var section = document.getElementById('sidebarPinnedSection');
+    var list    = document.getElementById('sidebarPinnedList');
+    if (!section || !list) return;
+    var pinned = (folders || []).filter(function(f) { return f.is_pinned; }).slice(0, 2);
+    if (!pinned.length) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = '';
+    list.innerHTML = pinned.map(function(f) {
+      var atype       = f.access_type || 'subscription';
+      var accessLabel = atype === 'free' ? 'Free' : atype === 'premium' ? 'Premium' : 'Subscription';
+      var fileCount   = f.file_count || 0;
+      var iconName    = atype === 'premium' ? 'star' : 'folder';
+      return '<div class="pinned-item" onclick="window.location.href=\'dropsub-content-viewer.html?folder_id=' + f.id + '\'">' +
+        '<div class="pinned-icon"><i data-lucide="' + iconName + '"></i></div>' +
+        '<div>' +
+          '<div class="pinned-name">' + (f.name || '') + '</div>' +
+          '<div class="pinned-meta">' + accessLabel + ' · ' + fileCount + ' files</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  function loadTrendingArtists(excludeSlug) {
+    var grid = document.getElementById('recGrid');
+    if (!grid) return;
+    fetch('https://api.dropsub.com/api/artists?trending=true')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (!data || !data.artists || !data.artists.length) { grid.innerHTML = ''; return; }
+      var recs = data.artists
+        .filter(function(a) { return a.slug !== excludeSlug; })
+        .slice(0, 3);
+      if (!recs.length) { grid.innerHTML = ''; return; }
+      grid.innerHTML = recs.map(function(a) {
+        var initials = (a.name || '').split(' ').filter(Boolean)
+          .map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2) || '♪';
+        var ringContent = a.avatar_url
+          ? '<img src="' + a.avatar_url + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.remove()" alt="">'
+          : initials;
+        var shortName    = (a.name || '').slice(0, 14).toUpperCase();
+        var followIdx    = _followingData.findIndex(function(f) { return f.slug === a.slug; });
+        var clickHandler = followIdx >= 0
+          ? 'loadArtistInline(' + followIdx + ',document.querySelectorAll(\'#followedArtistsList .artist-item\')[' + followIdx + '])'
+          : 'window.location.href=\'dropsub-discover.html\'';
+        return '<div class="rec-artist" onclick="' + clickHandler + '">' +
+          '<div class="rec-ring">' + ringContent + '</div>' +
+          '<div class="rec-name">' + shortName + '</div>' +
+        '</div>';
+      }).join('');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    })
+    .catch(function() {});
+  }
 
   // ── Artist data ─────────────────────────────────────────────
   const artists = {
@@ -1304,6 +1409,27 @@
       }
 
       renderApiTable(folders);
+      _currentFolderList = folders;
+      _currentArtistSlug = artist.slug || (a && a.slug) || null;
+
+      // Auto-select first folder to populate right sidebar
+      if (folders.length) {
+        var firstTr = document.querySelector('#fileTableBody tr');
+        if (firstTr) selectFolder(folders[0], firstTr);
+      } else {
+        var dateHdr = document.getElementById('sidebarDateHeader');
+        if (dateHdr) dateHdr.textContent = '—';
+        var grid = document.getElementById('sidebarThumbGrid');
+        if (grid) grid.innerHTML = '';
+        var ts = document.getElementById('sidebarTagsSection');
+        if (ts) ts.style.display = 'none';
+      }
+
+      // Fix 4: Pinned items
+      updateSidebarPinned(folders);
+
+      // Fix 5: Trending recommendations
+      loadTrendingArtists(_currentArtistSlug);
     })
     .catch(function() {
       document.getElementById('fileTableBody').innerHTML =
@@ -1498,15 +1624,15 @@
       }
       tr.appendChild(tdAct);
 
-      // ── Row click ─────────────────────────────────────────────
+      // ── Row click — select folder (updates sidebar); View Drop button navigates
       tr.style.cursor = 'pointer';
-      if (canAccess) {
-        (function(fid) { tr.onclick = function() { window.location.href = 'dropsub-content-viewer.html?folder_id=' + fid; }; })(f.id);
-      } else if (isSub) {
-        (function(n, p) { tr.onclick = function() { handleRowClick('subscription', n, p); }; })(f.name, price);
-      } else {
-        (function(n, p, d) { tr.onclick = function() { handlePremiumData(n, p, d); }; })(f.name, price, f.description || '');
-      }
+      (function(folder, row, access, sub, prem, pLocked, pOwned, pr, desc) {
+        row.onclick = function() {
+          selectFolder(folder, row);
+          if (!access && sub)   handleRowClick('subscription', folder.name, pr);
+          if (!access && pLocked) handlePremiumData(folder.name, pr, desc);
+        };
+      })(f, tr, canAccess, isSub, isPrem, isPremLocked, isPremOwned, price, f.description || '');
 
       tbody.appendChild(tr);
     });

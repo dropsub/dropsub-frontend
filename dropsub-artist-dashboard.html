@@ -318,6 +318,7 @@
       font-size: .72rem; cursor: pointer; transition: all .15s;
     }
     .fol-btn:hover { background: var(--blue-dim); border-color: var(--blue-bright); }
+    .fol-btn.pin-active { color: var(--blue-bright); border-color: var(--blue-bright); background: rgba(41,121,255,.15); }
     .folder-actions i[data-lucide] { width: 12px; height: 12px; display: block; }
 
     /* ── MORE MENU ───────────────────────────────── */
@@ -1672,6 +1673,7 @@
             <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
               <button class="privacy-toggle-btn ${isPublic ? 'pub' : 'priv'}" onclick="event.stopPropagation();toggleFolderPrivacy(${idx})" title="${isPublic ? 'Public — click to make private' : 'Private — click to make public'}">${isPublic ? '🌐 Public' : '🔒 Private'}</button>
               <div class="folder-actions">
+                <div class="fol-btn ${f.is_pinned ? 'pin-active' : ''}" onclick="event.stopPropagation();toggleFolderPin(${idx})" title="${f.is_pinned ? 'Unpin folder' : 'Pin folder (max 2)'}"><i data-lucide="pin"></i></div>
                 <div class="fol-btn" onclick="event.stopPropagation();shareFolderLink('${f.id}')" title="Copy share link"><i data-lucide="link"></i></div>
                 <div class="fol-btn" onclick="event.stopPropagation();openEditModal(${idx})" title="Edit folder"><i data-lucide="pencil"></i></div>
                 <div class="fol-btn" onclick="event.stopPropagation();openMoreMenu(${idx},this)" title="More options"><i data-lucide="more-horizontal"></i></div>
@@ -2041,6 +2043,25 @@
     var isPublic = _currentFolders[idx].is_public;
     renderFolders(_currentFolders);
     showToast(isPublic ? '🌐 "' + name + '" is now Public' : '🔒 "' + name + '" is now Private');
+  }
+
+  // ── Pin / Unpin ──────────────────────────────────
+  function toggleFolderPin(idx) {
+    var folder = _currentFolders[idx];
+    var token  = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    var action = folder.is_pinned ? 'unpin' : 'pin';
+    fetch('https://api.dropsub.com/api/folders/' + folder.id + '/' + action, {
+      method:  'PATCH',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+      if (!result.ok) { showToast(result.data.error || 'Could not update pin'); return; }
+      _currentFolders[idx] = Object.assign({}, _currentFolders[idx], { is_pinned: result.data.folder.is_pinned });
+      renderFolders(_currentFolders);
+      showToast(result.data.folder.is_pinned ? '📌 Folder pinned' : 'Folder unpinned');
+    })
+    .catch(function() { showToast('Network error — try again'); });
   }
 
   // ── Share ────────────────────────────────────────
