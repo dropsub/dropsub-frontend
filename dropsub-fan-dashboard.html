@@ -215,6 +215,55 @@
       color: var(--blue-glow); letter-spacing: .04em;
     }
 
+    /* ── BANNER CAROUSEL ─────────────────────────────── */
+    .banner-carousel { position: absolute; inset: 0; overflow: hidden; }
+    .carousel-slide {
+      position: absolute; inset: 0; opacity: 0;
+      transition: opacity .5s ease; background: var(--bg-deepest);
+    }
+    .carousel-slide.active { opacity: 1; }
+    .carousel-slide > img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.82); }
+    .carousel-slide-icon {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      background: linear-gradient(135deg, #1a2d50, #0d1a30);
+    }
+    .carousel-slide-icon svg { width: 44px; height: 44px; color: var(--text-dim); opacity: .45; }
+    .carousel-slide-icon .slide-filename {
+      font-size: .72rem; color: var(--text-dim);
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .carousel-play-btn {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 48px; height: 48px; background: rgba(255,255,255,.15);
+      backdrop-filter: blur(4px); border: 2px solid rgba(255,255,255,.6);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: #fff; cursor: pointer; transition: all .2s; z-index: 2;
+    }
+    .carousel-play-btn:hover { background: rgba(41,121,255,.5); border-color: var(--blue-bright); }
+    .carousel-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 5; width: 30px; height: 30px;
+      background: rgba(8,15,28,.55); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 50%; cursor: pointer; color: rgba(255,255,255,.75);
+      font-size: 1.15rem; display: flex; align-items: center; justify-content: center;
+      transition: opacity .2s, background .15s, border-color .15s;
+      backdrop-filter: blur(4px); user-select: none; opacity: 0;
+    }
+    .featured-banner:hover .carousel-arrow { opacity: 1; }
+    .carousel-arrow:hover { background: rgba(41,121,255,.5); border-color: var(--blue-bright); color: #fff; }
+    .carousel-arrow-left  { left: 12px; }
+    .carousel-arrow-right { right: 12px; }
+    .carousel-dots {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      z-index: 5; display: flex; gap: 5px; align-items: center;
+    }
+    .carousel-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255,255,255,.3); transition: all .2s; cursor: pointer;
+    }
+    .carousel-dot.active { width: 7px; height: 7px; background: rgba(255,255,255,.9); }
+
     /* Toolbar */
     .toolbar {
       display: flex; align-items: center; gap: 6px; padding: 10px 20px;
@@ -596,6 +645,9 @@
           <div style="font-size:3rem; opacity:.6;"><i data-lucide="drama"></i></div>
         </div>
       </div>
+      <div class="carousel-arrow carousel-arrow-left"  id="carouselPrev" onclick="carouselPrev()" style="display:none;">&#8249;</div>
+      <div class="carousel-arrow carousel-arrow-right" id="carouselNext" onclick="carouselNext()" style="display:none;">&#8250;</div>
+      <div class="carousel-dots" id="carouselDots"></div>
       <div class="featured-overlay">
         <div>
           <div class="artist-title" id="artistTitle">BANGCHAN</div>
@@ -765,6 +817,151 @@
   var _followingData = [];
   var _currentFolderList = [];
   var _currentArtistSlug = null;
+
+  // ── Banner carousel ──────────────────────────────────────────
+  var _carousel = { items: [], current: 0, timer: null, paused: false };
+
+  function _escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function _buildSlide(file, isFirst) {
+    var slide = document.createElement('div');
+    slide.className = 'carousel-slide' + (isFirst ? ' active' : '');
+    var mt = (file.mime_type || '').toLowerCase();
+    var ft = (file.file_type || '').toLowerCase();
+    var isImg = mt.startsWith('image/') || ft.includes('image');
+    var isVid = mt.startsWith('video/') || ft.includes('video');
+    var isAud = mt.startsWith('audio/') || ft.includes('audio');
+
+    if (file.thumbnail_url && (isImg || isVid)) {
+      var img = document.createElement('img');
+      img.src = file.thumbnail_url; img.alt = file.name || '';
+      img.onerror = function() {
+        img.remove();
+        slide.insertAdjacentHTML('afterbegin', _iconSlideHTML(isVid ? 'video' : 'image', file.name));
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      };
+      slide.appendChild(img);
+    } else {
+      slide.innerHTML = _iconSlideHTML(isVid ? 'video' : isAud ? 'music' : 'image', file.name);
+    }
+
+    if (isVid || isAud) {
+      var pb = document.createElement('div');
+      pb.className = 'carousel-play-btn'; pb.textContent = '▶';
+      (function(n) { pb.onclick = function() { showToast('Playing ' + (n || 'file') + '…'); }; })(file.name);
+      slide.appendChild(pb);
+    }
+    return slide;
+  }
+
+  function _iconSlideHTML(icon, name) {
+    return '<div class="carousel-slide-icon">' +
+      '<i data-lucide="' + icon + '"></i>' +
+      (name ? '<div class="slide-filename">' + _escHtml(name) + '</div>' : '') +
+      '</div>';
+  }
+
+  function buildCarousel(files) {
+    destroyCarousel();
+    var items = files.slice(0, 6);
+    if (!items.length) { showCarouselFallback(); return; }
+    _carousel.items = items;
+
+    var media = document.getElementById('featuredMedia');
+    media.className = 'banner-carousel';
+    media.innerHTML = '';
+    items.forEach(function(f, i) { media.appendChild(_buildSlide(f, i === 0)); });
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    var dotsEl = document.getElementById('carouselDots');
+    if (dotsEl) {
+      dotsEl.innerHTML = items.length > 1 ? items.map(function(_, i) {
+        return '<div class="carousel-dot' + (i === 0 ? ' active' : '') + '" onclick="carouselGoTo(' + i + ')"></div>';
+      }).join('') : '';
+    }
+    var showArrows = items.length > 1;
+    var al = document.getElementById('carouselPrev'), ar = document.getElementById('carouselNext');
+    if (al) al.style.display = showArrows ? '' : 'none';
+    if (ar) ar.style.display = showArrows ? '' : 'none';
+
+    if (items.length > 1) {
+      _carousel.timer = setInterval(function() {
+        if (!_carousel.paused) carouselGoTo((_carousel.current + 1) % _carousel.items.length);
+      }, 4000);
+    }
+  }
+
+  function destroyCarousel() {
+    if (_carousel.timer) { clearInterval(_carousel.timer); _carousel.timer = null; }
+    _carousel.items = []; _carousel.current = 0; _carousel.paused = false;
+  }
+
+  function carouselGoTo(idx) {
+    if (!_carousel.items.length) return;
+    var slides = document.querySelectorAll('#featuredMedia .carousel-slide');
+    var dots   = document.querySelectorAll('#carouselDots .carousel-dot');
+    if (slides[_carousel.current]) slides[_carousel.current].classList.remove('active');
+    if (dots[_carousel.current])   dots[_carousel.current].classList.remove('active');
+    _carousel.current = ((idx % _carousel.items.length) + _carousel.items.length) % _carousel.items.length;
+    if (slides[_carousel.current]) slides[_carousel.current].classList.add('active');
+    if (dots[_carousel.current])   dots[_carousel.current].classList.add('active');
+  }
+
+  function carouselPrev() { carouselGoTo(_carousel.current - 1); }
+  function carouselNext() { carouselGoTo(_carousel.current + 1); }
+
+  function showCarouselFallback() {
+    destroyCarousel();
+    var media = document.getElementById('featuredMedia');
+    if (!media) return;
+    media.className = 'featured-media';
+    media.innerHTML =
+      '<div class="media-col" style="background:linear-gradient(135deg,#1a2d50,#0d1a30);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">' +
+        '<div style="font-size:3rem;"><i data-lucide="mic-2"></i></div>' +
+        '<div style="font-size:.7rem;color:var(--text-mid);">STUDIO SESSION</div>' +
+      '</div>' +
+      '<div class="media-col active-frame" style="background:linear-gradient(135deg,#1c3060,#0a1428);display:flex;align-items:center;justify-content:center;position:relative;">' +
+        '<div style="font-size:4rem;opacity:.5;"><i data-lucide="music"></i></div>' +
+        '<div class="play-btn" onclick="showToast(\'Playing featured content…\')">&#9654;</div>' +
+      '</div>' +
+      '<div class="media-col tinted" style="background:linear-gradient(135deg,#2a1020,#100818);display:flex;align-items:center;justify-content:center;">' +
+        '<div style="font-size:3rem;opacity:.6;"><i data-lucide="drama"></i></div>' +
+      '</div>';
+    var dotsEl = document.getElementById('carouselDots');
+    if (dotsEl) dotsEl.innerHTML = '';
+    var al = document.getElementById('carouselPrev'), ar = document.getElementById('carouselNext');
+    if (al) al.style.display = 'none';
+    if (ar) ar.style.display = 'none';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  function loadCarousel(folders, bannerUrl, token) {
+    var accessible = null;
+    for (var i = 0; i < folders.length; i++) {
+      var f = folders[i], s = f.access_status || '';
+      if (s === 'free' || s === 'subscribed' || s === 'purchased' || f.access_type === 'free') {
+        accessible = f; break;
+      }
+    }
+    if (!accessible) {
+      bannerUrl
+        ? buildCarousel([{ mime_type: 'image/jpeg', thumbnail_url: bannerUrl, name: '' }])
+        : showCarouselFallback();
+      return;
+    }
+    var headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    fetch('https://api.dropsub.com/api/folders/' + accessible.id + '/files', { headers: headers })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      var files = (data && data.folder && data.folder.files) ? data.folder.files : [];
+      if (bannerUrl) files = [{ mime_type: 'image/jpeg', thumbnail_url: bannerUrl, name: '' }].concat(files);
+      files.length ? buildCarousel(files.slice(0, 6)) : showCarouselFallback();
+    })
+    .catch(function() { showCarouselFallback(); });
+  }
 
   // ── Right-sidebar helpers ────────────────────────────────────
 
@@ -1319,6 +1516,7 @@
   }
 
   function showMainEmptyState() {
+    showCarouselFallback();
     document.getElementById('artistTitle').textContent    = 'My Artists';
     document.getElementById('artistSubtitle').textContent = '';
     document.getElementById('folderCount').textContent    = '';
@@ -1376,6 +1574,7 @@
     currentArtist = name;
 
     // Immediate banner update while loading
+    showCarouselFallback();
     document.getElementById('artistTitle').textContent    = name.toUpperCase();
     document.getElementById('artistSubtitle').textContent = genre + ' · Loading folders…';
     document.getElementById('folderCount').textContent    = 'Loading…';
@@ -1407,16 +1606,8 @@
         '<div class="featured-tag">FOLLOWING</div>' +
         (folders.length ? '<div class="featured-tag">' + folders.length + ' DROPS</div>' : '');
 
-      // Update center banner column if artist has a banner image
-      if (artist.banner_url) {
-        var cols = document.querySelectorAll('#featuredMedia .media-col');
-        if (cols[1]) {
-          cols[1].innerHTML =
-            '<img src="' + artist.banner_url + '" style="width:100%;height:100%;object-fit:cover;filter:brightness(.85);" alt="">' +
-            '<div class="play-btn" onclick="showToast(\'Playing featured content…\')">▶</div>';
-          cols[1].style.background = '';
-        }
-      }
+      // Load banner carousel from first accessible folder's files
+      loadCarousel(folders, artist.banner_url || null, token);
 
       renderApiTable(folders);
       _currentFolderList = folders;
@@ -1656,6 +1847,15 @@
   document.getElementById('featuredTags').innerHTML     = '';
   document.getElementById('fileTableBody').innerHTML    =
     '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Loading your artists…</td></tr>';
+  // Pause carousel auto-advance while cursor is over the banner
+  (function() {
+    var banner = document.querySelector('.featured-banner');
+    if (banner) {
+      banner.addEventListener('mouseenter', function() { _carousel.paused = true; });
+      banner.addEventListener('mouseleave', function() { _carousel.paused = false; });
+    }
+  })();
+
   fetchUserProfile();
   fetchFollowing();
 </script>
