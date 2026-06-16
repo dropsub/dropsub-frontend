@@ -242,6 +242,7 @@
     .cp-center > img { filter: brightness(.88); }
     /* video */
     .cp-center video { width: 100%; height: 100%; object-fit: cover; background: #000; display: block; }
+    .cp-side video { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; filter: brightness(.65) saturate(.7); }
     /* icon placeholder shared by both panel types */
     .carousel-panel-icon {
       width: 100%; height: 100%;
@@ -864,9 +865,13 @@
     var isVid = mt.startsWith('video/') || ft.includes('video');
     var isAud = mt.startsWith('audio/') || ft.includes('audio');
     var icon  = isVid ? 'video' : isAud ? 'music' : 'image';
+    if (isVid && file.url) {
+      return '<video src="' + _escHtml(file.url) + '"' +
+        (file.thumbnail_url ? ' poster="' + _escHtml(file.thumbnail_url) + '"' : '') +
+        ' preload="metadata" muted playsinline disablepictureinpicture></video>';
+    }
     if (file.thumbnail_url && !isAud) {
-      return '<img src="' + _escHtml(file.thumbnail_url) + '" alt="' + _escHtml(file.name || '') + '">' +
-        (isVid ? '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;font-size:1.1rem;color:rgba(255,255,255,.75);pointer-events:none;">▶</div>' : '');
+      return '<img src="' + _escHtml(file.thumbnail_url) + '" alt="' + _escHtml(file.name || '') + '">';
     }
     return '<div class="carousel-panel-icon">' +
       '<i data-lucide="' + icon + '"></i>' +
