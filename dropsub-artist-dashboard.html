@@ -1425,6 +1425,15 @@
             </div>
           </div>
         </div>
+        <div class="mform-row" id="epriceRow" style="display:none;">
+          <div class="mfield">
+            <label>PRICE</label>
+            <div class="price-input-wrap">
+              <span class="price-symbol">$</span>
+              <input type="number" id="editFolderPrice" placeholder="9.99" min="0.99" step="0.01"/>
+            </div>
+          </div>
+        </div>
         <div class="mfield">
           <label>VISIBILITY</label>
           <select id="editFolderVisibility">
@@ -2111,6 +2120,8 @@
       tagsStr = rawTags.replace(/^#+/gm, '').replace(/[\s,]+/g, ', ').trim();
     }
     document.getElementById('editFolderTags').value = tagsStr;
+    var existingCents = f.sub_price_cents || f.premium_price_cents || null;
+    document.getElementById('editFolderPrice').value = existingCents ? (existingCents / 100).toFixed(2) : '';
     document.getElementById('editFolderVisibility').value = f.is_public !== false ? 'true' : 'false';
     document.getElementById('editFolderCollab').checked = f.is_collab === true;
     selectEditTier(_editTier);
@@ -2138,6 +2149,7 @@
       document.getElementById(id).className = 'tier-opt';
     });
     if (map[tier]) document.getElementById(map[tier]).className = 'tier-opt ' + clsMap[tier];
+    document.getElementById('epriceRow').style.display = tier === 'free' ? 'none' : 'grid';
   }
 
   function switchCoverTab(tab) {
@@ -2319,6 +2331,11 @@
       is_collab: document.getElementById('editFolderCollab').checked,
       tags: tags
     };
+    var editPrice = parseFloat(document.getElementById('editFolderPrice').value || '');
+    if (_editTier !== 'free' && editPrice) {
+      if (_editTier === 'subscription') patchBody.sub_price_cents = Math.round(editPrice * 100);
+      else patchBody.premium_price_cents = Math.round(editPrice * 100);
+    }
     if (_editCoverChanged) patchBody.cover_url = _editCoverUrl;
     fetch('https://api.dropsub.com/api/folders/' + f.id, {
       method: 'PATCH',
