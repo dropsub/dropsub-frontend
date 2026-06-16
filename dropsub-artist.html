@@ -514,10 +514,10 @@
         btnHtml = '<button class="fc-btn fc-btn-view" onclick="event.stopPropagation();viewFolder(\'' + f.id + '\')">View Drop</button>';
       } else if (f.access_type === 'subscription') {
         var btnLabel = price ? 'Subscribe · ' + price : 'Subscribe';
-        btnHtml = '<button class="fc-btn fc-btn-sub" onclick="event.stopPropagation();subscribeTo(\'' + f.id + '\')">' + btnLabel + '</button>';
+        btnHtml = '<button class="fc-btn fc-btn-sub" onclick="event.stopPropagation();subscribeTo(\'' + f.id + '\', this)">' + btnLabel + '</button>';
       } else {
         var btnLabel = price ? 'Buy · ' + price : 'Purchase';
-        btnHtml = '<button class="fc-btn fc-btn-buy" onclick="event.stopPropagation();purchaseDrop(\'' + f.id + '\')">' + btnLabel + '</button>';
+        btnHtml = '<button class="fc-btn fc-btn-buy" onclick="event.stopPropagation();purchaseDrop(\'' + f.id + '\', this)">' + btnLabel + '</button>';
       }
 
       var collabBadge = f.is_collab ? '<span class="fc-access-badge badge-collab">COLLAB</span>' : '';
@@ -553,22 +553,54 @@
     window.location.href = 'dropsub-content-viewer.html?folder_id=' + encodeURIComponent(folderId);
   }
 
-  function subscribeTo(folderId) {
+  function getAuthToken() {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  }
+
+  function startCheckout(endpoint, folderId, btn) {
+    var token = getAuthToken();
+    if (!token) {
+      showToast('Log in to continue');
+      setTimeout(function() { window.location.href = 'dropsub-login.html'; }, 1000);
+      return;
+    }
+    var originalText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+
+    fetch('https://api.dropsub.com/api/payments/' + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ folder_id: folderId })
+    })
+      .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+      .then(function(result) {
+        if (!result.ok || !result.data.checkout_url) {
+          throw new Error((result.data && result.data.error) || 'Failed to start checkout');
+        }
+        window.location.href = result.data.checkout_url;
+      })
+      .catch(function(err) {
+        showToast(err.message || 'Something went wrong. Please try again.');
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
+      });
+  }
+
+  function subscribeTo(folderId, btn) {
     if (!_token) {
       showToast('Log in to subscribe');
       setTimeout(function() { window.location.href = 'dropsub-login.html'; }, 1000);
       return;
     }
-    showToast('Subscription flow coming soon');
+    startCheckout('subscribe', folderId, btn);
   }
 
-  function purchaseDrop(folderId) {
+  function purchaseDrop(folderId, btn) {
     if (!_token) {
       showToast('Log in to purchase');
       setTimeout(function() { window.location.href = 'dropsub-login.html'; }, 1000);
       return;
     }
-    showToast('Purchase flow coming soon');
+    startCheckout('purchase', folderId, btn);
   }
 
   // ── Live user profile ──────────────────────────────────────

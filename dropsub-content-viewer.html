@@ -790,7 +790,7 @@
           <div class="upgrade-folder-name" id="upgradeFolderName">—</div>
           <div class="upgrade-artist" id="upgradeArtist">—</div>
           <div class="upgrade-price" id="upgradePrice">—</div>
-          <a class="btn-upgrade-cta" href="dropsub-fan-dashboard.html" id="upgradeCta">Subscribe to unlock</a>
+          <button type="button" class="btn-upgrade-cta" id="upgradeCta">Subscribe to unlock</button>
           <a class="btn-back-link" href="dropsub-fan-dashboard.html">← Back to My Artists</a>
         </div>
       </div>
@@ -963,6 +963,39 @@
     t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2400);
+  }
+
+  // ── Payments ─────────────────────────────────────────────────
+  function getAuthToken() {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  }
+
+  function startCheckout(endpoint, folderId, btn) {
+    var token = getAuthToken();
+    if (!token) {
+      var returnUrl = encodeURIComponent(window.location.href);
+      window.location.href = 'dropsub-login.html?return=' + returnUrl;
+      return;
+    }
+    var originalText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+
+    fetch('https://api.dropsub.com/api/payments/' + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ folder_id: folderId })
+    })
+      .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+      .then(function(result) {
+        if (!result.ok || !result.data.checkout_url) {
+          throw new Error((result.data && result.data.error) || 'Failed to start checkout');
+        }
+        window.location.href = result.data.checkout_url;
+      })
+      .catch(function(err) {
+        showToast(err.message || 'Something went wrong. Please try again.');
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
+      });
   }
 
   // ── State helpers ────────────────────────────────────────────
@@ -1306,6 +1339,9 @@
 
           var ctaEl = document.getElementById('upgradeCta');
           ctaEl.textContent = tier === 'premium' ? 'Purchase to unlock' : 'Subscribe to unlock';
+          ctaEl.onclick = function() {
+            startCheckout(tier === 'premium' ? 'purchase' : 'subscribe', folderId, ctaEl);
+          };
 
           showState('stateUpgrade');
           return;

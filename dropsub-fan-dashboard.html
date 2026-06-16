@@ -799,18 +799,18 @@
           <div class="tier-name">Subscription Access</div>
           <div class="tier-desc">Full folder + monthly new drops</div>
         </div>
-        <div class="tier-price">$4.99/mo</div>
+        <div class="tier-price" id="subTierPrice">—</div>
       </div>
       <div class="modal-tier">
         <div>
           <div class="tier-name" id="premiumTierName">Premium One-Time</div>
           <div class="tier-desc">Exclusive access, no recurring charge</div>
         </div>
-        <div class="tier-price" id="premiumTierPrice">$7.99</div>
+        <div class="tier-price" id="premiumTierPrice">—</div>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="modal-btn primary" onclick="closeModal();showToast('Subscribed! Access granted 🎉')">Subscribe Now</button>
+      <button class="modal-btn primary" id="modalConfirmBtn">Subscribe Now</button>
       <button class="modal-btn secondary" onclick="closeModal()">Maybe Later</button>
     </div>
   </div>
@@ -1457,29 +1457,37 @@
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  function handlePremiumData(name, price, teaser) {
+  function handlePremiumData(name, price, teaser, folderId) {
     document.getElementById('subModalIcon').textContent = '⭐';
     document.getElementById('subModalTitle').textContent = name;
     document.getElementById('subModalDesc').textContent = teaser || 'Purchase this exclusive Premium Drop for one-time access.';
     document.getElementById('premiumTierName').textContent = 'One-Time Purchase';
-    document.getElementById('premiumTierPrice').textContent = price;
+    document.getElementById('premiumTierPrice').textContent = price || '—';
     var tiers = document.querySelectorAll('.modal-tier');
     tiers.forEach(function(t, i) {
-      if (i === 0) t.style.display = 'none';
-      if (i === 1) t.style.display = 'none';
-      if (i === 2) t.classList.add('featured');
+      t.style.display = (i === 0 || i === 1) ? 'none' : '';
+      t.classList.toggle('featured', i === 2);
     });
-    var btn = document.querySelector('.modal-btn.primary');
-    if (btn) btn.textContent = 'Purchase for ' + price;
+    var btn = document.getElementById('modalConfirmBtn');
+    btn.textContent = price ? 'Purchase for ' + price : 'Purchase';
+    btn.onclick = function() { startCheckout('purchase', folderId, btn); };
     document.getElementById('subModal').classList.add('open');
   }
 
-  function handleRowClick(type, name, price) {
+  function handleRowClick(type, name, price, folderId) {
     if (type === 'subscription') {
       document.getElementById('subModalTitle').textContent = 'Unlock: ' + name;
       document.getElementById('subModalDesc').textContent = 'Subscribe to get full access to this content folder and all future drops from ' + currentArtist + '.';
       document.getElementById('subModalIcon').textContent = '📁';
-      document.getElementById('premiumTierPrice').textContent = price || '$7.99';
+      document.getElementById('subTierPrice').textContent = price || 'Subscription';
+      var tiers = document.querySelectorAll('.modal-tier');
+      tiers.forEach(function(t, i) {
+        t.style.display = '';
+        t.classList.toggle('featured', i === 1);
+      });
+      var btn = document.getElementById('modalConfirmBtn');
+      btn.textContent = price ? 'Subscribe · ' + price : 'Subscribe Now';
+      btn.onclick = function() { startCheckout('subscribe', folderId, btn); };
       document.getElementById('subModal').classList.add('open');
     }
   }
@@ -1503,6 +1511,39 @@
     t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ── Payments ────────────────────────────────────────────────
+  function getAuthToken() {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  }
+
+  function startCheckout(endpoint, folderId, btn) {
+    var token = getAuthToken();
+    if (!token) {
+      showToast('Log in to continue');
+      setTimeout(function() { window.location.href = 'dropsub-login.html'; }, 1000);
+      return;
+    }
+    var originalText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+
+    fetch('https://api.dropsub.com/api/payments/' + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ folder_id: folderId })
+    })
+      .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+      .then(function(result) {
+        if (!result.ok || !result.data.checkout_url) {
+          throw new Error((result.data && result.data.error) || 'Failed to start checkout');
+        }
+        window.location.href = result.data.checkout_url;
+      })
+      .catch(function(err) {
+        showToast(err.message || 'Something went wrong. Please try again.');
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
+      });
   }
 
   // ── Auth / user profile ─────────────────────────────────────
@@ -1864,9 +1905,13 @@
         tdBadge.appendChild(viewBtn);
       } else if (isSub && !canAccess) {
         // Locked subscription
-        var subBadge = document.createElement('span');
+        var subBadge = document.createElement('button');
         subBadge.className   = 'access-badge subscription';
+        subBadge.style.cssText = 'border:none;cursor:pointer;font-family:inherit;';
         subBadge.textContent = price ? 'Subscribe · ' + price : 'Subscribe';
+        (function(fid) {
+          subBadge.onclick = function(e) { e.stopPropagation(); startCheckout('subscribe', fid, subBadge); };
+        })(f.id);
         tdBadge.appendChild(subBadge);
       } else if (isPremOwned) {
         var ownBadge = document.createElement('span');
@@ -1878,9 +1923,9 @@
         var buyBtn = document.createElement('button');
         buyBtn.className   = 'purchase-cta';
         buyBtn.textContent = '⭐ Buy ' + price;
-        (function(n, p, d) {
-          buyBtn.onclick = function(e) { e.stopPropagation(); handlePremiumData(n, p, d); };
-        })(f.name, price, f.description || '');
+        (function(fid) {
+          buyBtn.onclick = function(e) { e.stopPropagation(); startCheckout('purchase', fid, buyBtn); };
+        })(f.id);
         tdBadge.appendChild(buyBtn);
       }
       tr.appendChild(tdBadge);
@@ -1918,8 +1963,8 @@
       (function(folder, row, access, sub, prem, pLocked, pOwned, pr, desc) {
         row.onclick = function() {
           selectFolder(folder, row);
-          if (!access && sub)   handleRowClick('subscription', folder.name, pr);
-          if (!access && pLocked) handlePremiumData(folder.name, pr, desc);
+          if (!access && sub)   handleRowClick('subscription', folder.name, pr, folder.id);
+          if (!access && pLocked) handlePremiumData(folder.name, pr, desc, folder.id);
         };
       })(f, tr, canAccess, isSub, isPrem, isPremLocked, isPremOwned, price, f.description || '');
 
