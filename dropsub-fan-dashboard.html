@@ -216,31 +216,56 @@
     }
 
     /* ── BANNER CAROUSEL ─────────────────────────────── */
-    .banner-carousel { position: absolute; inset: 0; overflow: hidden; }
-    .carousel-slide {
-      position: absolute; inset: 0; opacity: 0;
-      transition: opacity .5s ease; background: var(--bg-deepest);
+    /* Three-panel carousel */
+    .banner-carousel {
+      position: absolute; inset: 0; overflow: hidden;
+      display: flex; gap: 3px;
     }
-    .carousel-slide.active { opacity: 1; }
-    .carousel-slide > img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.82); }
-    .carousel-slide-icon {
+    .cp-side {
+      flex: 0 0 25%; position: relative; overflow: hidden;
+      background: var(--bg-deepest); cursor: pointer;
+    }
+    .cp-center {
+      flex: 1; position: relative; overflow: hidden;
+      background: var(--bg-deepest); transition: opacity .15s ease;
+    }
+    .banner-carousel.nav-transition .cp-center { opacity: 0; }
+    /* dim overlay on side panels */
+    .cp-side::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(8,15,28,.52); pointer-events: none; z-index: 1; transition: background .15s;
+    }
+    .cp-side:hover::after { background: rgba(8,15,28,.28); }
+    /* images */
+    .cp-side img, .cp-center > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cp-side img   { filter: brightness(.65) saturate(.7); }
+    .cp-center > img { filter: brightness(.88); }
+    /* video */
+    .cp-center video { width: 100%; height: 100%; object-fit: cover; background: #000; display: block; }
+    /* icon placeholder shared by both panel types */
+    .carousel-panel-icon {
       width: 100%; height: 100%;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       background: linear-gradient(135deg, #1a2d50, #0d1a30);
     }
-    .carousel-slide-icon svg { width: 44px; height: 44px; color: var(--text-dim); opacity: .45; }
-    .carousel-slide-icon .slide-filename {
-      font-size: .72rem; color: var(--text-dim);
-      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    .carousel-panel-icon svg { width: 36px; height: 36px; color: var(--text-dim); opacity: .4; }
+    .carousel-panel-icon .panel-filename {
+      font-size: .65rem; color: var(--text-dim); text-align: center;
+      max-width: 88%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .carousel-play-btn {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 48px; height: 48px; background: rgba(255,255,255,.15);
-      backdrop-filter: blur(4px); border: 2px solid rgba(255,255,255,.6);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; color: #fff; cursor: pointer; transition: all .2s; z-index: 2;
+    /* audio player panel (center only) */
+    .carousel-audio-panel {
+      width: 100%; height: 100%; box-sizing: border-box;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      background: linear-gradient(135deg, #0d1a30, #080f1c); padding: 0 28px;
     }
-    .carousel-play-btn:hover { background: rgba(41,121,255,.5); border-color: var(--blue-bright); }
+    .carousel-audio-panel svg { width: 42px; height: 42px; color: var(--text-dim); opacity: .5; }
+    .carousel-audio-panel .audio-filename {
+      font-size: .82rem; font-weight: 600; color: var(--text-light); text-align: center;
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .carousel-audio-panel audio { width: 100%; max-width: 320px; height: 36px; outline: none; }
+    /* arrows & dots */
     .carousel-arrow {
       position: absolute; top: 50%; transform: translateY(-50%);
       z-index: 5; width: 30px; height: 30px;
@@ -252,8 +277,8 @@
     }
     .featured-banner:hover .carousel-arrow { opacity: 1; }
     .carousel-arrow:hover { background: rgba(41,121,255,.5); border-color: var(--blue-bright); color: #fff; }
-    .carousel-arrow-left  { left: 12px; }
-    .carousel-arrow-right { right: 12px; }
+    .carousel-arrow-left  { left: 10px; }
+    .carousel-arrow-right { right: 10px; }
     .carousel-dots {
       position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
       z-index: 5; display: flex; gap: 5px; align-items: center;
@@ -819,61 +844,121 @@
   var _currentArtistSlug = null;
 
   // ── Banner carousel ──────────────────────────────────────────
-  var _carousel = { items: [], current: 0, timer: null, paused: false };
+  var _carousel = { items: [], current: 0 };
 
   function _escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function _buildSlide(file, isFirst) {
-    var slide = document.createElement('div');
-    slide.className = 'carousel-slide' + (isFirst ? ' active' : '');
+  function _pauseCenterMedia() {
+    var panel = document.getElementById('cpCenter');
+    if (!panel) return;
+    var m = panel.querySelector('video, audio');
+    if (m) try { m.pause(); } catch(e) {}
+  }
+
+  // Returns an HTML string for a side panel — thumbnail or icon, never a playable element
+  function _renderSideContent(file) {
+    var mt = (file.mime_type || '').toLowerCase();
+    var ft = (file.file_type || '').toLowerCase();
+    var isVid = mt.startsWith('video/') || ft.includes('video');
+    var isAud = mt.startsWith('audio/') || ft.includes('audio');
+    var icon  = isVid ? 'video' : isAud ? 'music' : 'image';
+    if (file.thumbnail_url && !isAud) {
+      return '<img src="' + _escHtml(file.thumbnail_url) + '" alt="' + _escHtml(file.name || '') + '">' +
+        (isVid ? '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;font-size:1.1rem;color:rgba(255,255,255,.75);pointer-events:none;">▶</div>' : '');
+    }
+    return '<div class="carousel-panel-icon">' +
+      '<i data-lucide="' + icon + '"></i>' +
+      (file.name ? '<div class="panel-filename">' + _escHtml(file.name) + '</div>' : '') +
+      '</div>';
+  }
+
+  // Returns a DOM node for the center panel — real media element or icon
+  function _renderCenterContent(file) {
     var mt = (file.mime_type || '').toLowerCase();
     var ft = (file.file_type || '').toLowerCase();
     var isImg = mt.startsWith('image/') || ft.includes('image');
     var isVid = mt.startsWith('video/') || ft.includes('video');
     var isAud = mt.startsWith('audio/') || ft.includes('audio');
 
-    if (file.thumbnail_url && (isImg || isVid)) {
+    if (isVid && file.url) {
+      var vid = document.createElement('video');
+      vid.controls = true; vid.setAttribute('playsinline', '');
+      if (file.thumbnail_url) vid.poster = file.thumbnail_url;
+      var vs = document.createElement('source');
+      vs.src = file.url; if (mt && mt !== 'video/') vs.type = mt;
+      vid.appendChild(vs);
+      return vid;
+    }
+
+    if (isAud && file.url) {
+      var wrap = document.createElement('div');
+      wrap.className = 'carousel-audio-panel';
+      wrap.innerHTML = '<i data-lucide="music"></i><div class="audio-filename">' + _escHtml(file.name || 'Audio') + '</div>';
+      var aud = document.createElement('audio');
+      aud.controls = true;
+      var as = document.createElement('source');
+      as.src = file.url; if (mt && mt !== 'audio/') as.type = mt;
+      aud.appendChild(as); wrap.appendChild(aud);
+      return wrap;
+    }
+
+    if (file.thumbnail_url) {
       var img = document.createElement('img');
       img.src = file.thumbnail_url; img.alt = file.name || '';
       img.onerror = function() {
         img.remove();
-        slide.insertAdjacentHTML('afterbegin', _iconSlideHTML(isVid ? 'video' : 'image', file.name));
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        var fb = document.createElement('div'); fb.className = 'carousel-panel-icon';
+        fb.innerHTML = '<i data-lucide="image"></i>';
+        var cp = document.getElementById('cpCenter');
+        if (cp) { cp.appendChild(fb); if (typeof lucide !== 'undefined') lucide.createIcons(); }
       };
-      slide.appendChild(img);
-    } else {
-      slide.innerHTML = _iconSlideHTML(isVid ? 'video' : isAud ? 'music' : 'image', file.name);
+      return img;
     }
 
-    if (isVid || isAud) {
-      var pb = document.createElement('div');
-      pb.className = 'carousel-play-btn'; pb.textContent = '▶';
-      (function(n) { pb.onclick = function() { showToast('Playing ' + (n || 'file') + '…'); }; })(file.name);
-      slide.appendChild(pb);
-    }
-    return slide;
+    var fb = document.createElement('div'); fb.className = 'carousel-panel-icon';
+    fb.innerHTML = '<i data-lucide="' + (isVid ? 'video' : isAud ? 'music' : 'image') + '"></i>' +
+      (file.name ? '<div class="panel-filename">' + _escHtml(file.name) + '</div>' : '');
+    return fb;
   }
 
-  function _iconSlideHTML(icon, name) {
-    return '<div class="carousel-slide-icon">' +
-      '<i data-lucide="' + icon + '"></i>' +
-      (name ? '<div class="slide-filename">' + _escHtml(name) + '</div>' : '') +
-      '</div>';
+  function _renderPanels() {
+    var items = _carousel.items, cur = _carousel.current, len = items.length;
+    var prevPanel   = document.getElementById('cpPrev');
+    var centerPanel = document.getElementById('cpCenter');
+    var nextPanel   = document.getElementById('cpNext');
+    if (!centerPanel) return;
+
+    if (len > 1 && prevPanel) {
+      prevPanel.style.display = '';
+      prevPanel.innerHTML = _renderSideContent(items[((cur - 1) + len) % len]);
+    } else if (prevPanel) { prevPanel.style.display = 'none'; }
+
+    if (len > 1 && nextPanel) {
+      nextPanel.style.display = '';
+      nextPanel.innerHTML = _renderSideContent(items[(cur + 1) % len]);
+    } else if (nextPanel) { nextPanel.style.display = 'none'; }
+
+    centerPanel.innerHTML = '';
+    centerPanel.appendChild(_renderCenterContent(items[cur]));
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function buildCarousel(files) {
     destroyCarousel();
     var items = files.slice(0, 6);
     if (!items.length) { showCarouselFallback(); return; }
-    _carousel.items = items;
+    _carousel.items = items; _carousel.current = 0;
 
     var media = document.getElementById('featuredMedia');
     media.className = 'banner-carousel';
-    media.innerHTML = '';
-    items.forEach(function(f, i) { media.appendChild(_buildSlide(f, i === 0)); });
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    media.innerHTML =
+      '<div class="cp-side" id="cpPrev" onclick="carouselPrev()"></div>' +
+      '<div class="cp-center" id="cpCenter"></div>' +
+      '<div class="cp-side" id="cpNext" onclick="carouselNext()"></div>';
+
+    _renderPanels();
 
     var dotsEl = document.getElementById('carouselDots');
     if (dotsEl) {
@@ -885,28 +970,26 @@
     var al = document.getElementById('carouselPrev'), ar = document.getElementById('carouselNext');
     if (al) al.style.display = showArrows ? '' : 'none';
     if (ar) ar.style.display = showArrows ? '' : 'none';
-
-    if (items.length > 1) {
-      _carousel.timer = setInterval(function() {
-        if (!_carousel.paused) carouselGoTo((_carousel.current + 1) % _carousel.items.length);
-      }, 4000);
-    }
   }
 
   function destroyCarousel() {
-    if (_carousel.timer) { clearInterval(_carousel.timer); _carousel.timer = null; }
-    _carousel.items = []; _carousel.current = 0; _carousel.paused = false;
+    _pauseCenterMedia();
+    _carousel.items = []; _carousel.current = 0;
   }
 
   function carouselGoTo(idx) {
     if (!_carousel.items.length) return;
-    var slides = document.querySelectorAll('#featuredMedia .carousel-slide');
-    var dots   = document.querySelectorAll('#carouselDots .carousel-dot');
-    if (slides[_carousel.current]) slides[_carousel.current].classList.remove('active');
-    if (dots[_carousel.current])   dots[_carousel.current].classList.remove('active');
+    _pauseCenterMedia();
+    var dots = document.querySelectorAll('#carouselDots .carousel-dot');
+    if (dots[_carousel.current]) dots[_carousel.current].classList.remove('active');
     _carousel.current = ((idx % _carousel.items.length) + _carousel.items.length) % _carousel.items.length;
-    if (slides[_carousel.current]) slides[_carousel.current].classList.add('active');
-    if (dots[_carousel.current])   dots[_carousel.current].classList.add('active');
+    if (dots[_carousel.current]) dots[_carousel.current].classList.add('active');
+    var media = document.getElementById('featuredMedia');
+    if (media) media.classList.add('nav-transition');
+    setTimeout(function() {
+      _renderPanels();
+      if (media) media.classList.remove('nav-transition');
+    }, 150);
   }
 
   function carouselPrev() { carouselGoTo(_carousel.current - 1); }
@@ -1847,15 +1930,6 @@
   document.getElementById('featuredTags').innerHTML     = '';
   document.getElementById('fileTableBody').innerHTML    =
     '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Loading your artists…</td></tr>';
-  // Pause carousel auto-advance while cursor is over the banner
-  (function() {
-    var banner = document.querySelector('.featured-banner');
-    if (banner) {
-      banner.addEventListener('mouseenter', function() { _carousel.paused = true; });
-      banner.addEventListener('mouseleave', function() { _carousel.paused = false; });
-    }
-  })();
-
   fetchUserProfile();
   fetchFollowing();
 </script>
