@@ -1404,6 +1404,11 @@
           <textarea id="editFolderDesc" placeholder="Optional description"></textarea>
         </div>
         <div class="mfield">
+          <label>TAGS</label>
+          <input type="text" id="editFolderTags" placeholder="e.g. rock, alternative, live"/>
+          <div style="font-size:.68rem;color:var(--text-dim);margin-top:2px;">Separate tags with commas or spaces. # is added automatically.</div>
+        </div>
+        <div class="mfield">
           <label>ACCESS TIER</label>
           <div class="tier-selector">
             <div class="tier-opt" id="etierFree" onclick="selectEditTier('free')">
@@ -2098,6 +2103,14 @@
     if (_editTier === 'sub') _editTier = 'subscription';
     document.getElementById('editFolderName').value = f.name || '';
     document.getElementById('editFolderDesc').value = f.description || '';
+    var rawTags = f.tags;
+    var tagsStr = '';
+    if (Array.isArray(rawTags) && rawTags.length) {
+      tagsStr = rawTags.map(function(t) { return String(t).replace(/^#+/, ''); }).join(', ');
+    } else if (typeof rawTags === 'string' && rawTags.trim()) {
+      tagsStr = rawTags.replace(/^#+/gm, '').replace(/[\s,]+/g, ', ').trim();
+    }
+    document.getElementById('editFolderTags').value = tagsStr;
     document.getElementById('editFolderVisibility').value = f.is_public !== false ? 'true' : 'false';
     document.getElementById('editFolderCollab').checked = f.is_collab === true;
     selectEditTier(_editTier);
@@ -2294,12 +2307,17 @@
     var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
     var btn = document.getElementById('editFolderSaveBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
+    var tagsRaw = document.getElementById('editFolderTags').value.trim();
+    var tags = tagsRaw
+      ? tagsRaw.split(/[\s,]+/).map(function(t) { return t.replace(/^#+/, ''); }).filter(Boolean)
+      : [];
     var patchBody = {
       name: name,
       description: document.getElementById('editFolderDesc').value.trim(),
       access_type: _editTier,
       is_public: document.getElementById('editFolderVisibility').value === 'true',
-      is_collab: document.getElementById('editFolderCollab').checked
+      is_collab: document.getElementById('editFolderCollab').checked,
+      tags: tags
     };
     if (_editCoverChanged) patchBody.cover_url = _editCoverUrl;
     fetch('https://api.dropsub.com/api/folders/' + f.id, {

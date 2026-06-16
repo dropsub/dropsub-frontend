@@ -784,18 +784,28 @@
     // Fix 2: Folder thumbnails
     loadFolderThumbnails(folder.id);
 
-    // Fix 3: Real tags
+    // Fix 3: Real tags — handle array, space-separated string, or array with multi-tag elements
     var tagsSection = document.getElementById('sidebarTagsSection');
     var tagsRow     = document.getElementById('sidebarTags');
-    var tags = Array.isArray(folder.tags) ? folder.tags.filter(Boolean) : [];
+    var rawTags = folder.tags;
+    var tags;
+    if (Array.isArray(rawTags)) {
+      tags = rawTags.reduce(function(acc, t) {
+        return acc.concat(String(t).split(/[\s,]+/).filter(Boolean));
+      }, []);
+    } else if (typeof rawTags === 'string' && rawTags.trim()) {
+      tags = rawTags.split(/[\s,]+/).filter(Boolean);
+    } else {
+      tags = [];
+    }
     if (tagsSection && tagsRow) {
       if (!tags.length) {
         tagsSection.style.display = 'none';
       } else {
         tagsSection.style.display = '';
         tagsRow.innerHTML = tags.map(function(t) {
-          var tag = String(t).startsWith('#') ? t : '#' + t;
-          return '<div class="tag-pill" onclick="showToast(\'Filtering by tag…\')">' + tag + '</div>';
+          var clean = String(t).replace(/^#+/, '');
+          return '<div class="tag-pill" onclick="showToast(\'Filtering by tag…\')">#' + clean + '</div>';
         }).join('');
       }
     }
