@@ -556,6 +556,43 @@
         </button>
       </div>
 
+      <!-- ── ARTIST INVITE-ONLY ──────────────────── -->
+      <div id="stepInvite" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">Artist accounts are invite-only</div>
+          <div class="card-sub">Apply for early access to get started.</div>
+        </div>
+
+        <button class="btn-submit" onclick="window.location.href='dropsub-artist-apply.html'" style="margin-bottom:20px;">
+          <span class="btn-text">Apply for Artist Access →</span>
+        </button>
+
+        <div style="text-align:center; margin-bottom:16px;">
+          <a href="javascript:void(0)" onclick="toggleInviteInput()" id="inviteToggleLink" style="font-size:.82rem; color:var(--blue-glow); text-decoration:none; font-weight:500;">Already have an invite code? Enter it here</a>
+        </div>
+
+        <div id="inviteCodeBlock" style="display:none;">
+          <div class="error-banner" id="inviteErrorBanner" style="margin-bottom:14px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="inviteErrorMsg">This invite code is not valid or has already been used.</span>
+          </div>
+          <div class="field" style="margin-bottom:14px;">
+            <div class="field-label">Invite code</div>
+            <div class="field-wrap">
+              <input type="text" class="field-input no-icon" id="inviteCodeInput" placeholder="Enter your invite code">
+            </div>
+          </div>
+          <button class="btn-submit" onclick="checkInviteCode()">
+            <span class="btn-text" id="inviteBtnText">Validate code →</span>
+            <span class="btn-spinner"><div class="spinner-ring"></div></span>
+          </button>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <a href="javascript:void(0)" onclick="goBackFromInvite()" style="font-size:.8rem; color:var(--text-mid); text-decoration:none;">← Back</a>
+        </div>
+      </div>
+
       <!-- ── STEP 2: Details form ───────────────── -->
       <div id="stepTwo" style="display:none;">
         <div class="card-header">
@@ -773,26 +810,25 @@
 
   // ── Step navigation ──────────────────────────────
   function goToStep2() {
-    // Show step 2
     document.getElementById('stepOne').style.display = 'none';
-    document.getElementById('stepTwo').style.display = 'block';
 
     // Update step indicator
     document.getElementById('step1-item').classList.remove('active');
     document.getElementById('step1-item').classList.add('done');
     document.getElementById('step1-circle').textContent = '✓';
-    document.getElementById('step2-item').classList.add('active');
 
-    // Update card title
-    if (selectedType === 'fan') {
-      document.getElementById('step2Title').textContent = 'Create your fan account';
-      document.getElementById('step2Sub').textContent = 'Fill in your details to get started.';
-      document.getElementById('artistFields').classList.remove('show');
-    } else {
-      document.getElementById('step2Title').textContent = 'Create your artist account';
-      document.getElementById('step2Sub').textContent = 'Tell us about yourself and your project.';
-      document.getElementById('artistFields').classList.add('show');
+    if (selectedType === 'artist') {
+      // Artists are invite-only — show the application gate instead of the form
+      document.getElementById('stepInvite').style.display = 'block';
+      currentStep = 'invite';
+      return;
     }
+
+    document.getElementById('stepTwo').style.display = 'block';
+    document.getElementById('step2-item').classList.add('active');
+    document.getElementById('step2Title').textContent = 'Create your fan account';
+    document.getElementById('step2Sub').textContent = 'Fill in your details to get started.';
+    document.getElementById('artistFields').classList.remove('show');
     currentStep = 2;
   }
 
@@ -805,6 +841,60 @@
     document.getElementById('step2-item').classList.remove('active');
     document.getElementById('errorBanner').classList.remove('show');
     currentStep = 1;
+  }
+
+  // ── Artist invite gate ────────────────────────────
+  function toggleInviteInput() {
+    const block  = document.getElementById('inviteCodeBlock');
+    const isOpen = block.style.display === 'block';
+    block.style.display = isOpen ? 'none' : 'block';
+    document.getElementById('inviteToggleLink').style.display = isOpen ? 'inline' : 'none';
+  }
+
+  function goBackFromInvite() {
+    document.getElementById('stepInvite').style.display = 'none';
+    document.getElementById('stepOne').style.display = 'block';
+    document.getElementById('step1-item').classList.add('active');
+    document.getElementById('step1-item').classList.remove('done');
+    document.getElementById('step1-circle').textContent = '1';
+    currentStep = 1;
+  }
+
+  async function checkInviteCode() {
+    const code         = document.getElementById('inviteCodeInput').value.trim();
+    const btn          = document.querySelector('#inviteCodeBlock .btn-submit');
+    const errorBanner  = document.getElementById('inviteErrorBanner');
+    const errorMsg     = document.getElementById('inviteErrorMsg');
+    errorBanner.classList.remove('show');
+
+    if (!code) {
+      errorMsg.textContent = 'Please enter an invite code.';
+      errorBanner.classList.add('show');
+      return;
+    }
+
+    btn.classList.add('loading');
+    try {
+      const res  = await fetch(`https://api.dropsub.com/api/invites/validate?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if (data.valid) {
+        document.getElementById('stepInvite').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'block';
+        document.getElementById('step2-item').classList.add('active');
+        document.getElementById('step2Title').textContent = 'Create your artist account';
+        document.getElementById('step2Sub').textContent = 'Tell us about yourself and your project.';
+        document.getElementById('artistFields').classList.add('show');
+        currentStep = 2;
+      } else {
+        errorMsg.textContent = 'This invite code is not valid or has already been used.';
+        errorBanner.classList.add('show');
+      }
+    } catch (err) {
+      errorMsg.textContent = 'Something went wrong. Please try again.';
+      errorBanner.classList.add('show');
+    } finally {
+      btn.classList.remove('loading');
+    }
   }
 
   // ── Username preview ─────────────────────────────
