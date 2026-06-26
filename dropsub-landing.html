@@ -249,33 +249,6 @@
     .artist-credit-pill.show { opacity: 1; }
     .artist-credit-pill strong { color: var(--text-white); }
 
-    /* ── LOGOS / SOCIAL PROOF BAR ─────────────────── */
-    .proof-bar {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 32px 48px;
-      background: rgba(12,21,39,.6);
-    }
-    .proof-inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center; gap: 48px; flex-wrap: wrap;
-    }
-    .proof-label {
-      font-size: .72rem; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: var(--text-dim);
-      white-space: nowrap;
-    }
-    .proof-names {
-      display: flex; align-items: center; gap: 40px; flex-wrap: wrap; flex: 1;
-    }
-    .proof-name {
-      font-size: .95rem; font-weight: 800; letter-spacing: .08em;
-      text-transform: uppercase; color: var(--text-dim);
-      transition: color .2s; cursor: default;
-      white-space: nowrap;
-    }
-    .proof-name:hover { color: var(--text-mid); }
-
     /* ── HOW IT WORKS ─────────────────────────────── */
     .section-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -293,34 +266,6 @@
       font-size: 1rem; color: var(--text-mid); line-height: 1.7;
       max-width: 560px; margin-bottom: 60px;
     }
-
-    /* ── STATS BAND ───────────────────────────────── */
-    .stats-band {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      gap: 1px; background: var(--border);
-      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .stat-item {
-      background: var(--bg-dark); padding: 48px 32px;
-      text-align: center; transition: background .2s;
-    }
-    .stat-item:hover { background: var(--bg-card); }
-    .stat-num {
-      font-size: 2.8rem; font-weight: 900; letter-spacing: -.04em;
-      margin-bottom: 8px; line-height: 1;
-    }
-    .stat-num.blue {
-      background: linear-gradient(135deg, var(--blue-bright), var(--blue-glow));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .stat-num.gold {
-      background: linear-gradient(135deg, var(--accent-gold), var(--accent-amber));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .stat-label { font-size: .82rem; color: var(--text-mid); line-height: 1.4; }
 
     /* ── FOR ARTISTS / FOR FANS ───────────────────── */
     .split-section {
@@ -451,12 +396,9 @@
       .artist-credit-pill { left: 16px; bottom: 16px; }
       section { padding: 60px 24px; }
       .split-section { grid-template-columns: 1fr; }
-      .stats-band { grid-template-columns: 1fr 1fr; }
       .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
       .nav { padding: 0 24px; }
       .nav-links { display: none; }
-      .proof-inner { flex-direction: column; gap: 20px; }
-      .proof-names { gap: 24px; }
     }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -518,41 +460,6 @@
       </div>
     </div>
     <div class="artist-credit-pill" id="artistCreditPill"></div>
-  </div>
-
-  <!-- ── SOCIAL PROOF BAR ──────────────────────────── -->
-  <div class="proof-bar">
-    <div class="proof-inner">
-      <div class="proof-label">Artists on platform</div>
-      <div class="proof-names">
-        <div class="proof-name">MIYAVI</div>
-        <div class="proof-name">BangChan</div>
-        <div class="proof-name">Doechii</div>
-        <div class="proof-name">Kendrick Lamar</div>
-        <div class="proof-name">Sabrina Carpenter</div>
-        <div class="proof-name">Dead Boyz</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── STATS BAND ────────────────────────────────── -->
-  <div class="stats-band fade-up">
-    <div class="stat-item">
-      <div class="stat-num gold">$80K+</div>
-      <div class="stat-label">Earned by MIYAVI's<br>archive alone</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num blue">5,000+</div>
-      <div class="stat-label">Content files<br>in MIYAVI's archive</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num blue">3</div>
-      <div class="stat-label">Monetization tiers<br>Free · Sub · Premium</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num gold">∞</div>
-      <div class="stat-label">Content lives forever<br>on the blockchain</div>
-    </div>
   </div>
 
   <!-- ── FOR ARTISTS / FOR FANS ────────────────────── -->
