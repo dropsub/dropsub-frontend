@@ -88,6 +88,7 @@
       background: linear-gradient(135deg, #2979ff, #7c4dff);
       display: flex; align-items: center; justify-content: center;
       font-size: .7rem; font-weight: 700; cursor: pointer;
+      flex-shrink: 0; min-width: 30px;
     }
     .notif-btn {
       display: flex; align-items: center; justify-content: center;
@@ -607,6 +608,7 @@
       .topnav { padding: 0 12px; }
       .search-bar { display: none; }
       .nav-link, .notif-btn, .user-avatar { min-height: 44px; }
+      .user-avatar { width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; }
 
       /* App shell: stack vertically */
       .app-shell { flex-direction: column; overflow: visible; height: auto; }
@@ -1478,11 +1480,12 @@
     document.getElementById('featuredTags').innerHTML     = '';
     document.getElementById('fileTableBody').innerHTML    =
       '<tr><td colspan="7" style="text-align:center;padding:60px 24px;">' +
-        '<div style="font-size:2.4rem;margin-bottom:14px;">🎵</div>' +
+        '<div style="margin-bottom:14px;"><i data-lucide="music" style="width:48px;height:48px;color:#4B6BFB;opacity:0.5;"></i></div>' +
         '<div style="font-size:.9rem;font-weight:700;color:var(--text-mid);margin-bottom:8px;">No artists followed yet</div>' +
         '<div style="font-size:.78rem;color:var(--text-dim);margin-bottom:18px;">Follow artists on Discover to see their drops here</div>' +
         '<a href="dropsub-discover.html" style="background:linear-gradient(135deg,var(--blue-bright),#5a4dff);color:#fff;border-radius:16px;padding:8px 22px;font-size:.78rem;font-weight:700;text-decoration:none;display:inline-block;">Go to Discover</a>' +
       '</td></tr>';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function renderFollowedSidebar(following) {
