@@ -150,6 +150,17 @@
     /* ── TOAST ───────────────────────────────────── */
     #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); border: 1px solid var(--blue-bright); border-radius: 8px; padding: 9px 20px; font-size: .84rem; font-weight: 600; color: var(--text-white); z-index: 300; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; box-shadow: 0 6px 24px rgba(41,121,255,.2); }
     #toast.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .topnav { padding: 0 12px; }
+    .back-link, .btn-nav, .user-avatar { min-height: 44px; }
+    .artist-banner { height: 160px; }
+    .artist-header { padding: 0 16px; }
+    .artist-name { font-size: 1.3rem; }
+    .artist-bio, .social-row, .drops-section { padding-left: 16px; padding-right: 16px; }
+    .filter-bar { gap: 6px; }
+    .filter-select, .date-input { font-size: .75rem; padding: 7px 8px; }
+  }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>

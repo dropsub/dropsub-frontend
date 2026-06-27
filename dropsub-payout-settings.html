@@ -271,6 +271,40 @@
     .toast.success { border-color: var(--success); }
     .toast.error   { border-color: var(--error); }
 
+  .mob-nav-toggle {
+    display: none; background: none; border: none; cursor: pointer;
+    color: var(--text-mid); font-size: 1.3rem; padding: 0 4px;
+    min-height: 44px; min-width: 44px; align-items: center; justify-content: center;
+  }
+  .mob-nav-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.5); z-index: 99;
+  }
+  .mob-nav-overlay.open { display: block; }
+
+  @media (max-width: 768px) {
+    html, body { height: auto; overflow: auto; }
+    .mob-nav-toggle { display: flex; }
+    .topnav { padding: 0 12px; }
+    .nav-tabs { display: none; }
+    .user-avatar, .notif-btn { min-height: 44px; min-width: 44px; }
+    .upload-cta-bar { flex-direction: column; gap: 10px; padding: 12px 16px; }
+    .upload-cta-right { flex-direction: column; gap: 8px; width: 100%; }
+    .btn-cta-ghost, .btn-upload-now { justify-content: center; min-height: 44px; }
+    .app-shell { display: block; overflow: visible; }
+    .left-nav {
+      position: fixed; top: 0; left: -240px; height: 100vh;
+      width: 240px; z-index: 100; transition: left .25s; overflow-y: auto;
+    }
+    .left-nav.mob-open { left: 0; }
+    .main { overflow: visible; }
+    .content-scroll { overflow: visible; padding: 16px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .lower-grid { grid-template-columns: 1fr; }
+    #payoutsTableWrap { overflow-x: auto; }
+    .page-header { padding: 16px; }
+  }
+
     /* Page-level loading overlay */
     .page-loading { position: fixed; inset: 0; background: var(--bg-deepest); display: flex; align-items: center; justify-content: center; z-index: 300; transition: opacity .3s; }
     .page-loading.hidden { opacity: 0; pointer-events: none; }
@@ -291,13 +325,16 @@
 
 <div class="page-loading" id="pageLoading"><div class="loading-spinner"></div></div>
 
+<div class="mob-nav-overlay" id="payoutMobOverlay" onclick="dsPayoutCloseMobNav()"></div>
+
 <!-- ── TOP NAV ──────────────────────────────────── -->
 <div class="topnav">
   <div class="topnav-left">
     <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height: 32px; width: auto; vertical-align: middle;">
-  
+
 </a>
+    <button class="mob-nav-toggle" onclick="dsPayoutToggleMobNav()" aria-label="Menu">&#9776;</button>
     <div class="nav-tabs">
       <a class="nav-tab" href="dropsub-fan-dashboard.html">Following</a>
       <a class="nav-tab" href="dropsub-discover.html">Discover</a>
@@ -1107,6 +1144,15 @@
 
   fetchUserProfile();
   loadPayoutSettings();
+
+  function dsPayoutToggleMobNav() {
+    document.querySelector('.left-nav').classList.toggle('mob-open');
+    document.getElementById('payoutMobOverlay').classList.toggle('open');
+  }
+  function dsPayoutCloseMobNav() {
+    document.querySelector('.left-nav').classList.remove('mob-open');
+    document.getElementById('payoutMobOverlay').classList.remove('open');
+  }
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>

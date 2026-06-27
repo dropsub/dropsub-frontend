@@ -601,6 +601,60 @@
     .file-area::-webkit-scrollbar { width: 4px; }
     .file-area::-webkit-scrollbar-track { background: transparent; }
     .file-area::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+    @media (max-width: 768px) {
+      html, body { height: auto; overflow: auto; }
+
+      /* Top nav */
+      .topnav { padding: 0 12px; }
+      .search-bar { display: none; }
+      .nav-link, .notif-btn, .user-avatar { min-height: 44px; }
+
+      /* App shell: stack vertically */
+      .app-shell { flex-direction: column; overflow: visible; height: auto; }
+
+      /* Left sidebar → horizontal scrollable strip */
+      .sidebar-left {
+        width: 100%; height: auto; flex-direction: row;
+        overflow-x: auto; overflow-y: hidden;
+        padding: 8px 12px; border-right: none;
+        border-bottom: 1px solid var(--border); flex-shrink: 0;
+        gap: 4px;
+      }
+      .sidebar-left::-webkit-scrollbar { height: 0; width: 0; }
+      .artist-item { min-width: 68px; flex-shrink: 0; flex-direction: column; }
+      .sidebar-divider { width: 1px; height: 40px; background: var(--border); margin: 0 4px; }
+      .add-artist-btn { flex-shrink: 0; }
+
+      /* Main content: full width, allow scroll */
+      .main-content { flex: 1; overflow: visible; }
+
+      /* Right sidebar: hide */
+      .sidebar-right { display: none; }
+
+      /* Banner carousel: reduce height */
+      .featured-banner { height: 180px; }
+
+      /* Toolbar */
+      .toolbar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+      .toolbar-btn { flex: 1 1 auto; justify-content: center; min-height: 44px; }
+      .toolbar-spacer { display: none; }
+
+      /* Folder table: hide DATE, SIZE, FILES on mobile */
+      .file-table th:nth-child(4),
+      .file-table td:nth-child(4),
+      .file-table th:nth-child(5),
+      .file-table td:nth-child(5),
+      .file-table th:nth-child(6),
+      .file-table td:nth-child(6) { display: none; }
+
+      /* Prevent text overflow in table */
+      .file-name { max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .folder-teaser { display: none; }
+
+      /* Modals: full width */
+      .modal, .upload-modal { width: 94%; max-width: 94%; }
+    }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>

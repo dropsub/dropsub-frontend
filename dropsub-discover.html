@@ -348,6 +348,64 @@
       box-shadow: 0 6px 20px rgba(0,0,0,.4);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── MOBILE NAV TOGGLE ─── */
+    .mob-nav-toggle {
+      display: none; background: none; border: none;
+      color: var(--text-white); font-size: 1.25rem; cursor: pointer;
+      min-width: 44px; min-height: 44px;
+      align-items: center; justify-content: center;
+    }
+    .disc-mob-menu {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: rgba(8,15,28,.97); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column; z-index: 98; padding: 4px 0 8px;
+    }
+    .disc-mob-menu.open { display: flex; }
+    .disc-mob-link {
+      display: flex; align-items: center;
+      padding: 13px 20px; font-size: .9rem; font-weight: 500;
+      color: var(--text-light); text-decoration: none; min-height: 44px;
+      transition: background .15s;
+    }
+    .disc-mob-link:hover { background: var(--bg-hover); color: var(--text-white); }
+
+    @media (max-width: 768px) {
+      html, body { height: auto; }
+
+      /* Top nav: both fan and artist versions */
+      .topnav { padding: 0 12px; position: relative; }
+      .nav-links, .nav-tabs { display: none; }
+      .search-bar { display: none; }
+      .mob-nav-toggle { display: flex; }
+      .notif-btn, .user-avatar { min-height: 44px; }
+
+      /* Discover hero */
+      .discover-hero { padding: 20px 16px 16px; }
+      .hero-title { font-size: 1.3rem; }
+      .hero-search { max-width: 100%; }
+
+      /* Filter bar: horizontal scroll */
+      .filter-bar { padding: 10px 12px; flex-wrap: nowrap; overflow-x: auto; gap: 10px; }
+      .filter-bar::-webkit-scrollbar { height: 0; }
+      .filter-tabs { flex-wrap: nowrap; overflow-x: auto; }
+      .filter-tabs::-webkit-scrollbar { height: 0; }
+      .filter-tab { white-space: nowrap; flex-shrink: 0; min-height: 44px; display: flex; align-items: center; }
+      .filter-right { flex-shrink: 0; }
+
+      /* Content area */
+      .content-area { padding: 16px 14px 32px; }
+
+      /* Featured row: single column */
+      .featured-row { grid-template-columns: 1fr; gap: 12px; }
+
+      /* Artist grid: single column */
+      .artists-grid { grid-template-columns: 1fr; gap: 12px; }
+
+      /* Cards: touch-friendly */
+      .fc-btn, .ac-btn { min-height: 44px; }
+    }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -364,9 +422,10 @@
 <!-- ── FAN NAV (shown for fans) ──────────────────────────────── -->
 <nav class="topnav" id="fanNav" style="display:none;">
   <div class="topnav-left">
+    <button class="mob-nav-toggle" onclick="dsDiscToggle('fanMobMenu')" aria-label="Menu">&#9776;</button>
     <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height: 32px; width: auto; vertical-align: middle;">
-  
+
 </a>
     <nav class="nav-links">
       <a class="nav-link" href="dropsub-fan-dashboard.html">Following</a>
@@ -392,14 +451,20 @@
       </div>
     </div>
   </div>
+  <div class="disc-mob-menu" id="fanMobMenu">
+    <a class="disc-mob-link" href="dropsub-fan-dashboard.html">Following</a>
+    <a class="disc-mob-link" href="dropsub-discover.html">Discover</a>
+    <a class="disc-mob-link" href="dropsub-account-settings.html">Settings</a>
+  </div>
 </nav>
 
 <!-- ── ARTIST NAV (shown for artists/managers) ───────────────── -->
 <div class="topnav" id="artistNav" style="display:none;">
   <div class="topnav-left">
+    <button class="mob-nav-toggle" onclick="dsDiscToggle('artistMobMenu')" aria-label="Menu">&#9776;</button>
     <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height: 32px; width: auto; vertical-align: middle;">
-  
+
 </a>
     <div class="nav-tabs">
       <a class="nav-tab" href="dropsub-fan-dashboard.html">Following</a>
@@ -422,6 +487,12 @@
         <div class="user-dropdown-item signout" onclick="dsLogout()"><i data-lucide="log-out"></i> Sign out</div>
       </div>
     </div>
+  </div>
+  <div class="disc-mob-menu" id="artistMobMenu">
+    <a class="disc-mob-link" href="dropsub-fan-dashboard.html">Following</a>
+    <a class="disc-mob-link" href="dropsub-discover.html">Discover</a>
+    <a class="disc-mob-link" href="dropsub-artist-dashboard.html">Dashboard</a>
+    <a class="disc-mob-link" href="dropsub-account-settings.html">Settings</a>
   </div>
 </div>
 
@@ -870,6 +941,19 @@
   fetchFeatured();
   fetchArtists(null);
   fetchFollowData();
+
+  function dsDiscToggle(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topnav')) {
+      ['fanMobMenu','artistMobMenu'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+      });
+    }
+  });
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>

@@ -634,6 +634,41 @@
     .nav-tab { padding: 5px 12px; border-radius: 6px; font-size: .82rem; font-weight: 500; color: var(--text-mid); cursor: pointer; transition: all .15s; text-decoration: none; }
     .nav-tab:hover { background: var(--bg-hover); color: var(--text-white); }
     .nav-tab.active { background: var(--bg-card); color: var(--text-white); }
+
+  .mob-hamburger {
+    display: none; background: none; border: none; cursor: pointer;
+    color: var(--text-mid); font-size: 1.3rem; padding: 0 4px;
+    min-height: 44px; min-width: 44px; align-items: center; justify-content: center;
+  }
+  .mob-menu {
+    display: none; position: absolute; top: 100%; left: 0; width: 100%;
+    background: var(--bg-panel); border-bottom: 1px solid var(--border);
+    flex-direction: column; z-index: 200;
+  }
+  .mob-menu.open { display: flex; }
+  .mob-menu-link {
+    display: flex; align-items: center; padding: 14px 16px;
+    font-size: .88rem; font-weight: 600; color: var(--text-mid);
+    text-decoration: none; border-bottom: 1px solid var(--border);
+    min-height: 44px; transition: background .12s;
+  }
+  .mob-menu-link:hover { background: var(--bg-hover); color: var(--text-white); }
+
+  @media (max-width: 768px) {
+    html, body { height: auto; overflow: auto; }
+    .topnav { padding: 0 12px; position: relative; }
+    .nav-links, .nav-tabs { display: none; }
+    .search-bar { display: none; }
+    .mob-hamburger { display: flex; }
+    .notif-btn, .user-avatar, .nav-avatar { min-height: 44px; min-width: 44px; }
+    .app-shell { display: block; overflow: visible; }
+    .main-content { overflow: visible; }
+    .filter-tabs { overflow-x: auto; white-space: nowrap; flex-wrap: nowrap; padding-bottom: 4px; }
+    .filter-tabs::-webkit-scrollbar { height: 0; }
+    .filter-tab { flex-shrink: 0; }
+    .file-grid { grid-template-columns: repeat(2, 1fr); }
+    .folder-header { padding: 12px 16px; }
+  }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="dropsub-auth.js"></script>
@@ -650,8 +685,9 @@
   <div class="topnav-left">
     <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height: 32px; width: auto; vertical-align: middle;">
-  
+
 </a>
+    <button class="mob-hamburger" onclick="dsCvToggle('fanMobMenu')" aria-label="Menu">&#9776;</button>
     <nav class="nav-links">
       <a class="nav-link" href="dropsub-fan-dashboard.html">Following</a>
       <a class="nav-link" href="dropsub-discover.html">Discover</a>
@@ -676,6 +712,11 @@
       </div>
     </div>
   </div>
+  <div class="mob-menu" id="fanMobMenu">
+    <a class="mob-menu-link" href="dropsub-fan-dashboard.html">Following</a>
+    <a class="mob-menu-link" href="dropsub-discover.html">Discover</a>
+    <a class="mob-menu-link" href="dropsub-account-settings.html">Settings</a>
+  </div>
 </nav>
 
 <!-- ══ ARTIST NAV ══════════════════════════════════════════════ -->
@@ -683,8 +724,9 @@
   <div class="topnav-left">
     <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height: 32px; width: auto; vertical-align: middle;">
-  
+
 </a>
+    <button class="mob-hamburger" onclick="dsCvToggle('artistMobMenu')" aria-label="Menu">&#9776;</button>
     <div class="nav-tabs">
       <a class="nav-tab" href="dropsub-fan-dashboard.html">Following</a>
       <a class="nav-tab" href="dropsub-discover.html">Discover</a>
@@ -706,6 +748,12 @@
         <div class="user-dropdown-item signout" onclick="dsLogout()"><i data-lucide="log-out"></i> Sign out</div>
       </div>
     </div>
+  </div>
+  <div class="mob-menu" id="artistMobMenu">
+    <a class="mob-menu-link" href="dropsub-fan-dashboard.html">Following</a>
+    <a class="mob-menu-link" href="dropsub-discover.html">Discover</a>
+    <a class="mob-menu-link" href="dropsub-artist-dashboard.html">Dashboard</a>
+    <a class="mob-menu-link" href="dropsub-account-settings.html">Settings</a>
   </div>
 </div>
 
@@ -1812,6 +1860,19 @@
   // ── Init ─────────────────────────────────────────────────────
   fetchUserProfile();
   loadFolder();
+
+  function dsCvToggle(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topnav')) {
+      ['fanMobMenu', 'artistMobMenu'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('open');
+      });
+    }
+  });
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>

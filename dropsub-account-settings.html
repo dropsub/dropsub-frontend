@@ -364,6 +364,40 @@
       box-shadow: 0 8px 32px rgba(41,121,255,.25); pointer-events: none;
     }
     #toast.show { opacity: 1; }
+
+  .mob-hamburger {
+    display: none; background: none; border: none; cursor: pointer;
+    color: var(--text-mid); font-size: 1.3rem; padding: 0 4px;
+    min-height: 44px; min-width: 44px; align-items: center; justify-content: center;
+  }
+  .mob-menu {
+    display: none; position: absolute; top: 100%; left: 0; width: 100%;
+    background: var(--bg-panel); border-bottom: 1px solid var(--border);
+    flex-direction: column; z-index: 200;
+  }
+  .mob-menu.open { display: flex; }
+  .mob-menu-link {
+    display: block; padding: 14px 16px; font-size: .88rem; font-weight: 600;
+    color: var(--text-mid); text-decoration: none;
+    border-bottom: 1px solid var(--border); min-height: 44px;
+    display: flex; align-items: center;
+    transition: background .12s;
+  }
+  .mob-menu-link:hover { background: var(--bg-hover); color: var(--text-white); }
+
+  @media (max-width: 768px) {
+    html, body { height: auto; overflow: auto; }
+    .topnav { padding: 0 12px; position: relative; }
+    .nav-links { display: none; }
+    .search-bar { display: none; }
+    .mob-hamburger { display: flex; }
+    .notif-btn, .user-avatar { min-height: 44px; min-width: 44px; }
+    .app-shell { display: block; overflow: visible; }
+    .main-content { overflow: visible; }
+    .scroll-area { overflow: visible; padding: 16px; }
+    .field-row { grid-template-columns: 1fr; }
+    .page-header { padding: 16px; }
+  }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -389,6 +423,7 @@
       <a class="nav-link" href="dropsub-discover.html">Discover</a>
       <a class="nav-link" href="dropsub-artist-dashboard.html">Dashboard</a>
     </nav>
+    <button class="mob-hamburger" onclick="dsAccToggle()" aria-label="Menu">&#9776;</button>
   </div>
   <div class="topnav-right">
     <div class="search-bar">
@@ -397,6 +432,11 @@
     </div>
     <div class="notif-btn"><i data-lucide="bell"></i><span class="notif-dot"></span></div>
     <div class="user-avatar" id="userAvatar">—</div>
+  </div>
+  <div class="mob-menu" id="accSettingsMobMenu">
+    <a class="mob-menu-link" href="dropsub-fan-dashboard.html">Following</a>
+    <a class="mob-menu-link" href="dropsub-discover.html">Discover</a>
+    <a class="mob-menu-link" href="dropsub-artist-dashboard.html">Dashboard</a>
   </div>
 </nav>
 
@@ -985,6 +1025,16 @@
 
   // ── Init ─────────────────────────────────────────────────────
   fetchUserProfile();
+
+  function dsAccToggle() {
+    document.getElementById('accSettingsMobMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topnav')) {
+      var m = document.getElementById('accSettingsMobMenu');
+      if (m) m.classList.remove('open');
+    }
+  });
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>

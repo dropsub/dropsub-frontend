@@ -400,6 +400,52 @@
       .nav { padding: 0 24px; }
       .nav-links { display: none; }
     }
+
+    /* ── HAMBURGER (hidden on desktop) ─── */
+    .mob-hamburger {
+      display: none; background: none; border: none;
+      color: var(--text-white); font-size: 1.35rem; cursor: pointer;
+      min-width: 44px; min-height: 44px;
+      align-items: center; justify-content: center; padding: 0 4px;
+    }
+    .mob-menu {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: rgba(8,15,28,.97); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column; z-index: 98; padding: 4px 0 8px;
+    }
+    .mob-menu.open { display: flex; }
+    .mob-link {
+      display: flex; align-items: center;
+      padding: 13px 24px; font-size: .9rem; font-weight: 500;
+      color: var(--text-light); text-decoration: none; min-height: 44px;
+      transition: background .15s;
+    }
+    .mob-link:hover { background: var(--bg-hover); color: var(--text-white); }
+
+    @media (max-width: 768px) {
+      /* Nav */
+      .nav { padding: 0 16px; }
+      .nav-center { display: none; }
+      .nav-right .btn-ghost { display: none; }
+      .mob-hamburger { display: flex; }
+
+      /* Hero */
+      .hero-fs-headline { font-size: 2.25rem; letter-spacing: -.03em; }
+      .hero-fs-body { font-size: .92rem; }
+      .hero-fs-cta { flex-direction: column; align-items: stretch; padding: 0 8px; }
+      .btn-hero, .btn-hero-white, .btn-hero-ghost { width: 100%; justify-content: center; }
+
+      /* Split cards */
+      .split-section { grid-template-columns: 1fr; }
+
+      /* Footer */
+      .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+      footer { padding: 40px 20px 28px; }
+
+      /* Touch targets */
+      .nav-link, .btn-ghost, .btn-primary { min-height: 44px; display: inline-flex; align-items: center; }
+    }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -420,7 +466,7 @@
     <div class="nav-left">
       <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
   <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height: 32px; width: auto; vertical-align: middle;">
-  
+
 </a>
     </div>
     <div class="nav-center">
@@ -430,6 +476,12 @@
     <div class="nav-right">
       <a class="btn-ghost" href="dropsub-login.html">Sign In</a>
       <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+      <button class="mob-hamburger" onclick="dsLandingToggleMenu()" aria-label="Menu">&#9776;</button>
+    </div>
+    <div class="mob-menu" id="landingMobMenu">
+      <a class="mob-link" href="dropsub-artist-apply.html">For Artists</a>
+      <a class="mob-link" href="dropsub-fan-info.html">For Fans</a>
+      <a class="mob-link" href="dropsub-login.html">Sign In</a>
     </div>
   </nav>
 
@@ -632,6 +684,13 @@
     }
   }
   loadFeaturedHero();
+
+  function dsLandingToggleMenu() {
+    document.getElementById('landingMobMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav')) document.getElementById('landingMobMenu').classList.remove('open');
+  });
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
