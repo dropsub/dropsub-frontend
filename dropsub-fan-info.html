@@ -278,6 +278,36 @@
       .nav { padding: 0 24px; }
       .benefits-card { padding: 32px 24px; }
     }
+
+    /* ── MOBILE NAV ─────────────────────────────── */
+    .mob-hamburger {
+      display: none; background: none; border: none;
+      color: var(--text-white); font-size: 1.5rem; cursor: pointer;
+      min-width: 44px; min-height: 44px;
+      align-items: center; justify-content: center; padding: 0 4px;
+    }
+    .mob-menu {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: rgba(8,15,28,.97); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column; z-index: 200; padding: 4px 0 8px;
+    }
+    .mob-menu.open { display: flex; }
+    .mob-link {
+      display: flex; align-items: center;
+      padding: 13px 24px; font-size: .9rem; font-weight: 500;
+      color: var(--text-light); text-decoration: none; min-height: 44px;
+      transition: background .15s;
+    }
+    .mob-link:hover { background: var(--bg-hover); color: var(--text-white); }
+
+    @media (max-width: 768px) {
+      .nav { padding: 0 16px; }
+      .nav-center { display: none; }
+      .nav-right .btn-ghost { display: none; }
+      .nav-right .btn-primary { padding: 8px 14px; font-size: 13px; }
+      .mob-hamburger { display: flex; }
+    }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -307,6 +337,13 @@
     <div class="nav-right">
       <a class="btn-ghost" href="dropsub-login.html">Sign In</a>
       <a class="btn-primary" href="dropsub-signup.html">Get started free</a>
+      <button class="mob-hamburger" onclick="dsFanInfoToggleMenu()" aria-label="Menu">&#9776;</button>
+    </div>
+    <div class="mob-menu" id="fanInfoMobMenu">
+      <a class="mob-link" href="dropsub-artist-apply.html">For Artists</a>
+      <a class="mob-link" href="dropsub-fan-info.html">For Fans</a>
+      <a class="mob-link" href="dropsub-login.html">Sign In</a>
+      <a class="mob-link" href="dropsub-signup.html">Get started free</a>
     </div>
   </nav>
 
@@ -473,6 +510,13 @@
   window.addEventListener('scroll', () => {
     const nav = document.querySelector('.nav');
     nav.style.boxShadow = window.scrollY > 10 ? '0 4px 24px rgba(0,0,0,.4)' : 'none';
+  });
+
+  function dsFanInfoToggleMenu() {
+    document.getElementById('fanInfoMobMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav')) document.getElementById('fanInfoMobMenu').classList.remove('open');
   });
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>

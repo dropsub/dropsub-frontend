@@ -211,6 +211,48 @@
     .page-loading.hidden { opacity: 0; pointer-events: none; }
     .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--blue-bright); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MOBILE NAV ─────────────────────────────────── */
+    .mob-nav-toggle {
+      display: none; background: none; border: none; cursor: pointer;
+      color: var(--text-white); font-size: 1.3rem; padding: 0 4px;
+      min-height: 44px; min-width: 44px; align-items: center; justify-content: center;
+    }
+    .mob-nav-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 199;
+    }
+    .mob-nav-overlay.open { display: block; }
+
+    @media (max-width: 768px) {
+      html, body { height: auto; overflow: auto; }
+
+      .topnav { padding: 0 12px; }
+      .nav-tabs { display: none; }
+      .mob-nav-toggle { display: flex; }
+      .notif-btn { background: none; border: none; border-radius: 0; }
+
+      .upload-cta-bar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+      .upload-cta-right { width: 100%; display: flex; gap: 8px; }
+      .btn-cta-ghost, .btn-upload-now { flex: 1; justify-content: center; min-height: 44px; }
+
+      .app-shell { flex-direction: column; overflow: visible; height: auto; }
+
+      .left-nav {
+        position: fixed; top: 0; left: -240px; height: 100vh;
+        width: 240px; z-index: 200; transition: left .25s ease; overflow-y: auto;
+      }
+      .left-nav.mob-open { left: 0; }
+
+      .main { flex: 1; overflow: visible; }
+      .content-scroll { overflow: visible; padding: 14px; }
+
+      #teamTableWrap { overflow-x: auto; }
+
+      .form-row-2 { grid-template-columns: 1fr; }
+      .btn-invite { width: 100%; justify-content: center; min-height: 44px; }
+
+      .capacity-bar-wrap { flex-wrap: wrap; }
+    }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -224,9 +266,13 @@
 
 <div class="page-loading" id="pageLoading"><div class="loading-spinner"></div></div>
 
+<!-- Mobile nav overlay -->
+<div class="mob-nav-overlay" id="teamMobOverlay" onclick="dsTeamCloseMobNav()"></div>
+
 <!-- ── TOP NAV ─────────────────────────────────────── -->
 <div class="topnav">
   <div class="topnav-left">
+    <button class="mob-nav-toggle" onclick="dsTeamToggleMobNav()" aria-label="Menu">&#9776;</button>
     <a class="logo" href="dropsub-landing.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
       <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub-icon.png" alt="DropSub" style="height:28px; width:auto;">
       <span style="font-size:18px; font-weight:500; color:#fff; letter-spacing:-0.3px;">Drop<span style="color:#2979ff;">Sub</span></span>
@@ -759,6 +805,15 @@
 
   // ── Init ────────────────────────────────────────────────────────
   fetchUserProfile();
+
+  function dsTeamToggleMobNav() {
+    document.querySelector('.left-nav').classList.toggle('mob-open');
+    document.getElementById('teamMobOverlay').classList.toggle('open');
+  }
+  function dsTeamCloseMobNav() {
+    document.querySelector('.left-nav').classList.remove('mob-open');
+    document.getElementById('teamMobOverlay').classList.remove('open');
+  }
 </script>
 <script>document.addEventListener('DOMContentLoaded', function() { if (typeof lucide !== 'undefined') lucide.createIcons(); });</script>
 </body>
