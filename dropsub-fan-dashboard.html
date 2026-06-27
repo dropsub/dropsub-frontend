@@ -574,14 +574,18 @@
     @keyframes dropsFlash { 0%,100% { background: transparent; } 50% { background: rgba(41,121,255,.06); } }
     #fanDropsArea.drops-flash { animation: dropsFlash .7s ease-out; }
 
-    /* ── STATUS BAR ──────────────────────────────────── */
-    .status-bar {
-      height: 28px; background: var(--bg-panel);
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center; padding: 0 16px; gap: 16px; flex-shrink: 0;
+    /* ── SKELETON LOADER ─────────────────────────────── */
+    .ds-skel {
+      display: inline-block; width: 28px; height: 12px;
+      background: linear-gradient(90deg, var(--bg-hover) 25%, var(--border-bright) 50%, var(--bg-hover) 75%);
+      background-size: 200% 100%;
+      border-radius: 4px; animation: dsSkelShimmer 1.4s infinite;
+      vertical-align: middle;
     }
-    .status-item { font-size: .68rem; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
-    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; }
+    @keyframes dsSkelShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
 
     /* ── TOAST ───────────────────────────────────────── */
     #toast {
@@ -724,7 +728,7 @@
   <aside class="sidebar-right">
 
     <!-- Also Viewing -->
-    <div class="rs-section">
+    <div class="rs-section" style="display:none;">
       <div class="rs-label"><span class="dot"></span>ALSO VIEWING</div>
       <div class="also-viewing-avatars">
         <div class="av-avatar a1">JK</div>
@@ -759,25 +763,22 @@
       <div class="rec-grid" id="recGrid"></div>
     </div>
 
-    <!-- Storage info -->
-    <div class="rs-section">
-      <div class="rs-label">YOUR STORAGE</div>
-      <div style="font-size:.72rem; color:var(--text-mid); margin-bottom:6px;">12.4 GB of 50 GB used</div>
-      <div style="background:var(--bg-card); border-radius:4px; height:5px; overflow:hidden;">
-        <div style="background:linear-gradient(90deg,var(--blue-bright),#7c4dff); width:25%; height:100%; border-radius:4px;"></div>
+    <!-- Fan stats widget -->
+    <div class="rs-section" id="fanStatsWidget">
+      <div class="rs-label">YOUR STATS</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.72rem;color:var(--text-mid);">Artists Following</span>
+          <span style="font-size:.88rem;font-weight:700;color:var(--text-white);" id="statArtistsFollowing"><span class="ds-skel"></span></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.72rem;color:var(--text-mid);">Active Subscriptions</span>
+          <span style="font-size:.88rem;font-weight:700;color:var(--text-white);" id="statActiveSubscriptions"><span class="ds-skel"></span></span>
+        </div>
       </div>
-      <div style="font-size:.65rem; color:var(--text-dim); margin-top:6px; line-height:1.5;">Content archived to blockchain<br><i data-lucide="link"></i> Permanent storage enabled</div>
     </div>
 
   </aside>
-</div>
-
-<!-- ══ STATUS BAR ════════════════════════════════════════════ -->
-<div class="status-bar">
-  <div class="status-item"><span class="status-dot"></span> Connected</div>
-  <div class="status-item"><i data-lucide="link"></i> Blockchain sync: Active</div>
-  <div class="status-item"><i data-lucide="cloud"></i> Cloud backup: On</div>
-  <div class="status-item" style="margin-left:auto;">DropSub v1.0 — MVP</div>
 </div>
 
 <!-- ══ SUBSCRIPTION MODAL ════════════════════════════════════ -->
@@ -1418,6 +1419,8 @@
     var list = document.getElementById('followedArtistsList');
     if (!list) return;
     _followingData = following;
+    var followingEl = document.getElementById('statArtistsFollowing');
+    if (followingEl) followingEl.textContent = following.length;
     if (!following.length) {
       list.innerHTML =
         '<div style="padding:8px 6px;text-align:center;font-size:.6rem;color:var(--text-dim);line-height:1.5;">' +
@@ -1728,6 +1731,26 @@
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
+  // ── Fan stats widget ─────────────────────────────────────────
+  function loadFanStats() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) return;
+    fetch('https://api.dropsub.com/api/payments/subscriptions', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      var list = data && (Array.isArray(data) ? data : data.subscriptions || []);
+      var active = list.filter(function(s) { return s.status === 'active'; }).length;
+      var el = document.getElementById('statActiveSubscriptions');
+      if (el) el.textContent = active;
+    })
+    .catch(function() {
+      var el = document.getElementById('statActiveSubscriptions');
+      if (el) el.textContent = '—';
+    });
+  }
+
   // ── Init ────────────────────────────────────────────────────
   document.getElementById('artistTitle').textContent    = 'My Artists';
   document.getElementById('artistSubtitle').textContent = '';
@@ -1737,6 +1760,7 @@
     '<tr><td colspan="7" style="text-align:center;padding:36px 0;color:var(--text-dim);font-size:.82rem;">Loading your artists…</td></tr>';
   fetchUserProfile();
   fetchFollowing();
+  loadFanStats();
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
