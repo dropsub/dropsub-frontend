@@ -9,9 +9,9 @@
   // ── Inject styles ─────────────────────────────────────────────
   var _style = document.createElement('style');
   _style.textContent = [
-    // Base button — provides styling for pages that don't define .notif-btn
-    '.notif-btn{width:30px;height:30px;background:var(--bg-card,#132540);border:1px solid var(--border-bright,#1e3a5f);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;position:relative;color:var(--text-mid,#7a9cc8);flex-shrink:0;}',
-    '.notif-btn:hover{background:var(--bg-hover,rgba(41,121,255,.08));color:var(--text-white,#e8f0ff);}',
+    // Base button — bell icon only, no circle
+    '.notif-btn{display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;position:relative;color:var(--text-mid,#7a9cc8);flex-shrink:0;}',
+    '.notif-btn:hover{color:var(--text-white,#e8f0ff);}',
     // Wrapper (injected by script)
     '.notif-wrap{position:relative;display:inline-flex;}',
     // Red badge
