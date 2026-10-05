@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="https://dropsub-media.s3.amazonaws.com/brand/favicon-32.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DropSub — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #0a0f1e;
+      --bg-panel:      #0f1d35;
+      --bg-card:       #132040;
+      --bg-hover:      #1a2d50;
+      --bg-row:        #0e1a2e;
+      --accent:        #4B6BFB;
+      --accent-dim:    #1e3580;
+      --success:       #3fa06a;
+      --warning:       #e8921a;
+      --error:         #ff4f6a;
+      --text-white:    #ffffff;
+      --text-light:    #c8d8f0;
+      --text-mid:      #7a9cc8;
+      --text-dim:      #3d5a8a;
+      --border:        #1a2d50;
+      --border-bright: #253d6e;
+      --radius:        8px;
+    }
+
+    html, body { min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-white); }
+
+    /* ── TOP NAV ──────────────────────────────── */
+    .topnav {
+      height: 52px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 20px;
+      background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topnav-left { display: flex; align-items: center; gap: 16px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: .95rem; text-decoration: none; color: var(--text-white); }
+    .page-title { font-size: .85rem; font-weight: 600; color: var(--text-mid); padding-left: 16px; border-left: 1px solid var(--border); }
+    .topnav-right { display: flex; align-items: center; gap: 10px; }
+    .user-menu-wrap { position: relative; }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: linear-gradient(135deg, #4B6BFB, #7c4dff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; font-weight: 700; cursor: pointer;
+    }
+    .user-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--bg-panel); border: 1px solid var(--border-bright);
+      border-radius: 12px; min-width: 200px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 200; overflow: hidden;
+      animation: dropIn .15s cubic-bezier(.22,1,.36,1);
+    }
+    .user-dropdown.open { display: block; }
+    @keyframes dropIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+    .dd-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .dd-name  { font-size: .85rem; font-weight: 700; }
+    .dd-email { font-size: .72rem; color: var(--text-dim); margin-top: 2px; }
+    .dd-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; font-size: .82rem; color: var(--text-light);
+      cursor: pointer; transition: background .12s;
+    }
+    .dd-item:hover { background: var(--bg-hover); }
+    .dd-item.danger { color: var(--error); }
+    .dd-divider { height: 1px; background: var(--border); }
+
+    /* ── FILTER TABS ──────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 4px;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      background: var(--bg-panel);
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-tab {
+      flex-shrink: 0; padding: 5px 14px; border-radius: 20px;
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      color: var(--text-mid); background: transparent;
+      border: 1px solid transparent; transition: all .15s; white-space: nowrap;
+    }
+    .filter-tab:hover { background: var(--bg-hover); color: var(--text-light); }
+    .filter-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .count-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 18px; height: 18px; padding: 0 5px;
+      background: rgba(255,255,255,.12); border-radius: 9px;
+      font-size: .68rem; font-weight: 700; margin-left: 5px;
+    }
+    .filter-tab.active .count-badge { background: rgba(255,255,255,.25); }
+
+    /* ── MAIN LAYOUT ──────────────────────────── */
+    .main-wrap {
+      display: flex; height: calc(100vh - 52px - 49px);
+    }
+
+    /* ── APPLICATIONS LIST ────────────────────── */
+    .list-pane {
+      flex: 1; overflow-y: auto; min-width: 0;
+    }
+    .list-pane::-webkit-scrollbar { width: 4px; }
+    .list-pane::-webkit-scrollbar-track { background: transparent; }
+    .list-pane::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Table layout (desktop) */
+    .app-table { width: 100%; border-collapse: collapse; }
+    .app-table thead { position: sticky; top: 0; z-index: 10; }
+    .app-table th {
+      text-align: left; padding: 10px 16px;
+      font-size: .7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--text-dim);
+      background: var(--bg); border-bottom: 1px solid var(--border);
+    }
+    .app-table td {
+      padding: 12px 16px; font-size: .82rem; color: var(--text-light);
+      border-bottom: 1px solid var(--border); vertical-align: middle;
+    }
+    .app-row { cursor: pointer; transition: background .1s; }
+    .app-row:hover { background: var(--bg-row); }
+    .app-row.selected { background: var(--accent-dim); }
+    .app-name { font-weight: 600; color: var(--text-white); }
+    .app-email { font-size: .75rem; color: var(--text-mid); margin-top: 1px; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px 9px; border-radius: 12px; font-size: .72rem; font-weight: 600;
+    }
+    .status-badge.pending  { background: rgba(232,146,26,.15); color: #f5a623; }
+    .status-badge.approved { background: rgba(63,160,106,.15); color: #4cc98b; }
+    .status-badge.rejected { background: rgba(255,79,106,.15); color: #ff4f6a; }
+
+    /* Card layout (mobile) */
+    .app-cards { display: none; padding: 12px; }
+    .app-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+      cursor: pointer; transition: border-color .15s;
+    }
+    .app-card:hover { border-color: var(--border-bright); }
+    .app-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .card-name { font-weight: 700; font-size: .88rem; }
+    .card-meta { font-size: .74rem; color: var(--text-mid); margin-top: 3px; }
+    .card-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .card-date { font-size: .72rem; color: var(--text-dim); }
+
+    /* Empty/loading states */
+    .list-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 20px; color: var(--text-dim); gap: 12px; font-size: .85rem;
+    }
+    .list-empty i { opacity: .4; }
+    .spinner {
+      width: 24px; height: 24px; border: 2px solid var(--border);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Pagination */
+    .pagination {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 16px; border-top: 1px solid var(--border);
+    }
+    .page-btn {
+      padding: 5px 12px; border-radius: 6px; font-size: .78rem; font-weight: 500;
+      background: var(--bg-card); color: var(--text-mid); border: 1px solid var(--border);
+      cursor: pointer; transition: all .12s;
+    }
+    .page-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-white); }
+    .page-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .page-info { font-size: .78rem; color: var(--text-dim); }
+
+    /* ── DETAIL PANEL ─────────────────────────── */
+    .detail-pane {
+      width: 420px; flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      background: var(--bg-panel);
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+    .detail-pane::-webkit-scrollbar { width: 4px; }
+    .detail-pane::-webkit-scrollbar-track { background: transparent; }
+    .detail-pane::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .detail-pane.hidden { display: none; }
+    .detail-placeholder {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--text-dim); gap: 10px; font-size: .83rem;
+    }
+    .detail-placeholder i { opacity: .3; }
+    .detail-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--bg-panel); z-index: 5;
+    }
+    .detail-back {
+      display: none; padding: 4px 8px; border-radius: 6px;
+      background: var(--bg-hover); cursor: pointer; color: var(--text-mid);
+      transition: color .12s;
+    }
+    .detail-back:hover { color: var(--text-white); }
+    .detail-title { font-size: .95rem; font-weight: 700; flex: 1; }
+    .detail-body { padding: 20px; flex: 1; }
+    .field-group { margin-bottom: 16px; }
+    .field-label { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-bottom: 4px; }
+    .field-value { font-size: .83rem; color: var(--text-light); word-break: break-all; }
+    .field-value a { color: var(--accent); text-decoration: none; }
+    .field-value a:hover { text-decoration: underline; }
+    .field-value.large { font-size: .85rem; line-height: 1.6; }
+    .field-value.none { color: var(--text-dim); font-style: italic; }
+    .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .detail-divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* Action area */
+    .action-area { padding: 0 20px 20px; }
+    .note-field {
+      width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; color: var(--text-light);
+      font-family: 'Inter', sans-serif; font-size: .82rem; resize: vertical;
+      min-height: 72px; margin-bottom: 12px;
+      transition: border-color .15s;
+    }
+    .note-field:focus { outline: none; border-color: var(--border-bright); }
+    .note-field::placeholder { color: var(--text-dim); }
+    .btn-row { display: flex; gap: 8px; }
+    .btn-approve, .btn-reject {
+      flex: 1; padding: 9px 14px; border-radius: 8px;
+      font-size: .82rem; font-weight: 700; cursor: pointer;
+      border: none; transition: opacity .15s;
+    }
+    .btn-approve { background: var(--success); color: #fff; }
+    .btn-reject  { background: var(--error); color: #fff; }
+    .btn-approve:hover, .btn-reject:hover { opacity: .85; }
+    .btn-approve:disabled, .btn-reject:disabled { opacity: .4; cursor: not-allowed; }
+    .action-status {
+      display: none; align-items: center; gap: 8px;
+      font-size: .8rem; padding: 8px 0;
+    }
+    .action-status.show { display: flex; }
+    .action-status.ok   { color: var(--success); }
+    .action-status.err  { color: var(--error); }
+
+    /* Invite code display */
+    .invite-box {
+      display: none; background: rgba(75,107,251,.08);
+      border: 1px solid rgba(75,107,251,.3); border-radius: 10px;
+      padding: 16px; margin-top: 16px;
+    }
+    .invite-box.show { display: block; }
+    .invite-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-bottom: 8px; }
+    .invite-code-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .invite-code {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px; font-family: monospace;
+      font-size: .82rem; color: var(--text-white); word-break: break-all;
+    }
+    .btn-copy {
+      flex-shrink: 0; padding: 6px 10px; border-radius: 6px;
+      background: var(--bg-hover); border: 1px solid var(--border);
+      color: var(--text-light); font-size: .75rem; font-weight: 600;
+      cursor: pointer; transition: all .12s; white-space: nowrap;
+    }
+    .btn-copy:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .invite-link-row { display: flex; align-items: center; gap: 8px; }
+    .invite-link {
+      flex: 1; font-size: .73rem; color: var(--accent);
+      word-break: break-all; cursor: pointer;
+      text-decoration: none;
+    }
+    .invite-link:hover { text-decoration: underline; }
+
+    /* Already-reviewed banner */
+    .reviewed-banner {
+      display: none; align-items: center; gap: 8px;
+      padding: 10px 12px; border-radius: 8px; font-size: .8rem;
+      margin-bottom: 12px;
+    }
+    .reviewed-banner.show { display: flex; }
+    .reviewed-banner.approved { background: rgba(63,160,106,.12); color: #4cc98b; }
+    .reviewed-banner.rejected { background: rgba(255,79,106,.12); color: #ff4f6a; }
+
+    /* ── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 768px) {
+      .main-wrap { height: auto; flex-direction: column; }
+      .list-pane { height: auto; overflow-y: visible; }
+      .app-table-wrap { display: none; }
+      .app-cards { display: block; }
+      .detail-pane {
+        width: 100%; border-left: none; border-top: 1px solid var(--border);
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 150; transform: translateX(100%);
+        transition: transform .25s cubic-bezier(.22,1,.36,1);
+      }
+      .detail-pane.open { transform: translateX(0); }
+      .detail-pane.hidden { transform: translateX(100%); display: flex; }
+      .detail-back { display: flex; align-items: center; gap: 4px; }
+      .fields-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<script src="dropsub-auth.js"></script>
+<script>
+  (function() {
+    var token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    if (!token) { window.location.replace('dropsub-login.html'); }
+  })();
+</script>
+
+<!-- ── TOP NAV ──────────────────────────────── -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <a class="logo" href="dropsub-landing.html">
+      <img src="https://dropsub-media.s3.amazonaws.com/brand/dropsub_logo_blue.png" alt="DropSub" style="height:28px;width:auto;">
+    </a>
+    <span class="page-title">Artist Applications</span>
+  </div>
+  <div class="topnav-right">
+    <div class="user-menu-wrap">
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu(event)">—</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="dd-header">
+          <div class="dd-name"  id="ddName">—</div>
+          <div class="dd-email" id="ddEmail">—</div>
+        </div>
+        <div class="dd-item" onclick="window.location.href='dropsub-account-settings.html'">
+          <i data-lucide="settings" style="width:14px;height:14px;"></i> Settings
+        </div>
+        <div class="dd-divider"></div>
+        <div class="dd-item danger" onclick="dsLogout()">
+          <i data-lucide="log-out" style="width:14px;height:14px;"></i> Sign out
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── FILTER TABS ──────────────────────────── -->
+<div class="filter-bar" id="filterBar">
+  <div class="filter-tab active" data-status="" onclick="setFilter(this)">
+    All <span class="count-badge" id="cnt-all">—</span>
+  </div>
+  <div class="filter-tab" data-status="pending" onclick="setFilter(this)">
+    Pending <span class="count-badge" id="cnt-pending">—</span>
+  </div>
+  <div class="filter-tab" data-status="approved" onclick="setFilter(this)">
+    Approved <span class="count-badge" id="cnt-approved">—</span>
+  </div>
+  <div class="filter-tab" data-status="rejected" onclick="setFilter(this)">
+    Rejected <span class="count-badge" id="cnt-rejected">—</span>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ───────────────────────────── -->
+<div class="main-wrap">
+
+  <!-- Applications list -->
+  <div class="list-pane">
+
+    <!-- Table (desktop) -->
+    <div class="app-table-wrap">
+      <table class="app-table">
+        <thead>
+          <tr>
+            <th>Applicant</th>
+            <th>Artist name</th>
+            <th>Genre</th>
+            <th>Submitted</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="app-cards" id="cardList"></div>
+
+    <!-- Empty / loading states -->
+    <div class="list-empty" id="listEmpty" style="display:none;">
+      <div class="spinner" id="listSpinner"></div>
+      <span id="listEmptyMsg">Loading…</span>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display:none;">
+      <button class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Prev</button>
+      <span class="page-info" id="pageInfo"></span>
+      <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="detail-pane hidden" id="detailPane">
+
+    <!-- Placeholder (no selection) -->
+    <div class="detail-placeholder" id="detailPlaceholder">
+      <i data-lucide="mouse-pointer-2" style="width:32px;height:32px;"></i>
+      <span>Select an application to review</span>
+    </div>
+
+    <!-- Detail content (hidden until selection) -->
+    <div id="detailContent" style="display:none; flex:1; display:none; flex-direction:column;">
+
+      <div class="detail-header">
+        <div class="detail-back" onclick="closeDetail()">
+          <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back
+        </div>
+        <div class="detail-title" id="detailHeading">—</div>
+        <span id="detailStatus"></span>
+      </div>
+
+      <div class="detail-body">
+        <div class="fields-grid">
+          <div class="field-group">
+            <div class="field-label">Full name</div>
+            <div class="field-value" id="dFullName">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Artist name</div>
+            <div class="field-value" id="dArtistName">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Email</div>
+            <div class="field-value" id="dEmail">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Genre</div>
+            <div class="field-value" id="dGenre">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Followers</div>
+            <div class="field-value" id="dFollowers">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Content size</div>
+            <div class="field-value" id="dContentSize">—</div>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field-group">
+            <div class="field-label">Instagram</div>
+            <div class="field-value" id="dInstagram">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">TikTok</div>
+            <div class="field-value" id="dTiktok">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Spotify</div>
+            <div class="field-value" id="dSpotify">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Submitted</div>
+            <div class="field-value" id="dCreatedAt">—</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Why join</div>
+          <div class="field-value large" id="dWhyJoin">—</div>
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <!-- Reviewed-state banner (shown after action or if already reviewed) -->
+        <div class="reviewed-banner" id="reviewedBanner"></div>
+
+        <!-- Admin notes (shown if rejected with note) -->
+        <div class="field-group" id="adminNotesGroup" style="display:none;">
+          <div class="field-label">Admin note</div>
+          <div class="field-value" id="dAdminNotes">—</div>
+        </div>
+
+        <!-- Invite code display (shown after approve) -->
+        <div class="invite-box" id="inviteBox">
+          <div class="invite-label">Invite code</div>
+          <div class="invite-code-row">
+            <div class="invite-code" id="inviteCodeDisplay">—</div>
+            <button class="btn-copy" onclick="copyCode()">Copy</button>
+          </div>
+          <div class="invite-link-row">
+            <a class="invite-link" id="inviteLink" href="#" target="_blank">—</a>
+            <button class="btn-copy" onclick="copyLink()">Copy link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action area -->
+      <div class="action-area" id="actionArea">
+        <textarea class="note-field" id="noteField" placeholder="Internal note (optional — shown only on rejection)"></textarea>
+        <div class="btn-row">
+          <button class="btn-approve" id="btnApprove" onclick="approveApp()">
+            <i data-lucide="check" style="width:13px;height:13px;vertical-align:-2px;"></i> Approve
+          </button>
+          <button class="btn-reject" id="btnReject" onclick="rejectApp()">
+            <i data-lucide="x" style="width:13px;height:13px;vertical-align:-2px;"></i> Reject
+          </button>
+        </div>
+        <div class="action-status" id="actionStatus"></div>
+      </div>
+
+    </div><!-- /detailContent -->
+
+  </div><!-- /detailPane -->
+
+</div><!-- /main-wrap -->
+
+<script>
+  const API = 'https://api.dropsub.com';
+  const FRONTEND = 'https://dropsub.com';
+
+  let currentFilter = '';
+  let currentPage   = 1;
+  let totalPages    = 1;
+  let selectedId    = null;
+  let counts        = { '': 0, pending: 0, approved: 0, rejected: 0 };
+
+  // ── Auth guard + bootstrap ──────────────────────
+  async function init() {
+    const token = window.getAuthToken();
+    if (!token) { window.location.replace('dropsub-login.html'); return; }
+
+    try {
+      const res  = await fetch(`${API}/api/auth/me`, { headers: { Authorization: 'Bearer ' + token } });
+      if (!res.ok) { window.location.replace('dropsub-login.html'); return; }
+      const data = await res.json();
+      const user = data.user;
+
+      if (!user.is_admin) {
+        // Redirect non-admins to their appropriate dashboard
+        const dest = (user.role === 'fan') ? 'dropsub-fan-dashboard.html' : 'dropsub-artist-dashboard.html';
+        window.location.replace(dest);
+        return;
+      }
+
+      const initials = (user.full_name || user.email || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      document.getElementById('userAvatar').textContent = initials;
+      document.getElementById('ddName').textContent  = user.full_name || user.username || '—';
+      document.getElementById('ddEmail').textContent = user.email || '—';
+
+    } catch (e) {
+      window.location.replace('dropsub-login.html');
+      return;
+    }
+
+    await Promise.all([loadCounts(), loadApplications()]);
+    lucide.createIcons();
+  }
+
+  // ── Counts for all tabs ─────────────────────────
+  async function loadCounts() {
+    const token = window.getAuthToken();
+    const statuses = ['pending', 'approved', 'rejected'];
+    const results = await Promise.all(
+      statuses.map(s =>
+        fetch(`${API}/api/admin/applications?status=${s}&limit=1`, { headers: { Authorization: 'Bearer ' + token } })
+          .then(r => r.json()).catch(() => ({ total: 0 }))
+      )
+    );
+    let total = 0;
+    statuses.forEach((s, i) => {
+      counts[s] = results[i].total || 0;
+      total += counts[s];
+    });
+    counts[''] = total;
+
+    document.getElementById('cnt-all').textContent      = counts[''];
+    document.getElementById('cnt-pending').textContent  = counts['pending'];
+    document.getElementById('cnt-approved').textContent = counts['approved'];
+    document.getElementById('cnt-rejected').textContent = counts['rejected'];
+  }
+
+  // ── Load applications list ──────────────────────
+  async function loadApplications() {
+    const token = window.getAuthToken();
+    showListLoading(true);
+
+    const statusParam = currentFilter ? `&status=${currentFilter}` : '';
+    const url = `${API}/api/admin/applications?page=${currentPage}&limit=20${statusParam}`;
+
+    try {
+      const res  = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Failed');
+
+      totalPages = Math.max(1, Math.ceil((data.total || 0) / data.limit));
+      renderList(data.applications || []);
+      renderPagination(data.page, totalPages, data.total);
+    } catch (e) {
+      showListEmpty('Failed to load applications.');
+    } finally {
+      showListLoading(false);
+    }
+  }
+
+  function showListLoading(on) {
+    const el = document.getElementById('listEmpty');
+    const spinner = document.getElementById('listSpinner');
+    const msg = document.getElementById('listEmptyMsg');
+    if (on) {
+      el.style.display = 'flex';
+      spinner.style.display = 'block';
+      msg.textContent = 'Loading…';
+      document.getElementById('tableBody').innerHTML = '';
+      document.getElementById('cardList').innerHTML = '';
+    } else {
+      spinner.style.display = 'none';
+    }
+  }
+
+  function showListEmpty(msg) {
+    const el = document.getElementById('listEmpty');
+    el.style.display = 'flex';
+    document.getElementById('listSpinner').style.display = 'none';
+    document.getElementById('listEmptyMsg').textContent = msg || 'No applications found.';
+    document.getElementById('pagination').style.display = 'none';
+  }
+
+  function renderList(apps) {
+    const el = document.getElementById('listEmpty');
+    if (!apps.length) { showListEmpty('No applications found.'); return; }
+    el.style.display = 'none';
+
+    // Table rows
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = apps.map(a => `
+      <tr class="app-row${a.id === selectedId ? ' selected' : ''}" onclick="selectApp('${a.id}')">
+        <td>
+          <div class="app-name">${esc(a.full_name)}</div>
+          <div class="app-email">${esc(a.email)}</div>
+        </td>
+        <td>${esc(a.artist_name)}</td>
+        <td>${esc(a.genre || '—')}</td>
+        <td>${fmtDate(a.created_at)}</td>
+        <td><span class="status-badge ${a.status}">${a.status}</span></td>
+      </tr>
+    `).join('');
+
+    // Cards (mobile)
+    const cardList = document.getElementById('cardList');
+    cardList.innerHTML = apps.map(a => `
+      <div class="app-card${a.id === selectedId ? ' selected' : ''}" onclick="selectApp('${a.id}')">
+        <div class="card-top">
+          <div>
+            <div class="card-name">${esc(a.full_name)}</div>
+            <div class="card-meta">${esc(a.artist_name)}${a.genre ? ' · ' + esc(a.genre) : ''}</div>
+            <div class="card-meta">${esc(a.email)}</div>
+          </div>
+          <span class="status-badge ${a.status}">${a.status}</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-date">${fmtDate(a.created_at)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderPagination(page, total, count) {
+    const el = document.getElementById('pagination');
+    if (total <= 1) { el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    document.getElementById('pageInfo').textContent = `Page ${page} of ${total} (${count} total)`;
+    document.getElementById('prevBtn').disabled = (page <= 1);
+    document.getElementById('nextBtn').disabled = (page >= total);
+  }
+
+  // ── Filter tabs ─────────────────────────────────
+  function setFilter(el) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    currentFilter = el.dataset.status;
+    currentPage   = 1;
+    loadApplications();
+  }
+
+  // ── Pagination ──────────────────────────────────
+  function changePage(dir) {
+    const next = currentPage + dir;
+    if (next < 1 || next > totalPages) return;
+    currentPage = next;
+    loadApplications();
+  }
+
+  // ── Select application ──────────────────────────
+  async function selectApp(id) {
+    selectedId = id;
+    // Highlight row/card
+    document.querySelectorAll('.app-row').forEach(r => r.classList.toggle('selected', r.onclick.toString().includes(`'${id}'`)));
+    document.querySelectorAll('.app-card').forEach(c => c.classList.toggle('selected', c.onclick.toString().includes(`'${id}'`)));
+
+    openDetailPane();
+    showDetailLoading();
+
+    const token = window.getAuthToken();
+    try {
+      const res  = await fetch(`${API}/api/admin/applications/${id}`, { headers: { Authorization: 'Bearer ' + token } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      renderDetail(data.application);
+    } catch (e) {
+      showDetailError('Failed to load application.');
+    }
+  }
+
+  function openDetailPane() {
+    const pane = document.getElementById('detailPane');
+    pane.classList.remove('hidden');
+    pane.classList.add('open');
+  }
+
+  function closeDetail() {
+    const pane = document.getElementById('detailPane');
+    pane.classList.remove('open');
+    pane.classList.add('hidden');
+    selectedId = null;
+    document.querySelectorAll('.app-row, .app-card').forEach(r => r.classList.remove('selected'));
+  }
+
+  function showDetailLoading() {
+    document.getElementById('detailPlaceholder').style.display = 'flex';
+    document.getElementById('detailContent').style.display     = 'none';
+    document.getElementById('detailPlaceholder').innerHTML =
+      '<div class="spinner"></div><span>Loading…</span>';
+    lucide.createIcons();
+  }
+
+  function showDetailError(msg) {
+    document.getElementById('detailPlaceholder').style.display = 'flex';
+    document.getElementById('detailContent').style.display     = 'none';
+    document.getElementById('detailPlaceholder').innerHTML =
+      `<i data-lucide="alert-circle" style="width:24px;height:24px;"></i><span>${esc(msg)}</span>`;
+    lucide.createIcons();
+  }
+
+  function renderDetail(a) {
+    document.getElementById('detailPlaceholder').style.display = 'none';
+    document.getElementById('detailContent').style.display     = 'flex';
+
+    document.getElementById('detailHeading').textContent = a.artist_name;
+    document.getElementById('detailStatus').innerHTML    = `<span class="status-badge ${a.status}">${a.status}</span>`;
+
+    document.getElementById('dFullName').textContent    = a.full_name   || '—';
+    document.getElementById('dArtistName').textContent  = a.artist_name || '—';
+    document.getElementById('dEmail').textContent       = a.email       || '—';
+    document.getElementById('dGenre').textContent       = a.genre       || '—';
+    document.getElementById('dFollowers').textContent   = a.follower_count  || '—';
+    document.getElementById('dContentSize').textContent = a.content_size    || '—';
+    document.getElementById('dCreatedAt').textContent   = fmtDate(a.created_at);
+    document.getElementById('dWhyJoin').textContent     = a.why_join || '—';
+
+    setLink('dInstagram', a.instagram_url);
+    setLink('dTiktok',    a.tiktok_url);
+    setLink('dSpotify',   a.spotify_url);
+
+    // Reset action area
+    document.getElementById('noteField').value = '';
+    document.getElementById('actionStatus').className = 'action-status';
+    document.getElementById('actionStatus').innerHTML = '';
+    document.getElementById('inviteBox').classList.remove('show');
+    document.getElementById('reviewedBanner').className = 'reviewed-banner';
+    document.getElementById('reviewedBanner').innerHTML = '';
+    document.getElementById('adminNotesGroup').style.display = 'none';
+    document.getElementById('actionArea').style.display = 'block';
+
+    if (a.status === 'approved') {
+      const banner = document.getElementById('reviewedBanner');
+      banner.className = 'reviewed-banner approved show';
+      banner.innerHTML = '<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Approved' + (a.reviewed_at ? ' on ' + fmtDate(a.reviewed_at) : '');
+      document.getElementById('actionArea').style.display = 'none';
+      if (a.invite_code) {
+        showInviteBox(a.invite_code);
+      }
+    } else if (a.status === 'rejected') {
+      const banner = document.getElementById('reviewedBanner');
+      banner.className = 'reviewed-banner rejected show';
+      banner.innerHTML = '<i data-lucide="x-circle" style="width:14px;height:14px;"></i> Rejected' + (a.reviewed_at ? ' on ' + fmtDate(a.reviewed_at) : '');
+      document.getElementById('actionArea').style.display = 'none';
+      if (a.admin_notes) {
+        document.getElementById('adminNotesGroup').style.display = 'block';
+        document.getElementById('dAdminNotes').textContent = a.admin_notes;
+      }
+    }
+
+    lucide.createIcons();
+  }
+
+  function setLink(elId, url) {
+    const el = document.getElementById(elId);
+    if (url) {
+      el.innerHTML = `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>`;
+    } else {
+      el.textContent = '—';
+      el.className = 'field-value none';
+    }
+  }
+
+  function showInviteBox(code) {
+    const link = `${FRONTEND}/dropsub-signup.html?invite=${code}`;
+    document.getElementById('inviteCodeDisplay').textContent = code;
+    document.getElementById('inviteLink').textContent = link;
+    document.getElementById('inviteLink').href = link;
+    document.getElementById('inviteBox').classList.add('show');
+  }
+
+  // ── Approve ─────────────────────────────────────
+  async function approveApp() {
+    if (!selectedId) return;
+    setActionBtns(true);
+    const token = window.getAuthToken();
+    try {
+      const res  = await fetch(`${API}/api/admin/applications/${selectedId}/approve`, {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+
+      showInviteBox(data.invite_code);
+      document.getElementById('actionArea').style.display = 'none';
+      const banner = document.getElementById('reviewedBanner');
+      banner.className = 'reviewed-banner approved show';
+      banner.innerHTML = '<i data-lucide="check-circle" style="width:14px;height:14px;"></i> Approved';
+      lucide.createIcons();
+
+      // Refresh counts and row
+      await loadCounts();
+      await loadApplications();
+    } catch (e) {
+      showActionStatus('err', e.message || 'Approval failed.');
+    } finally {
+      setActionBtns(false);
+    }
+  }
+
+  // ── Reject ──────────────────────────────────────
+  async function rejectApp() {
+    if (!selectedId) return;
+    const note = document.getElementById('noteField').value.trim();
+    setActionBtns(true);
+    const token = window.getAuthToken();
+    try {
+      const res  = await fetch(`${API}/api/admin/applications/${selectedId}/reject`, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+
+      document.getElementById('actionArea').style.display = 'none';
+      const banner = document.getElementById('reviewedBanner');
+      banner.className = 'reviewed-banner rejected show';
+      banner.innerHTML = '<i data-lucide="x-circle" style="width:14px;height:14px;"></i> Rejected';
+      if (note) {
+        document.getElementById('adminNotesGroup').style.display = 'block';
+        document.getElementById('dAdminNotes').textContent = note;
+      }
+      lucide.createIcons();
+
+      await loadCounts();
+      await loadApplications();
+    } catch (e) {
+      showActionStatus('err', e.message || 'Rejection failed.');
+    } finally {
+      setActionBtns(false);
+    }
+  }
+
+  function setActionBtns(disabled) {
+    document.getElementById('btnApprove').disabled = disabled;
+    document.getElementById('btnReject').disabled  = disabled;
+  }
+
+  function showActionStatus(type, msg) {
+    const el = document.getElementById('actionStatus');
+    el.className = `action-status show ${type}`;
+    el.innerHTML = (type === 'ok' ? '✓ ' : '✕ ') + esc(msg);
+  }
+
+  // ── Copy helpers ────────────────────────────────
+  function copyCode() {
+    const code = document.getElementById('inviteCodeDisplay').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = document.querySelector('.invite-code-row .btn-copy');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    });
+  }
+
+  function copyLink() {
+    const link = document.getElementById('inviteLink').textContent;
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.querySelector('.invite-link-row .btn-copy');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    });
+  }
+
+  // ── User menu ───────────────────────────────────
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    document.getElementById('userDropdown').classList.remove('open');
+  });
+
+  // ── Utilities ───────────────────────────────────
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  init();
+</script>
+</body>
+</html>
