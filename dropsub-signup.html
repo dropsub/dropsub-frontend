@@ -1100,6 +1100,36 @@
   document.getElementById('termsCheck').addEventListener('change', function() {
     document.getElementById('termsError').classList.remove('show');
   });
+
+  // ── Invite code auto-fill from ?invite= URL param ────────────────────────
+  // Runs once on load. Sanitized via .value assignment (never innerHTML).
+  (function autoFillInvite() {
+    var raw = new URLSearchParams(window.location.search).get('invite');
+    if (!raw) return;
+
+    // Sanitize: trim, cap length, allow only alphanumeric characters
+    var code = raw.trim().slice(0, 64).replace(/[^a-zA-Z0-9]/g, '');
+    if (!code) return;
+
+    // Advance to the artist invite gate (same path as selecting Artist + Continue)
+    selectedType = 'artist';
+    document.getElementById('stepOne').style.display     = 'none';
+    document.getElementById('stepInvite').style.display  = 'block';
+    document.getElementById('inviteCodeBlock').style.display = 'block';
+    document.getElementById('inviteToggleLink').style.display = 'none';
+
+    // Mark step 1 as done in the progress indicator
+    var step1 = document.getElementById('step1-item');
+    if (step1) { step1.classList.remove('active'); step1.classList.add('done'); }
+    var circle = document.getElementById('step1-circle');
+    if (circle) circle.textContent = '✓';
+
+    // Pre-fill via value property — never innerHTML
+    document.getElementById('inviteCodeInput').value = code;
+
+    // Trigger the existing validation call
+    checkInviteCode();
+  }());
 </script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});</script>
 </body>
