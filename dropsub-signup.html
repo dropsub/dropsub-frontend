@@ -1015,6 +1015,8 @@
       const genreVal      = (document.getElementById('genre').value || '').trim();
       if (artistNameVal) signupBody.artist_name = artistNameVal;
       if (genreVal)      signupBody.genre = genreVal;
+      // Send the validated invite code for server-side enforcement
+      signupBody.invite_code = document.getElementById('inviteCodeInput').value.trim();
     }
 
     fetch('https://api.dropsub.com/api/auth/signup', {
@@ -1059,7 +1061,12 @@
             window.location.href = 'dropsub-login.html';
           }, 3000);
         } else {
-          const msg = (data && data.message) || 'Something went wrong. Please try again.';
+          var msg = 'Something went wrong. Please try again.';
+          if (data) {
+            if (data.error) msg = data.error;
+            else if (data.errors && data.errors.length) msg = data.errors[0].msg;
+            else if (data.message) msg = data.message;
+          }
           document.getElementById('errorBanner').classList.add('show');
           document.getElementById('errorMsg').textContent = msg;
         }
